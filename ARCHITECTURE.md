@@ -55,7 +55,7 @@ Remarques :
 | Base de données | Supabase Postgres, **nouveau projet Supabase dédié** |
 | Fichiers | Supabase Storage |
 | Authentification | Supabase Auth (email + mot de passe, Google) et son serveur OAuth 2.1 pour le MCP. Plan B : Better Auth |
-| MCP | SDK officiel `@modelcontextprotocol/sdk`, transport Streamable HTTP |
+| MCP | `mcp-handler` 2.x sur le SDK officiel `@modelcontextprotocol/server` 2.x, transport Streamable HTTP sans état |
 | Paiement | Stripe (Checkout, Customer Portal, webhooks) |
 | Cache, quotas, limites de débit | Redis |
 | Génération d'images | Gemini (comme l'app existante), derrière une interface pour pouvoir changer de fournisseur |
@@ -269,6 +269,8 @@ Plus tard, Claude pourra aussi utiliser des outils CRM (créer un client, ajoute
 ## 16. Points ouverts
 
 - Compatibilité du serveur OAuth 2.1 de Supabase Auth avec Claude (premier chantier).
+- La version 2026-07-28 de la spec MCP remplace le Dynamic Client Registration par les Client ID Metadata Documents (CIMD). Supabase gère le DCR ; vérifier son support des CIMD et ce que Claude utilise.
+- Audience des jetons (RFC 8707) : les jetons Supabase ont `aud = authenticated`, pas l'URL du MCP. Le MCP exige pour l'instant un `client_id` (jeton OAuth uniquement). Un Custom Access Token Hook pourra ajouter une audience dédiée.
 - Limites des connecteurs personnalisés sur le plan gratuit de Claude.
 - **Licence de GlowRise** : il est construit à partir du "Shopify Skeleton Theme", dont la licence mentionne la vente via le Shopify Theme Store. À faire vérifier par un juriste avant le lancement. Origine de Nostra à confirmer.
 - Calibrage des prix en crédits, à partir des coûts réels mesurés.
