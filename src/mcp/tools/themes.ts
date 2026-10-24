@@ -1,9 +1,10 @@
 import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
 import { getTheme, THEMES } from "@/modules/themes/catalog";
-import { readThemeGuide } from "@/modules/themes/files";
+import { readThemeGuide, readThemeScreenshots } from "@/modules/themes/files";
 import { prepareThemeInstall } from "@/modules/deliveries/service";
 import { dbErrorResult, errorResult, mcpContext, NOT_AUTHENTICATED, resolveAgency, textResult } from "../context";
+import { MCP_APP_MIME_TYPE, THEME_CATALOG_HTML, THEME_CATALOG_URI } from "../widgets/theme-catalog";
 
 const INSTALL_STEPS = (themeName: string, url: string) => [
   `1. Avec le connecteur Shopify, appelle la mutation themeCreate(source: "${url}", name: "${themeName} (Webuild)", role: UNPUBLISHED). ` +
@@ -19,27 +20,61 @@ const INSTALL_STEPS = (themeName: string, url: string) => [
 ];
 
 export function registerThemeTools(server: McpServer) {
+  server.registerResource(
+    "theme-catalog",
+    THEME_CATALOG_URI,
+    { title: "Catalogue de thèmes Webuild", mimeType: MCP_APP_MIME_TYPE },
+    async (uri) => ({
+      contents: [{ uri: uri.href, mimeType: MCP_APP_MIME_TYPE, text: THEME_CATALOG_HTML, _meta: { ui: {} } }],
+    }),
+  );
+
   server.registerTool(
     "list_themes",
     {
       title: "Catalogue de thèmes",
       description:
-        "Liste les thèmes Shopify premium Webuild : style, cas d'usage, points forts. " +
-        "Aide l'utilisateur à choisir le thème adapté à sa boutique.",
+        "Liste les thèmes Shopify premium Webuild : style, cas d'usage, points forts, lien de démonstration. " +
+        "Aide l'utilisateur à choisir le thème adapté à sa boutique. Dans Claude, le catalogue s'affiche aussi " +
+        "en cartes avec captures d'écran : l'utilisateur peut y ouvrir la démo ou choisir un thème.",
       annotations: { readOnlyHint: true },
+      _meta: { ui: { resourceUri: THEME_CATALOG_URI } },
     },
-    async () =>
-      textResult({
-        themes: THEMES.map((theme) => ({
-          slug: theme.slug,
-          name: theme.name,
-          version: theme.version,
-          tagline: theme.tagline,
-          description: theme.description,
-          bestFor: theme.bestFor,
-          highlights: theme.highlights,
-        })),
-      }),
+    async () => {
+      const themes = THEMES.map((theme) => ({
+        slug: theme.slug,
+        name: theme.name,
+        version: theme.version,
+        tagline: theme.tagline,
+        description: theme.description,
+        bestFor: theme.bestFor,
+        highlights: theme.highlights,
+        previewUrl: theme.previewUrl ?? null,
+        accent: theme.accent,
+      }));
+      return textResult({ themes });
+    },
+  );
+
+  // Réservé à l'interface du catalogue : les captures (data URL) ne doivent pas remplir le contexte du modèle.
+  server.registerTool(
+    "get_theme_screenshots",
+    {
+      title: "Captures d'un thème",
+      description: "Captures d'écran d'un thème pour l'interface du catalogue.",
+      inputSchema: z.object({ theme: z.string() }),
+      annotations: { readOnlyHint: true },
+      _meta: { ui: { resourceUri: THEME_CATALOG_URI, visibility: ["app"] } },
+    },
+    async ({ theme: slug }) => {
+      const theme = getTheme(slug);
+      if (!theme) return errorResult(`Thème inconnu : ${slug}.`);
+      const screenshots = await readThemeScreenshots(theme.slug);
+      return {
+        content: [{ type: "text" as const, text: `${screenshots.length} capture(s) pour ${theme.name}.` }],
+        structuredContent: { theme: theme.slug, screenshots },
+      };
+    },
   );
 
   server.registerTool(

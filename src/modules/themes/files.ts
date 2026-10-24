@@ -31,6 +31,37 @@ export async function readThemeFiles(slug: string): Promise<Map<string, Uint8Arr
   return files;
 }
 
+const SCREENSHOT_TYPES: Record<string, string> = {
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".png": "image/png",
+  ".webp": "image/webp",
+};
+
+export type ThemeScreenshot = { label: string; src: string };
+
+/**
+ * Captures d'écran du catalogue (themes/<slug>/screenshots/), en data URL : l'interface MCP de Claude
+ * ne charge pas les images distantes de façon fiable. "02-page-produit.jpg" devient "Page produit".
+ */
+export async function readThemeScreenshots(slug: string): Promise<ThemeScreenshot[]> {
+  const dir = join(themeDir(slug), "screenshots");
+  const names = (await readdir(dir).catch(() => [] as string[])).sort();
+  const screenshots: ThemeScreenshot[] = [];
+  for (const name of names) {
+    const extension = name.slice(name.lastIndexOf(".")).toLowerCase();
+    const type = SCREENSHOT_TYPES[extension];
+    if (!type) continue;
+    const base = name.slice(0, name.lastIndexOf(".")).replace(/^\d+[-_ ]*/, "").replace(/[-_]+/g, " ").trim();
+    const bytes = await readFile(join(dir, name));
+    screenshots.push({
+      label: base ? base[0].toUpperCase() + base.slice(1) : "Aperçu",
+      src: `data:${type};base64,${bytes.toString("base64")}`,
+    });
+  }
+  return screenshots;
+}
+
 /** Licence d'origine du thème (ex. Shopify Skeleton), à reproduire dans chaque copie livrée. */
 export async function readThemeLicense(slug: string): Promise<string | null> {
   return readFile(join(themeDir(slug), "LICENSE.md"), "utf8").catch(() => null);

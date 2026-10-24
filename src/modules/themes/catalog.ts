@@ -8,10 +8,13 @@ export type ThemeEntry = {
   highlights: string[];
   /** Dégradé utilisé comme visuel tant qu'il n'y a pas de captures d'écran. */
   accent: [string, string];
+  /** Boutique de démonstration du thème, ouverte par le bouton "Voir la démo". */
+  previewUrl?: string;
 };
 
 /**
- * Catalogue des thèmes Webuild. Les sources sont dans themes/<slug>/.
+ * Catalogue des thèmes Webuild. Les sources sont dans themes/<slug>/, les captures d'écran du catalogue
+ * dans themes/<slug>/screenshots/ (jpg, png ou webp, affichées dans l'ordre des noms de fichiers).
  * Pour l'instant, un seul thème de test (Skeleton de Shopify, v1.0.0) en attendant les vrais thèmes.
  */
 export const THEMES: ThemeEntry[] = [
