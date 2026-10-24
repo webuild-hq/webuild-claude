@@ -13,7 +13,7 @@ Projet Next.js 16 (App Router), Supabase (Postgres, Auth, Storage), Stripe, Gemi
 | `/` | Présentation et thèmes |
 | `/login`, `/forgot-password`, `/reset-password` | Connexion, inscription (email + mot de passe, Google), mot de passe oublié |
 | `/dashboard/[agence]` | Vue d'ensemble : crédits, plan, boutiques, membres |
-| `/dashboard/[agence]/claude` | Connecter Claude (URL du MCP, skill à télécharger, exemples) |
+| `/dashboard/[agence]/claude` | Connecter Claude (URL du MCP, exemples) |
 | `/dashboard/[agence]/themes` | Catalogue et détail des thèmes |
 | `/dashboard/[agence]/shops` | Boutiques livrées, re-téléchargement du zip |
 | `/dashboard/[agence]/images` | Images générées |
@@ -28,12 +28,15 @@ Projet Next.js 16 (App Router), Supabase (Postgres, Auth, Storage), Stripe, Gemi
 |---|---|---|
 | `list_my_agencies` | Agences, rôle, solde, agence par défaut | Non |
 | `get_account_status` | Plan, solde, tarifs | Non |
+| `get_build_guide` | Méthode complète de construction d'une boutique (contenu de `skills/webuild-store-builder/SKILL.md`) | Non |
 | `list_themes` | Catalogue | Non |
 | `get_theme_guide` | Templates, sections, réglages, emplacements d'image | Non |
 | `prepare_theme_install` | Licence + lien de zip verrouillé sur la boutique | Oui (une fois par boutique et version) |
 | `generate_section_image` | Image Gemini pour une section, URL publique | Oui (remboursé en cas d'échec) |
 
-**Autres routes** : `/api/themes/download/[jeton]/[fichier].zip` (zip signé, valable 1 h), `/api/skill/download` (skill Claude), `/api/stripe/webhook`.
+Le serveur fournit aussi le prompt `construire-boutique` (menu + de Claude) et des instructions qui renvoient vers `get_build_guide` : l'utilisateur n'a pas de skill à installer.
+
+**Autres routes** : `/api/themes/download/[jeton]/[fichier].zip` (zip signé, valable 1 h), `/api/skill/download` (la même méthode en skill, pour Claude Code), `/api/stripe/webhook`.
 
 ## Thèmes
 

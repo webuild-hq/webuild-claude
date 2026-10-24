@@ -51,23 +51,23 @@ export default async function ConnectClaudePage({ params }: PageProps<"/dashboar
       </Card>
 
       <Card className="flex flex-col gap-4 p-6">
-        <h2 className="font-semibold">3. Installer la skill Webuild (recommandé)</h2>
+        <h2 className="font-semibold">3. C&apos;est prêt</h2>
         <p className="text-sm">
-          La skill apprend à Claude la méthode complète : choix du thème, installation en brouillon, remplissage des
-          sections, images, validation puis publication. Dans Claude : Paramètres, Capacités, Skills, importer le fichier.
+          Rien d&apos;autre à installer : le connecteur fournit à Claude la méthode complète (choix du thème,
+          installation en brouillon, sections, images, validation puis publication). Pour démarrer en un clic, choisis
+          &laquo; Construire une boutique avec Webuild &raquo; dans le menu + de Claude, ou écris simplement ta demande.
         </p>
-        <div>
-          <a
-            href="/api/skill/download"
-            className="inline-flex items-center rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground hover:opacity-90"
-          >
-            Télécharger la skill
+        <p className="text-xs text-muted">
+          Avec Claude Code, tu peux aussi installer la méthode comme skill :{" "}
+          <a href="/api/skill/download" className="underline hover:text-foreground">
+            télécharger la skill
           </a>
-        </div>
+          .
+        </p>
       </Card>
 
       <Card className="flex flex-col gap-3 p-6">
-        <h2 className="font-semibold">4. Exemples de demandes</h2>
+        <h2 className="font-semibold">Exemples de demandes</h2>
         <ul className="flex flex-col gap-2 text-sm">
           {PROMPTS.map((prompt) => (
             <li key={prompt} className="rounded-lg bg-background px-3 py-2">

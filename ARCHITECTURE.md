@@ -91,7 +91,7 @@ src/
     stripe.ts
 themes/                   sources des thèmes (pour l'instant : skeleton, thème de test)
 skills/
-  webuild-store-builder/  skill distribuée aux utilisateurs
+  webuild-store-builder/  méthode Webuild (servie par get_build_guide, téléchargeable comme skill)
 supabase/
   migrations/             schéma SQL versionné
 ```
@@ -132,7 +132,7 @@ Exigences de la spec MCP (OAuth 2.1) :
 1. **Agence par défaut** : choisie sur l'écran de consentement OAuth au moment de connecter le connecteur (étape sautée si l'utilisateur n'a qu'une agence). Enregistrée dans `mcp_connections.default_organization_id`.
 2. **Paramètre explicite** : les outils payants acceptent un paramètre `agency` optionnel. S'il est absent, on utilise l'agence par défaut. Chaque réponse indique l'agence débitée.
 3. **Déduction par la boutique** : une fois un thème livré, la boutique appartient à une agence. Les actions suivantes sur cette boutique sont rattachées à cette agence automatiquement.
-4. **La skill** demande à Claude de clarifier l'agence au début d'une nouvelle boutique si l'utilisateur en a plusieurs.
+4. **La méthode Webuild** (`get_build_guide`) demande à Claude de clarifier l'agence au début d'une nouvelle boutique si l'utilisateur en a plusieurs.
 
 On n'utilise **pas** d'outil `switch_agency` qui changerait un état global : deux conversations Claude ouvertes en parallèle sur deux agences se marcheraient dessus.
 
@@ -154,8 +154,8 @@ Le serveur MCP envoie aussi des **instructions** à Claude à la connexion (rapp
 
 Le guide des thèmes est construit à partir des fichiers `*-tools.json` de l'app existante, qui décrivent déjà chaque section avec un schéma JSON.
 
-### Skill "Webuild Store Builder"
-Distribuée aux utilisateurs (import manuel, ou déploiement par un admin Team / Enterprise). Elle décrit :
+### Méthode "Webuild Store Builder"
+Fournie directement par le connecteur, sans rien à installer : les instructions du serveur demandent à Claude d'appeler `get_build_guide`, qui renvoie la méthode (source unique : `skills/webuild-store-builder/SKILL.md`). Le prompt MCP `construire-boutique` la charge aussi en un clic. Le même fichier reste téléchargeable comme skill pour Claude Code. Elle décrit :
 - le déroulé complet de la section 3,
 - la clarification de l'agence au départ,
 - l'usage du rôle `UNPUBLISHED` et la validation par l'utilisateur avant `themePublish`,
@@ -202,7 +202,7 @@ Distribuée aux utilisateurs (import manuel, ou déploiement par un admin Team /
 - Fournisseur : Gemini (`GEMINI_API_KEY`, modèle `GEMINI_IMAGE_MODEL`). Coût estimé enregistré pour chaque image.
 - Débit avant la génération, **remboursement automatique** en cas d'échec.
 - Stockage dans le bucket public `generated-images`, dossier = identifiant de l'agence, écrit avec le jeton de l'utilisateur (politique RLS de Storage). Les images servent de relais : Claude les importe dans la boutique avec `fileCreate`. Elles pourront être purgées après un délai.
-- Recommandation dans la skill : images d'ambiance (hero, bannières, lifestyle). Ne pas remplacer les vraies photos de produits.
+- Recommandation dans la méthode : images d'ambiance (hero, bannières, lifestyle). Ne pas remplacer les vraies photos de produits.
 
 ## 13. Modèle de données
 
@@ -283,6 +283,6 @@ Plus tard, Claude pourra aussi utiliser des outils CRM (créer un client, ajoute
 3. ~~Thèmes~~ : catalogue, guides, zip verrouillé, livraisons, outils MCP.
 4. ~~Images~~ : génération par section.
 5. ~~Paiement~~ : Stripe, plans, registre de crédits, limite de places.
-6. ~~Skill et onboarding~~ : skill "Webuild Store Builder", page "Connecter Claude".
+6. ~~Méthode et onboarding~~ : méthode "Webuild Store Builder" fournie par le MCP, page "Connecter Claude".
 7. **CRM** : clients, projets, timeline.
 8. **À suivre** : envoi des emails (SMTP), captures d'écran des thèmes, calibrage des prix, invitations par email, purge des images, packs de crédits.
