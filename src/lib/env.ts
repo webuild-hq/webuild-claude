@@ -6,8 +6,9 @@ function required(name: string, value: string | undefined): string {
 }
 
 // Accès direct à process.env.NEXT_PUBLIC_* pour que Next.js puisse les injecter côté navigateur.
+// Sans slash final : sinon l'issuer attendu ("...co//auth/v1") ne correspond plus à celui des jetons.
 export const supabaseUrl = () =>
-  required("NEXT_PUBLIC_SUPABASE_URL", process.env.NEXT_PUBLIC_SUPABASE_URL);
+  required("NEXT_PUBLIC_SUPABASE_URL", process.env.NEXT_PUBLIC_SUPABASE_URL).replace(/\/+$/, "");
 
 export const supabasePublishableKey = () =>
   required(
