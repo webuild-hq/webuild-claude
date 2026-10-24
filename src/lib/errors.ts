@@ -13,6 +13,8 @@ const MESSAGES: Record<string, string> = {
   unknown_action: "Action inconnue.",
   download_not_configured:
     "L'installation de thèmes est momentanément indisponible côté Webuild. Aucun crédit n'a été débité. Réessaie plus tard.",
+  download_failed:
+    "Le thème est bien livré pour cette boutique, mais son fichier n'a pas pu être préparé. Réessaie : un nouvel appel est gratuit.",
 };
 
 export type DbError = { message?: string; details?: string | null } | null | undefined;

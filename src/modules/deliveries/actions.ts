@@ -19,7 +19,7 @@ export async function downloadDelivery(formData: FormData) {
     .single<{ id: string; theme_slug: string; license_salt: string; license_hash: string; shops: { myshopify_domain: string } }>();
   if (!data) redirect(`/dashboard/${slug}/shops`);
 
-  const { url } = downloadUrl(await publicOrigin(), {
+  const { url } = await downloadUrl(await publicOrigin(), {
     id: data.id,
     theme_slug: data.theme_slug,
     license_salt: data.license_salt,

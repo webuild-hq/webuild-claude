@@ -36,11 +36,11 @@ Projet Next.js 16 (App Router), Supabase (Postgres, Auth, Storage), Stripe, Gemi
 
 Le serveur fournit aussi le prompt `construire-boutique` (menu + de Claude) et des instructions qui renvoient vers `get_build_guide` : l'utilisateur n'a pas de skill à installer.
 
-**Autres routes** : `/api/themes/download/[thème].zip?token=...` (zip signé, valable 1 h), `/api/skill/download` (la même méthode en skill, pour Claude Code), `/api/stripe/webhook`.
+**Autres routes** : `/api/skill/download` (la même méthode en skill, pour Claude Code), `/api/stripe/webhook`.
 
 ## Thèmes
 
-Les sources sont dans `themes/<slug>/` (dossiers Shopify standards uniquement). Le zip livré est construit à la volée : ajout de `snippets/webuild-license.liquid` et de ses appels dans `layout/`. Le verrou compare `shop.permanent_domain` (Liquid) et `Shopify.shop` (JS) à l'empreinte de la livraison ; sur une autre boutique, la vitrine affiche "Thème non licencié".
+Les sources sont dans `themes/<slug>/` (dossiers Shopify standards uniquement). Le zip livré est construit par le serveur, déposé dans le bucket privé `theme-deliveries` et transmis par un lien signé Supabase valable 1 h : ajout de `snippets/webuild-license.liquid` et de ses appels dans `layout/`. Le verrou compare `shop.permanent_domain` (Liquid) et `Shopify.shop` (JS) à l'empreinte de la livraison ; sur une autre boutique, la vitrine affiche "Thème non licencié".
 
 Après une modification des sections d'un thème, régénérer son guide :
 
@@ -69,8 +69,7 @@ Voir `.env.example`. Dans Vercel, les clés secrètes sont de type **Secret** et
 | Variable | Obligatoire | Usage |
 |---|---|---|
 | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Oui | Supabase |
-| `THEME_DOWNLOAD_SECRET` | Oui | Signature des liens de zip (32 caractères aléatoires minimum) |
-| `SUPABASE_SECRET_KEY` | Pour Stripe et les images | Webhook Stripe (abonnements et crédits), remboursement des images ratées |
+| `SUPABASE_SECRET_KEY` | Oui | Zips des thèmes livrés, webhook Stripe (abonnements et crédits), remboursement des images ratées |
 | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | Pour le paiement | Abonnements |
 | `GEMINI_API_KEY` | Pour les images | Génération d'images (avec `SUPABASE_SECRET_KEY`) |
 

@@ -1,7 +1,19 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getTheme } from "@/modules/themes/catalog";
-import { createDownloadToken, isDownloadConfigured } from "@/modules/themes/download-token";
+import { buildThemeZip } from "@/modules/themes/package";
+
+/** Bucket privé des zips livrés (migration 0004) : seul le serveur y lit et écrit. */
+export const DELIVERIES_BUCKET = "theme-deliveries";
+
+/** Durée de validité du lien : Shopify télécharge le zip de façon asynchrone après themeCreate. */
+export const DOWNLOAD_TTL_SECONDS = 60 * 60;
+
+/** Vrai si les zips peuvent être déposés et signés. À vérifier avant de débiter une livraison. */
+export function isDownloadConfigured() {
+  return Boolean(process.env.SUPABASE_SECRET_KEY);
+}
 
 export type DeliveryRow = {
   id: string;
@@ -16,18 +28,32 @@ export type DeliveryRow = {
   created_at: string;
 };
 
-export function downloadUrl(appOrigin: string, delivery: Pick<DeliveryRow, "id" | "myshopify_domain" | "theme_slug" | "license_salt" | "license_hash">) {
-  const { token, expiresAt } = createDownloadToken({
-    deliveryId: delivery.id,
-    theme: delivery.theme_slug,
-    shop: delivery.myshopify_domain,
+/**
+ * Construit le zip verrouillé d'une livraison, le dépose dans Supabase Storage et renvoie un lien signé.
+ * themeCreate refuse le zip servi directement par l'app ("Src is empty") mais accepte un lien de CDN.
+ */
+export async function downloadUrl(
+  appOrigin: string,
+  delivery: Pick<DeliveryRow, "id" | "myshopify_domain" | "theme_slug" | "license_salt" | "license_hash">,
+) {
+  const zip = await buildThemeZip(delivery.theme_slug, {
     salt: delivery.license_salt,
     hash: delivery.license_hash,
     appOrigin,
   });
+
+  // Un seul fichier par livraison, remplacé à chaque demande (le lien d'origine de la licence peut changer).
+  const path = `${delivery.id}/${delivery.theme_slug}-${delivery.myshopify_domain.split(".")[0]}.zip`;
+  const storage = createAdminClient().storage.from(DELIVERIES_BUCKET);
+  const { error: uploadError } = await storage.upload(path, zip, { contentType: "application/zip", upsert: true });
+  if (uploadError) throw uploadError;
+
+  const { data, error } = await storage.createSignedUrl(path, DOWNLOAD_TTL_SECONDS);
+  if (error || !data) throw error ?? new Error("Lien signé non créé");
+
   return {
-    url: `${appOrigin}/api/themes/download/${delivery.theme_slug}.zip?token=${token}`,
-    expiresAt: new Date(expiresAt * 1000).toISOString(),
+    url: data.signedUrl,
+    expiresAt: new Date(Date.now() + DOWNLOAD_TTL_SECONDS * 1000).toISOString(),
   };
 }
 
@@ -43,9 +69,9 @@ export async function prepareThemeInstall(
   if (!theme) {
     return { error: { message: "unknown_theme" } } as const;
   }
-  // Vérifié avant create_delivery : sans signature possible, aucun crédit ne doit être débité.
+  // Vérifié avant create_delivery : sans dépôt possible du zip, aucun crédit ne doit être débité.
   if (!isDownloadConfigured()) {
-    console.error("[themes] THEME_DOWNLOAD_SECRET manquant ou trop court : installation refusée avant débit");
+    console.error("[themes] SUPABASE_SECRET_KEY manquante : installation refusée avant débit");
     return { error: { message: "download_not_configured" } } as const;
   }
 
@@ -61,7 +87,13 @@ export async function prepareThemeInstall(
     return { error } as const;
   }
 
-  return { delivery: data, theme, download: downloadUrl(params.appOrigin, data) } as const;
+  // La livraison est enregistrée : si le dépôt échoue, un nouvel appel est gratuit pour la même boutique.
+  try {
+    return { delivery: data, theme, download: await downloadUrl(params.appOrigin, data) } as const;
+  } catch (cause) {
+    console.error("[themes] dépôt du zip impossible", data.id, cause);
+    return { error: { message: "download_failed" } } as const;
+  }
 }
 
 export type ShopWithDeliveries = {

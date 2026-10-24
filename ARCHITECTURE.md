@@ -193,7 +193,7 @@ Fournie directement par le connecteur, sans rien à installer : les instructions
 - **Catalogue dans le code** (`src/modules/themes/catalog.ts`) et **sources dans le dépôt** (`themes/<slug>/`, dossiers Shopify standards uniquement). Le dépôt est privé ; les sources sont embarquées dans les fonctions serveur.
 - Chaque thème a un **guide** (`themes/<slug>/guide.json`), généré depuis les schémas Liquid par `npm run themes:guides` et exposé par `get_theme_guide`.
 - **Livraison** : `create_delivery` enregistre la boutique, la licence (sel aléatoire + empreinte `sha256(domaine:sel)`) et débite les crédits la première fois.
-- **Zip construit à la volée** par `/api/themes/download/<thème>.zip?token=<jeton>` (jeton en paramètre : `themeCreate` refuse un chemin qui le contient) : le jeton (signé HMAC, `THEME_DOWNLOAD_SECRET`, valable 1 h) contient tout ce qu'il faut (thème, domaine, sel, empreinte). Aucun stockage de zip, aucun accès base pour Shopify. Un nouveau lien est gratuit pour une livraison existante.
+- **Zip déposé dans Supabase Storage** : le serveur construit le zip verrouillé, le dépose dans le bucket privé `theme-deliveries` (clé secrète, un fichier par livraison) et renvoie un lien signé valable 1 h. `themeCreate` refuse le zip servi directement par l'app sur Vercel ("Src is empty") mais accepte un lien de CDN. Un nouveau lien est gratuit pour une livraison existante.
 - **Thème de test** : le Skeleton theme de Shopify (v1.0.0), en attendant les vrais thèmes premium.
 
 ## 12. Images

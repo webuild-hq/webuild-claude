@@ -5,9 +5,9 @@ const nextConfig: NextConfig = {
   partialPrefetching: true,
   // Les sources des thèmes sont lues à l'exécution : elles doivent être embarquées dans les fonctions.
   outputFileTracingIncludes: {
-    "/api/themes/**": ["./themes/**/*"],
-    "/api/mcp": ["./themes/*/guide.json", "./skills/**/*"],
-    "/dashboard/**": ["./themes/*/guide.json"],
+    // Le zip d'une livraison est construit par prepare_theme_install (MCP) et par le bouton du dashboard.
+    "/api/mcp": ["./themes/**/*", "./skills/**/*"],
+    "/dashboard/**": ["./themes/**/*"],
     "/api/skill/**": ["./skills/**/*"],
   },
   turbopack: {
