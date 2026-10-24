@@ -1,5 +1,6 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { createAdminClient } from "@/lib/supabase/admin";
 import {
   type AspectRatio,
   buildImagePrompt,
@@ -104,7 +105,14 @@ export async function generateSectionImage(supabase: SupabaseClient, request: Se
     return { image: { url: publicUrl, filename }, charged: -debit.amount } as const;
   } catch (cause) {
     const message = cause instanceof Error ? cause.message : String(cause);
-    await supabase.rpc("refund_credits", { transaction_id: debit.id, details: "Image non générée" });
+    // Le remboursement est réservé au serveur : un membre ne doit pas pouvoir rembourser un débit lui-même.
+    const { error: refundError } = await createAdminClient().rpc("refund_credits", {
+      transaction_id: debit.id,
+      details: "Image non générée",
+    });
+    if (refundError) {
+      console.error("[images] remboursement impossible", debit.id, refundError);
+    }
     await supabase.from("image_generations").insert({
       organization_id: request.organizationId,
       shop_id: request.shopId,

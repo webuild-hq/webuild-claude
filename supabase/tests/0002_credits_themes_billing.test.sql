@@ -34,10 +34,12 @@ select public.credit_balance(:'ben_org');
 select amount from public.consume_credits(:'ana_org', 'image_generation', 'img-1');
 select amount from public.consume_credits(:'ana_org', 'image_generation', 'img-1');
 select public.credit_balance(:'ana_org') as solde_apres_image;
-\echo === remboursement unique de l image
+\echo === remboursement unique de l image, par le serveur (service_role, depuis 0003)
 select id as img_tx from public.credit_transactions where idempotency_key like '%img-1' \gset
+reset role; set role service_role;
 select amount, reason from public.refund_credits(:'img_tx');
 select amount, reason from public.refund_credits(:'img_tx');
+reset role; set role authenticated;
 select public.credit_balance(:'ana_org') as solde_apres_remboursement;
 \echo === credits insuffisants : 5 livraisons de 200 avec 800, tout est annule (insufficient_credits, solde 800)
 select count(*) from (select public.create_delivery(:'ana_org', 'shop' || g || '.myshopify.com', 'skeleton', '1.0.0') from generate_series(1,5) g) x;

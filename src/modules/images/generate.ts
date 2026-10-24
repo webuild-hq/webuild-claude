@@ -11,8 +11,9 @@ export function imageModel() {
   return process.env.GEMINI_IMAGE_MODEL || "gemini-2.5-flash-image";
 }
 
+// La clé secrète Supabase est requise aussi : sans elle, une image ratée ne pourrait pas être remboursée.
 export function isImageGenerationConfigured() {
-  return Boolean(process.env.GEMINI_API_KEY);
+  return Boolean(process.env.GEMINI_API_KEY && process.env.SUPABASE_SECRET_KEY);
 }
 
 /** Génère une image avec Gemini et renvoie ses octets. */

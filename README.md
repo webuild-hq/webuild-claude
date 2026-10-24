@@ -70,9 +70,9 @@ Voir `.env.example`. Dans Vercel, les clés secrètes sont de type **Secret** et
 |---|---|---|
 | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Oui | Supabase |
 | `THEME_DOWNLOAD_SECRET` | Oui | Signature des liens de zip (32 caractères aléatoires minimum) |
-| `SUPABASE_SECRET_KEY` | Pour Stripe | Webhook Stripe (écriture des abonnements et crédits) |
+| `SUPABASE_SECRET_KEY` | Pour Stripe et les images | Webhook Stripe (abonnements et crédits), remboursement des images ratées |
 | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | Pour le paiement | Abonnements |
-| `GEMINI_API_KEY` | Pour les images | Génération d'images |
+| `GEMINI_API_KEY` | Pour les images | Génération d'images (avec `SUPABASE_SECRET_KEY`) |
 
 ## Configuration externe
 

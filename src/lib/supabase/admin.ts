@@ -3,8 +3,9 @@ import { createClient } from "@supabase/supabase-js";
 import { supabaseUrl } from "@/lib/env";
 
 /**
- * Client Supabase "serveur" (clé secrète) : contourne RLS. À réserver aux traitements sans
- * utilisateur, comme les webhooks Stripe. Ne jamais l'utiliser pour une action d'un utilisateur.
+ * Client Supabase "serveur" (clé secrète) : contourne RLS. À réserver aux traitements que seul
+ * le serveur peut décider, comme les webhooks Stripe ou le remboursement d'une image ratée.
+ * Ne jamais l'utiliser pour une action qu'un utilisateur demande directement.
  */
 export function createAdminClient() {
   const secretKey = process.env.SUPABASE_SECRET_KEY;

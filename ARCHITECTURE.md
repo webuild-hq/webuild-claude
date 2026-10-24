@@ -200,7 +200,7 @@ Fournie directement par le connecteur, sans rien à installer : les instructions
 
 - Génération à la demande de Claude, pour une section précise : le format est choisi par Claude, ou déduit de la section et du réglage (hero et bannières en 16:9, mobile en 9:16, sinon 4:5).
 - Fournisseur : Gemini (`GEMINI_API_KEY`, modèle `GEMINI_IMAGE_MODEL`). Coût estimé enregistré pour chaque image.
-- Débit avant la génération, **remboursement automatique** en cas d'échec.
+- Débit avant la génération, **remboursement automatique** en cas d'échec. Le remboursement est fait par le serveur (clé secrète) : un membre ne peut pas rembourser un débit lui-même.
 - Stockage dans le bucket public `generated-images`, dossier = identifiant de l'agence, écrit avec le jeton de l'utilisateur (politique RLS de Storage). Les images servent de relais : Claude les importe dans la boutique avec `fileCreate`. Elles pourront être purgées après un délai.
 - Recommandation dans la méthode : images d'ambiance (hero, bannières, lifestyle). Ne pas remplacer les vraies photos de produits.
 
