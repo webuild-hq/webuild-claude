@@ -26,7 +26,7 @@ export function downloadUrl(appOrigin: string, delivery: Pick<DeliveryRow, "id" 
     appOrigin,
   });
   return {
-    url: `${appOrigin}/api/themes/download/${token}/${delivery.theme_slug}.zip`,
+    url: `${appOrigin}/api/themes/download/${delivery.theme_slug}.zip?token=${token}`,
     expiresAt: new Date(expiresAt * 1000).toISOString(),
   };
 }

@@ -36,7 +36,7 @@ Projet Next.js 16 (App Router), Supabase (Postgres, Auth, Storage), Stripe, Gemi
 
 Le serveur fournit aussi le prompt `construire-boutique` (menu + de Claude) et des instructions qui renvoient vers `get_build_guide` : l'utilisateur n'a pas de skill à installer.
 
-**Autres routes** : `/api/themes/download/[jeton]/[fichier].zip` (zip signé, valable 1 h), `/api/skill/download` (la même méthode en skill, pour Claude Code), `/api/stripe/webhook`.
+**Autres routes** : `/api/themes/download/[thème].zip?token=...` (zip signé, valable 1 h), `/api/skill/download` (la même méthode en skill, pour Claude Code), `/api/stripe/webhook`.
 
 ## Thèmes
 

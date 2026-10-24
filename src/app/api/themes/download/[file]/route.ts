@@ -4,9 +4,12 @@ import { verifyDownloadToken } from "@/modules/themes/download-token";
 /**
  * Téléchargement d'un thème livré, appelé par Shopify (themeCreate) ou par l'agence.
  * Le zip est construit à la volée à partir des sources et du verrou de licence de la livraison.
+ *
+ * Le jeton est dans `?token=` et non dans le chemin : themeCreate refuse ("Src is empty") une URL
+ * dont le chemin contient le jeton, alors qu'il accepte un chemin court en .zip suivi d'un long paramètre.
  */
-export async function GET(_req: Request, ctx: RouteContext<"/api/themes/download/[token]/[file]">) {
-  const { token } = await ctx.params;
+export async function GET(req: Request) {
+  const token = new URL(req.url).searchParams.get("token") ?? "";
   const claims = verifyDownloadToken(token);
   if (!claims) {
     return new Response("Lien de téléchargement invalide ou expiré.", { status: 403 });
