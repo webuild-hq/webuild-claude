@@ -11,6 +11,8 @@ const MESSAGES: Record<string, string> = {
   insufficient_credits: "Crédits insuffisants pour cette action. Recharge en changeant de plan.",
   invalid_shop_domain: "Le domaine doit être le domaine permanent de la boutique, au format xxx.myshopify.com.",
   unknown_action: "Action inconnue.",
+  download_not_configured:
+    "L'installation de thèmes est momentanément indisponible côté Webuild. Aucun crédit n'a été débité. Réessaie plus tard.",
 };
 
 export type DbError = { message?: string; details?: string | null } | null | undefined;

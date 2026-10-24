@@ -1,7 +1,7 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { getTheme } from "@/modules/themes/catalog";
-import { createDownloadToken } from "@/modules/themes/download-token";
+import { createDownloadToken, isDownloadConfigured } from "@/modules/themes/download-token";
 
 export type DeliveryRow = {
   id: string;
@@ -42,6 +42,11 @@ export async function prepareThemeInstall(
   const theme = getTheme(params.themeSlug);
   if (!theme) {
     return { error: { message: "unknown_theme" } } as const;
+  }
+  // Vérifié avant create_delivery : sans signature possible, aucun crédit ne doit être débité.
+  if (!isDownloadConfigured()) {
+    console.error("[themes] THEME_DOWNLOAD_SECRET manquant ou trop court : installation refusée avant débit");
+    return { error: { message: "download_not_configured" } } as const;
   }
 
   const { data, error } = await supabase

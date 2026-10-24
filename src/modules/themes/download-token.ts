@@ -18,9 +18,14 @@ export type DownloadClaims = {
 /** Durée de validité : Shopify télécharge le zip de façon asynchrone après themeCreate. */
 export const DOWNLOAD_TTL_SECONDS = 60 * 60;
 
+/** Vrai si les liens de téléchargement peuvent être signés. À vérifier avant de débiter une livraison. */
+export function isDownloadConfigured() {
+  return (process.env.THEME_DOWNLOAD_SECRET?.length ?? 0) >= 32;
+}
+
 function secret() {
   const value = process.env.THEME_DOWNLOAD_SECRET;
-  if (!value || value.length < 32) {
+  if (!value || !isDownloadConfigured()) {
     throw new Error("THEME_DOWNLOAD_SECRET manquant ou trop court (32 caractères minimum)");
   }
   return value;
