@@ -16,7 +16,7 @@ export async function signInWithPassword(
   _state: AuthFormState,
   formData: FormData,
 ): Promise<AuthFormState> {
-  const next = safeNextPath(formData.get("next") as string | null);
+  const next = safeNextPath(formData.get("next") as string | null, "/dashboard");
   const supabase = await createClient();
 
   const { error } = await supabase.auth.signInWithPassword({
@@ -34,7 +34,7 @@ export async function signUp(
   _state: AuthFormState,
   formData: FormData,
 ): Promise<AuthFormState> {
-  const next = safeNextPath(formData.get("next") as string | null);
+  const next = safeNextPath(formData.get("next") as string | null, "/dashboard");
   const supabase = await createClient();
   const origin = await publicOrigin();
 
@@ -57,7 +57,7 @@ export async function signUp(
 }
 
 export async function signInWithGoogle(formData: FormData) {
-  const next = safeNextPath(formData.get("next") as string | null);
+  const next = safeNextPath(formData.get("next") as string | null, "/dashboard");
   const supabase = await createClient();
   const origin = await publicOrigin();
 
