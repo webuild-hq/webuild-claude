@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export function CopyButton({ value }: { value: string }) {
+export function CopyButton({ value, label = "Copier le lien" }: { value: string; label?: string }) {
   const [copied, setCopied] = useState(false);
 
   return (
@@ -13,9 +13,9 @@ export function CopyButton({ value }: { value: string }) {
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
       }}
-      className="hover:underline"
+      className="text-sm underline hover:no-underline"
     >
-      {copied ? "Lien copié" : "Copier le lien"}
+      {copied ? "Copié" : label}
     </button>
   );
 }

@@ -2,68 +2,93 @@
 
 Catalogue de thèmes Shopify premium, pilotable par Claude via un serveur MCP. Voir [ARCHITECTURE.md](./ARCHITECTURE.md) pour les décisions d'architecture.
 
-Projet Next.js 16 (App Router), Supabase (Postgres, Auth, Storage).
+Projet Next.js 16 (App Router), Supabase (Postgres, Auth, Storage), Stripe, Gemini.
 
 ## Fonctionnalités
 
+**Site et dashboard**
+
 | Route | Rôle |
 |---|---|
-| `/login` | Connexion et inscription (email + mot de passe, Google) |
-| `/auth/callback` | Retour de Google et des liens de confirmation email |
-| `/dashboard` | Ouvre la dernière agence utilisée |
-| `/dashboard/new` | Création d'une agence |
-| `/dashboard/[agence]` | Vue d'ensemble de l'agence et connexion à Claude |
-| `/dashboard/[agence]/members` | Membres, invitations, retrait d'un membre |
-| `/invitations/[token]` | Acceptation d'une invitation |
-| `/oauth/consent` | Écran de consentement OAuth, avec choix de l'agence par défaut |
-| `/.well-known/oauth-protected-resource/api/mcp` | Métadonnées RFC 9728 : Supabase Auth est le serveur d'autorisation |
-| `/.well-known/oauth-authorization-server` | Copie des métadonnées Supabase pour les anciens clients MCP |
-| `/api/mcp` | Serveur MCP (Streamable HTTP), protégé par jeton Bearer |
+| `/` | Présentation et thèmes |
+| `/login`, `/forgot-password`, `/reset-password` | Connexion, inscription (email + mot de passe, Google), mot de passe oublié |
+| `/dashboard/[agence]` | Vue d'ensemble : crédits, plan, boutiques, membres |
+| `/dashboard/[agence]/claude` | Connecter Claude (URL du MCP, skill à télécharger, exemples) |
+| `/dashboard/[agence]/themes` | Catalogue et détail des thèmes |
+| `/dashboard/[agence]/shops` | Boutiques livrées, re-téléchargement du zip |
+| `/dashboard/[agence]/images` | Images générées |
+| `/dashboard/[agence]/credits` | Solde, tarifs, historique |
+| `/dashboard/[agence]/billing` | Plans, paiement Stripe, portail client |
+| `/dashboard/[agence]/members` | Membres, invitations, places |
+| `/oauth/consent` | Consentement OAuth de Claude, avec choix de l'agence par défaut |
 
-Outils MCP : `list_my_agencies` (agences de l'utilisateur, rôle, agence par défaut).
+**Serveur MCP** (`/api/mcp`, OAuth Supabase)
 
-À l'inscription, chaque utilisateur reçoit automatiquement un profil et une première agence dont il est propriétaire.
+| Outil | Rôle | Crédits |
+|---|---|---|
+| `list_my_agencies` | Agences, rôle, solde, agence par défaut | Non |
+| `get_account_status` | Plan, solde, tarifs | Non |
+| `list_themes` | Catalogue | Non |
+| `get_theme_guide` | Templates, sections, réglages, emplacements d'image | Non |
+| `prepare_theme_install` | Licence + lien de zip verrouillé sur la boutique | Oui (une fois par boutique et version) |
+| `generate_section_image` | Image Gemini pour une section, URL publique | Oui (remboursé en cas d'échec) |
+
+**Autres routes** : `/api/themes/download/[jeton]/[fichier].zip` (zip signé, valable 1 h), `/api/skill/download` (skill Claude), `/api/stripe/webhook`.
+
+## Thèmes
+
+Les sources sont dans `themes/<slug>/` (dossiers Shopify standards uniquement). Le zip livré est construit à la volée : ajout de `snippets/webuild-license.liquid` et de ses appels dans `layout/`. Le verrou compare `shop.permanent_domain` (Liquid) et `Shopify.shop` (JS) à l'empreinte de la livraison ; sur une autre boutique, la vitrine affiche "Thème non licencié".
+
+Après une modification des sections d'un thème, régénérer son guide :
+
+```bash
+npm run themes:guides
+```
+
+Pour ajouter un thème : copier ses dossiers dans `themes/<slug>/`, l'ajouter à `src/modules/themes/catalog.ts`, puis régénérer les guides.
 
 ## Base de données
 
 Les migrations sont dans `supabase/migrations/`, à exécuter dans l'ordre dans le **SQL Editor** de Supabase.
 
-Les tests de sécurité (RLS et fonctions) tournent sur un Postgres local jetable qui imite Supabase :
+Les tests de sécurité (RLS, crédits, livraisons, places) tournent sur un Postgres local jetable qui imite Supabase :
 
 ```bash
-scripts/test-db.sh                           # avec un superutilisateur Postgres local
-PSQL="sudo -u postgres psql" scripts/test-db.sh
+PSQL="sudo -u postgres psql" npm run test:db
 ```
 
 Chaque ligne `===` du résultat annonce ce qui est attendu (un refus attendu apparaît comme `ERROR`).
 
+## Variables d'environnement
+
+Voir `.env.example`. Dans Vercel, les clés secrètes sont de type **Secret** et ne commencent jamais par `NEXT_PUBLIC_`.
+
+| Variable | Obligatoire | Usage |
+|---|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Oui | Supabase |
+| `THEME_DOWNLOAD_SECRET` | Oui | Signature des liens de zip (32 caractères aléatoires minimum) |
+| `SUPABASE_SECRET_KEY` | Pour Stripe | Webhook Stripe (écriture des abonnements et crédits) |
+| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | Pour le paiement | Abonnements |
+| `GEMINI_API_KEY` | Pour les images | Génération d'images |
+
+## Configuration externe
+
+**Supabase**
+- Authentication > OAuth Server : activé, enregistrement dynamique activé, Authorization Path `/oauth/consent`.
+- Authentication > URL Configuration : Site URL `https://webuild-claude.vercel.app` (sans slash final), Redirect URLs `https://webuild-claude.vercel.app/auth/callback`.
+- Authentication > Emails > SMTP Settings : un vrai service d'envoi (Resend, Postmark...) pour la confirmation d'email et le mot de passe oublié. Le service intégré de Supabase est très limité.
+
+**Stripe**
+- Developers > Webhooks : endpoint `https://webuild-claude.vercel.app/api/stripe/webhook`, événements `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.paid`.
+- Settings > Billing > Customer portal : activer le portail (factures, moyen de paiement, changement de plan, résiliation).
+- Les produits et prix sont créés automatiquement au premier paiement, à partir de la table `plans`.
+
 ## Développement local
 
 ```bash
-cp .env.example .env.local   # puis renseigner la clé publishable
+cp .env.example .env.local   # puis renseigner les valeurs
 npm install
 npm run dev
 ```
 
-Scripts utiles : `npm run typecheck`, `npm run lint`, `npm run build`.
-
-## Configuration Supabase
-
-1. **Settings > API Keys** : copier la clé **publishable** (`sb_publishable_...`) dans `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
-2. **Authentication > OAuth Server** :
-   - activer le serveur OAuth ;
-   - activer l'enregistrement dynamique des clients ;
-   - Authorization Path : `/oauth/consent`.
-3. **Authentication > URL Configuration** :
-   - Site URL : l'URL publique du site (par exemple `https://webuild-xxx.vercel.app`). L'écran de consentement est à `Site URL + Authorization Path` ;
-   - Redirect URLs : ajouter `https://<domaine>/auth/callback` et `http://localhost:3000/auth/callback`.
-4. **Authentication > Sign In / Providers > Google** : activer Google avec un client OAuth créé dans Google Cloud. Dans Google Cloud, l'URL de redirection autorisée est `https://spuacvknjmbhirfxfptt.supabase.co/auth/v1/callback`.
-
-## Connecter Claude
-
-Le MCP doit être joignable en HTTPS (Claude ne peut pas se connecter à `localhost`).
-
-1. Déployer le projet (par exemple sur Vercel) avec les variables de `.env.example`.
-2. Dans Claude : Paramètres > Connecteurs > Ajouter un connecteur personnalisé, avec l'URL `https://<domaine>/api/mcp`.
-3. Se connecter à Webuild et autoriser l'accès sur l'écran de consentement.
-4. Demander à Claude d'appeler l'outil `list_my_agencies` : il doit renvoyer les agences du compte connecté.
+Scripts : `npm run typecheck`, `npm run lint`, `npm run build`, `npm run test:db`, `npm run themes:guides`.

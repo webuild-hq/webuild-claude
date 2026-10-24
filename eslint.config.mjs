@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Sources des thèmes Shopify (JS tiers et minifié), livrées telles quelles.
+    "themes/**",
   ]),
 ]);
 

@@ -1,0 +1,222 @@
+{
+  "theme": "skeleton",
+  "generatedFrom": "Schémas {% schema %} des sections et templates JSON du thème",
+  "templates": {
+    "404": {
+      "file": "templates/404.json",
+      "sections": [
+        {
+          "id": "main",
+          "type": "404"
+        }
+      ]
+    },
+    "article": {
+      "file": "templates/article.json",
+      "sections": [
+        {
+          "id": "main",
+          "type": "article"
+        }
+      ]
+    },
+    "blog": {
+      "file": "templates/blog.json",
+      "sections": [
+        {
+          "id": "main",
+          "type": "blog"
+        }
+      ]
+    },
+    "cart": {
+      "file": "templates/cart.json",
+      "sections": [
+        {
+          "id": "main",
+          "type": "cart"
+        }
+      ]
+    },
+    "collection": {
+      "file": "templates/collection.json",
+      "sections": [
+        {
+          "id": "main",
+          "type": "collection"
+        }
+      ]
+    },
+    "gift_card.liquid": {
+      "kind": "liquid"
+    },
+    "index": {
+      "file": "templates/index.json",
+      "sections": [
+        {
+          "id": "main",
+          "type": "hello-world"
+        }
+      ]
+    },
+    "list-collections": {
+      "file": "templates/list-collections.json",
+      "sections": [
+        {
+          "id": "main",
+          "type": "collections"
+        }
+      ]
+    },
+    "page": {
+      "file": "templates/page.json",
+      "sections": [
+        {
+          "id": "main",
+          "type": "page"
+        }
+      ]
+    },
+    "password": {
+      "file": "templates/password.json",
+      "sections": [
+        {
+          "id": "main",
+          "type": "password"
+        }
+      ]
+    },
+    "product": {
+      "file": "templates/product.json",
+      "sections": [
+        {
+          "id": "main",
+          "type": "product"
+        }
+      ]
+    },
+    "search": {
+      "file": "templates/search.json",
+      "sections": [
+        {
+          "id": "main",
+          "type": "search"
+        }
+      ]
+    }
+  },
+  "sections": {
+    "404": {
+      "name": "Not found"
+    },
+    "article": {
+      "name": "Article"
+    },
+    "blog": {
+      "name": "Blog"
+    },
+    "cart": {
+      "name": "Cart"
+    },
+    "collection": {
+      "name": "Collection"
+    },
+    "collections": {
+      "name": "Collections grid",
+      "settings": [
+        {
+          "id": "grid_item_width",
+          "type": "select",
+          "label": "Grid item width",
+          "default": "collections--full",
+          "options": [
+            "collections--compact",
+            "collections--full"
+          ]
+        },
+        {
+          "id": "grid_gap",
+          "type": "range",
+          "label": "Grid spacing",
+          "default": 10,
+          "min": 0,
+          "max": 50,
+          "step": 5,
+          "unit": "px"
+        }
+      ],
+      "presets": [
+        "Collections grid"
+      ]
+    },
+    "custom-section": {
+      "name": "Custom section",
+      "settings": [
+        {
+          "id": "background_image",
+          "type": "image_picker",
+          "label": "Background"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "@theme"
+        }
+      ],
+      "presets": [
+        "Custom section"
+      ]
+    },
+    "footer": {
+      "name": "Footer",
+      "settings": [
+        {
+          "id": "menu",
+          "type": "link_list",
+          "label": "Menu"
+        },
+        {
+          "id": "show_payment_icons",
+          "type": "checkbox",
+          "label": "Show payment icons",
+          "default": true
+        }
+      ]
+    },
+    "header": {
+      "name": "Header",
+      "settings": [
+        {
+          "id": "menu",
+          "type": "link_list",
+          "label": "Menu"
+        }
+      ]
+    },
+    "hello-world": {
+      "name": "Hello World",
+      "presets": [
+        "Hello World Template"
+      ]
+    },
+    "page": {
+      "name": "Page"
+    },
+    "password": {
+      "name": "Password"
+    },
+    "product": {
+      "name": "Product"
+    },
+    "search": {
+      "name": "Search"
+    }
+  },
+  "imageSettings": [
+    {
+      "section": "custom-section",
+      "setting": "background_image",
+      "label": "Background"
+    }
+  ]
+}

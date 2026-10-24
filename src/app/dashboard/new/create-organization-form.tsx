@@ -13,13 +13,13 @@ export function CreateOrganizationForm() {
         required
         maxLength={80}
         placeholder="Nom de l'agence"
-        className="rounded-lg border border-black/15 bg-transparent px-3 py-2.5 dark:border-white/20"
+        className="rounded-lg border border-border bg-surface px-3 py-2.5"
       />
-      {state.error && <p className="text-sm text-red-600">{state.error}</p>}
+      {state.error && <p className="text-sm text-error">{state.error}</p>}
       <button
         type="submit"
         disabled={pending}
-        className="rounded-lg bg-foreground px-4 py-2.5 font-medium text-background disabled:opacity-60"
+        className="rounded-lg bg-accent px-4 py-2.5 font-medium text-accent-foreground disabled:opacity-50"
       >
         Créer l&apos;agence
       </button>

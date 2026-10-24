@@ -89,7 +89,7 @@ src/
     supabase/             clients serveur et navigateur
     redis.ts
     stripe.ts
-themes/                   sources des thèmes (GlowRise, Nostra, ...)
+themes/                   sources des thèmes (pour l'instant : skeleton, thème de test)
 skills/
   webuild-store-builder/  skill distribuée aux utilisateurs
 supabase/
@@ -190,20 +190,19 @@ Distribuée aux utilisateurs (import manuel, ou déploiement par un admin Team /
 
 ## 11. Thèmes
 
-- Les sources de chaque version sont stockées dans un bucket **privé**.
-- Chaque version a un **guide** (JSON) exposé par `get_theme_guide`.
-- **Build d'une livraison** :
-  1. charger la source de la version,
-  2. injecter l'empreinte de licence (Liquid + JS obfusqué),
-  3. créer le zip et le stocker,
-  4. générer un lien signé (validité d'environ 30 à 60 minutes).
-- Le zip généré est conservé pour permettre le re-téléchargement.
+- **Catalogue dans le code** (`src/modules/themes/catalog.ts`) et **sources dans le dépôt** (`themes/<slug>/`, dossiers Shopify standards uniquement). Le dépôt est privé ; les sources sont embarquées dans les fonctions serveur.
+- Chaque thème a un **guide** (`themes/<slug>/guide.json`), généré depuis les schémas Liquid par `npm run themes:guides` et exposé par `get_theme_guide`.
+- **Livraison** : `create_delivery` enregistre la boutique, la licence (sel aléatoire + empreinte `sha256(domaine:sel)`) et débite les crédits la première fois.
+- **Zip construit à la volée** par `/api/themes/download/<jeton>/<thème>.zip` : le jeton (signé HMAC, `THEME_DOWNLOAD_SECRET`, valable 1 h) contient tout ce qu'il faut (thème, domaine, sel, empreinte). Aucun stockage de zip, aucun accès base pour Shopify. Un nouveau lien est gratuit pour une livraison existante.
+- **Thème de test** : le Skeleton theme de Shopify (v1.0.0), en attendant les vrais thèmes premium.
 
 ## 12. Images
 
-- Génération à la demande de Claude, pour une section précise : le ratio et le style sont fixés par le guide du thème.
-- Les images sont stockées dans un bucket **public** et servent uniquement de relais : Claude les importe dans les fichiers de la boutique avec `fileCreate`. Elles peuvent être purgées après un délai (par exemple 30 jours).
-- Recommandation dans la skill : images d'ambiance (hero, bannières, lifestyle). Ne pas remplacer les vraies photos de produits par des images générées.
+- Génération à la demande de Claude, pour une section précise : le format est choisi par Claude, ou déduit de la section et du réglage (hero et bannières en 16:9, mobile en 9:16, sinon 4:5).
+- Fournisseur : Gemini (`GEMINI_API_KEY`, modèle `GEMINI_IMAGE_MODEL`). Coût estimé enregistré pour chaque image.
+- Débit avant la génération, **remboursement automatique** en cas d'échec.
+- Stockage dans le bucket public `generated-images`, dossier = identifiant de l'agence, écrit avec le jeton de l'utilisateur (politique RLS de Storage). Les images servent de relais : Claude les importe dans la boutique avec `fileCreate`. Elles pourront être purgées après un délai.
+- Recommandation dans la skill : images d'ambiance (hero, bannières, lifestyle). Ne pas remplacer les vraies photos de produits.
 
 ## 13. Modèle de données
 
@@ -272,17 +271,18 @@ Plus tard, Claude pourra aussi utiliser des outils CRM (créer un client, ajoute
 - La version 2026-07-28 de la spec MCP remplace le Dynamic Client Registration par les Client ID Metadata Documents (CIMD). Supabase gère le DCR ; vérifier son support des CIMD et ce que Claude utilise.
 - Audience des jetons (RFC 8707) : les jetons Supabase ont `aud = authenticated`, pas l'URL du MCP. Le MCP exige pour l'instant un `client_id` (jeton OAuth uniquement). Un Custom Access Token Hook pourra ajouter une audience dédiée.
 - Limites des connecteurs personnalisés sur le plan gratuit de Claude.
-- **Licence de GlowRise** : il est construit à partir du "Shopify Skeleton Theme", dont la licence mentionne la vente via le Shopify Theme Store. À faire vérifier par un juriste avant le lancement. Origine de Nostra à confirmer.
+- **Licence des thèmes** : le Skeleton theme (et tout thème qui en dérive) est sous licence Shopify, qui mentionne la vente via le Shopify Theme Store. À faire vérifier par un juriste avant de vendre un thème dérivé.
 - Calibrage des prix en crédits, à partir des coûts réels mesurés.
 - Choix de l'hébergeur (durée maximale des fonctions pour la génération d'images, Redis managé ou non).
 - Contenu exact des plans (crédits, places, prix).
 
 ## 17. Étapes
 
-1. **Validation OAuth** : projet Next.js minimal, Supabase Auth, un outil MCP de test, connexion réussie depuis Claude.
-2. **Socle** : comptes, organisations, membres, invitations, dashboard avec sélecteur d'agence.
-3. **Thèmes** : catalogue, guides, build du zip verrouillé, livraisons. Test de bout en bout avec Claude sur une boutique de développement.
-4. **Images** : génération par section.
-5. **Paiement** : Stripe, plans, registre de crédits.
-6. **Skill et onboarding** : skill "Webuild Store Builder", documentation de connexion.
+1. ~~Validation OAuth~~ : fait.
+2. ~~Socle~~ : comptes, agences, membres, invitations, dashboard.
+3. ~~Thèmes~~ : catalogue, guides, zip verrouillé, livraisons, outils MCP.
+4. ~~Images~~ : génération par section.
+5. ~~Paiement~~ : Stripe, plans, registre de crédits, limite de places.
+6. ~~Skill et onboarding~~ : skill "Webuild Store Builder", page "Connecter Claude".
 7. **CRM** : clients, projets, timeline.
+8. **À suivre** : envoi des emails (SMTP), captures d'écran des thèmes, calibrage des prix, invitations par email, purge des images, packs de crédits.

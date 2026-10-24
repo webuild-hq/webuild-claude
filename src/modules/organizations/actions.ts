@@ -3,24 +3,10 @@
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
+import { errorMessage } from "@/lib/errors";
 import type { OrgRole } from "./types";
 
 export type ActionState = { error?: string; ok?: string };
-
-const ERROR_MESSAGES: Record<string, string> = {
-  forbidden: "Tu n'as pas les droits pour faire ça.",
-  invalid_role: "Ce rôle ne peut pas être attribué par invitation.",
-  already_member: "Cette personne est déjà membre de l'agence.",
-  last_owner: "L'agence doit garder au moins un propriétaire.",
-  not_member: "Cette personne n'est pas membre de l'agence.",
-  invitation_invalid: "Cette invitation n'est plus valide.",
-  email_mismatch: "Cette invitation a été envoyée à une autre adresse email.",
-};
-
-function errorMessage(error: { message?: string } | null) {
-  const code = error?.message ?? "";
-  return ERROR_MESSAGES[code] ?? "Une erreur est survenue. Réessaie.";
-}
 
 export async function createOrganization(_state: ActionState, formData: FormData): Promise<ActionState> {
   const name = String(formData.get("name") ?? "").trim();
