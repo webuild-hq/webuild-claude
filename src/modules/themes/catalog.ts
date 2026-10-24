@@ -34,6 +34,25 @@ export const THEMES: ThemeEntry[] = [
     ],
     accent: ["#e7e5e4", "#57534e"],
   },
+  {
+    slug: "mist",
+    name: "Mist",
+    version: "1.0.0",
+    tagline: "Beauté et soin, doux et éditorial, pensé pour mettre les produits en scène.",
+    description:
+      "Thème pour les marques de beauté, de soin et de parfum. Une page d'accueil qui raconte la marque : " +
+      "bandeau promo, cartes produits mises en avant, bandeau défilant d'images, sélection \"Currently obsessed\", " +
+      "vidéos en défilement, citations presse et avis clients, puis une déclaration de marque. Base Dawn 15.5.",
+    bestFor: ["Beauté", "Soin", "Parfum"],
+    highlights: [
+      "Accueil éditorial en 13 sections, prêt à remplir",
+      "Cartes produits, image avec produits et sélection \"Currently obsessed\"",
+      "Bandeaux défilants d'images et de vidéos",
+      "Citations presse, avis clients, FAQ et engagements de marque",
+      "Tiroir panier, recherche prédictive et commande rapide",
+    ],
+    accent: ["#F4E3E7", "#8c5a66"],
+  },
 ];
 
 export function getTheme(slug: string): ThemeEntry | undefined {

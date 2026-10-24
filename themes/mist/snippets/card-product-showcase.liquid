@@ -1,0 +1,158 @@
+{% comment %}
+  Showcase product card for the featured-collection section.
+
+  Accepts:
+  - card_product: {Object} Product (required)
+  - section: {Object} featured-collection section, for its settings (required)
+  - placeholder_image: {String} Placeholder svg name when no product (optional)
+{% endcomment %}
+
+{%- liquid
+  assign s = section.settings
+
+  assign badge_text = ''
+  if s.showcase_badge_text != blank
+    if s.showcase_badge_scope == 'all'
+      assign badge_text = s.showcase_badge_text
+    elsif s.showcase_badge_scope == 'tag' and card_product.tags contains s.showcase_badge_tag
+      assign badge_text = s.showcase_badge_text
+    endif
+  endif
+
+  assign has_options = false
+  if card_product.variants.size > 1 and card_product.options_with_values.size > 0
+    assign has_options = true
+    assign pill_option = card_product.options_with_values.first
+  endif
+
+  comment
+    With 'adapt' each card follows its own image's proportions, so the ratio is
+    set per card. Other values come from the section-level --sc-ratio.
+  endcomment
+  assign media_style = ''
+  if s.image_ratio == 'adapt' and card_product.featured_media != blank
+    assign media_style = 'aspect-ratio: ' | append: card_product.featured_media.aspect_ratio | append: ';'
+  endif
+
+  assign hover_animation = s.hover_image_animation | default: 'fade'
+-%}
+
+<div class="showcase-card">
+  {%- comment -%}
+    The image box is the bordered frame: the hover border hugs the image, and
+    the quick view button sits inside it at the bottom. Title, price, option
+    count and pills are below, outside the border.
+  {%- endcomment -%}
+  <div
+    class="showcase-card__media showcase-card__media--anim-{{ hover_animation }}"
+    {%- if media_style != blank %} style="{{ media_style }}"{% endif %}
+  >
+    <a
+      href="{{ card_product.url | default: '#' }}"
+      class="showcase-card__media-link"
+      aria-label="{{ card_product.title | escape }}"
+      tabindex="-1"
+    >
+      {%- if card_product.featured_media != blank -%}
+        {{
+          card_product.featured_media
+          | image_url: width: 800
+          | image_tag:
+            loading: 'lazy',
+            widths: '200, 300, 400, 500, 600, 800',
+            sizes: '(min-width: 750px) 300px, 45vw',
+            alt: card_product.featured_media.alt | escape
+        }}
+        {%- comment -%}
+          Reuses the section's existing "Show secondary image on hover" setting
+          (already used by the standard card) rather than adding a new one.
+        {%- endcomment -%}
+        {%- if s.show_secondary_image and card_product.media[1] != null -%}
+          {{
+            card_product.media[1]
+            | image_url: width: 800
+            | image_tag:
+              loading: 'lazy',
+              widths: '200, 300, 400, 500, 600, 800',
+              sizes: '(min-width: 750px) 300px, 45vw',
+              class: 'showcase-card__media-alt',
+              alt: card_product.media[1].alt | escape
+          }}
+        {%- endif -%}
+      {%- else -%}
+        {{ placeholder_image | default: 'product-apparel-2' | placeholder_svg_tag: 'placeholder-svg' }}
+      {%- endif -%}
+    </a>
+
+    {%- if badge_text != blank -%}
+      <span class="showcase-card__badge color-{{ s.showcase_badge_scheme }}">{{ badge_text }}</span>
+    {%- endif -%}
+
+    {%- if s.show_quick_view -%}
+      <a href="{{ card_product.url }}" class="showcase-card__quickview button">
+        {{ s.quick_view_label | default: 'Quick view' | escape }}
+      </a>
+    {%- endif -%}
+  </div>
+
+  <div class="showcase-card__info">
+    <p class="showcase-card__title">
+      <a href="{{ card_product.url | default: '#' }}">{{ card_product.title | escape }}</a>
+    </p>
+
+    {%- if s.show_rating and card_product.metafields.reviews.rating.value != blank -%}
+      {%- liquid
+        assign rating_decimal = 0
+        assign decimal = card_product.metafields.reviews.rating.value.rating | modulo: 1
+        if decimal >= 0.3 and decimal <= 0.7
+          assign rating_decimal = 0.5
+        elsif decimal > 0.7
+          assign rating_decimal = 1
+        endif
+      -%}
+      <div class="showcase-card__rating">
+        <span
+          aria-hidden="true"
+          class="rating-star"
+          style="--rating: {{ card_product.metafields.reviews.rating.value.rating | floor }}; --rating-max: {{ card_product.metafields.reviews.rating.value.scale_max }}; --rating-decimal: {{ rating_decimal }};"
+        ></span>
+        <span class="showcase-card__rating-text caption">
+          {{- card_product.metafields.reviews.rating.value }} ({{ card_product.metafields.reviews.rating_count }})
+        </span>
+      </div>
+    {%- endif -%}
+
+    {%- render 'price', product: card_product, price_class: 'showcase-card__price' -%}
+
+    {%- if s.show_variant_count and card_product.variants.size > 1 -%}
+      <p class="showcase-card__variant-count caption">
+        {{ card_product.variants.size }} {{ s.variant_count_label | default: 'options' | escape }}
+      </p>
+    {%- endif -%}
+
+    {%- comment -%} Option pills, revealed on hover, at the very bottom. {%- endcomment -%}
+    {%- if s.show_variant_pills and has_options -%}
+      <div class="showcase-card__reveal">
+        <div class="showcase-card__reveal-inner">
+          <div class="showcase-card__pills">
+            {%- for value in pill_option.values limit: 4 -%}
+              {%- assign variant_for_value = null -%}
+              {%- for variant in card_product.variants -%}
+                {%- if variant.options contains value -%}
+                  {%- assign variant_for_value = variant -%}
+                  {%- break -%}
+                {%- endif -%}
+              {%- endfor -%}
+              <a
+                href="{{ card_product.url }}{% if variant_for_value %}?variant={{ variant_for_value.id }}{% endif %}"
+                class="showcase-card__pill"
+              >
+                {{- value -}}
+              </a>
+            {%- endfor -%}
+          </div>
+        </div>
+      </div>
+    {%- endif -%}
+  </div>
+</div>

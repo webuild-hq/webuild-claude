@@ -1,0 +1,49 @@
+.editorial-statement__content {
+  max-width: var(--es-max-width, 140rem);
+}
+
+.editorial-statement__content--center {
+  margin-inline: auto;
+  text-align: center;
+}
+
+.editorial-statement__overline {
+  margin: 0 0 var(--es-gap-overline, 1rem);
+  font-size: var(--es-overline-size, 13px);
+  letter-spacing: var(--es-overline-spacing, 0.08em);
+  text-transform: var(--es-overline-transform, uppercase);
+  font-weight: var(--es-overline-weight, inherit);
+  color: var(--es-overline-color, inherit);
+}
+
+.editorial-statement__heading {
+  margin: 0;
+  font-size: var(--es-heading-size, 44px);
+  line-height: var(--es-heading-line-height, 1.15);
+  letter-spacing: var(--es-heading-spacing, normal);
+  font-weight: var(--es-heading-weight, var(--font-heading-weight));
+  color: var(--es-heading-color, inherit);
+}
+
+.editorial-statement__body {
+  margin-top: var(--es-gap-body, 2.4rem);
+  font-size: var(--es-body-size, 16px);
+  line-height: var(--es-body-line-height, 1.55);
+  color: var(--es-body-color, inherit);
+}
+
+.editorial-statement__body > *:first-child {
+  margin-top: 0;
+}
+
+.editorial-statement__body > *:last-child {
+  margin-bottom: 0;
+}
+
+@media screen and (max-width: 749px) {
+  /* A large display heading has to come down on a phone. The setting still
+     drives it below this cap. */
+  .editorial-statement__heading {
+    font-size: min(var(--es-heading-size, 44px), 8vw);
+  }
+}

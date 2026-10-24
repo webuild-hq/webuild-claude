@@ -1,0 +1,196 @@
+.featured-cards__header {
+  margin-bottom: 3rem;
+}
+
+.featured-cards__header--left {
+  text-align: left;
+}
+.featured-cards__header--center {
+  text-align: center;
+}
+.featured-cards__header--right {
+  text-align: right;
+}
+
+.featured-cards__heading {
+  margin: 0;
+  font-size: var(--cards-header-size, inherit);
+  font-weight: var(--cards-header-weight, inherit);
+  line-height: var(--cards-header-line-height, inherit);
+  text-transform: var(--cards-header-transform, none);
+  color: var(--cards-header-color, inherit);
+}
+
+.featured-cards__subheading {
+  margin-top: 1rem;
+  font-size: var(--cards-subheader-size, inherit);
+  color: var(--cards-subheader-color, inherit);
+}
+
+.featured-cards__grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cards-columns-mobile, 1), minmax(0, 1fr));
+  gap: var(--cards-gap, 2rem);
+}
+
+@media screen and (min-width: 750px) {
+  .featured-cards__grid {
+    grid-template-columns: repeat(var(--cards-columns, 2), minmax(0, 1fr));
+  }
+}
+
+.featured-card {
+  position: relative;
+  display: flex;
+  aspect-ratio: var(--cards-ratio, 1 / 1);
+  border-radius: var(--cards-radius, 1.6rem);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Dawn's .media turns children into absolutely positioned, full-size elements,
+   so the image fills the card on its own. */
+.featured-card__media {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.featured-card__media img,
+.featured-card__media .placeholder-svg {
+  object-fit: cover;
+}
+
+/* Scrim for text legibility over the photo. */
+.featured-card__media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, var(--cards-overlay, 0.2)) 0%, rgba(0, 0, 0, 0) 60%);
+  pointer-events: none;
+}
+
+.featured-card--middle .featured-card__media::after,
+.featured-card--top .featured-card__media::after {
+  background: rgba(0, 0, 0, var(--cards-overlay, 0.2));
+}
+
+/* Sits above the media but below the content, so the whole card is clickable
+   when there is no button. */
+.featured-card__link {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.featured-card__content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: var(--cards-text-gap, 0.8rem);
+  width: 100%;
+  padding: var(--cards-padding, 3rem);
+  color: var(--cards-text-color, rgb(var(--color-background)));
+  pointer-events: none;
+}
+
+/* Re-enable clicks only on the button itself. */
+.featured-card__content .button {
+  pointer-events: auto;
+}
+
+.featured-card--top .featured-card__content {
+  justify-content: flex-start;
+}
+.featured-card--middle .featured-card__content {
+  justify-content: center;
+}
+.featured-card--bottom .featured-card__content {
+  justify-content: flex-end;
+}
+
+.featured-card--align-left .featured-card__content {
+  align-items: flex-start;
+  text-align: left;
+}
+.featured-card--align-center .featured-card__content {
+  align-items: center;
+  text-align: center;
+}
+.featured-card--align-right .featured-card__content {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.featured-card__overline,
+.featured-card__title,
+.featured-card__subtitle {
+  margin: 0;
+  color: inherit;
+}
+
+.featured-card__overline {
+  font-size: var(--cards-overline-size, 13px);
+  letter-spacing: var(--cards-overline-spacing, 0.13em);
+  text-transform: var(--cards-overline-transform, uppercase);
+  font-weight: var(--cards-overline-weight, inherit);
+  color: var(--cards-overline-color, inherit);
+}
+
+.featured-card__title {
+  font-size: var(--cards-title-size, 36px);
+  line-height: var(--cards-title-line-height, 1.1);
+  letter-spacing: var(--cards-title-spacing, normal);
+  text-transform: var(--cards-title-transform, none);
+  color: var(--cards-title-color, inherit);
+  font-family: var(--font-heading-family);
+  font-style: var(--font-heading-style);
+  font-weight: var(--cards-title-weight, var(--font-heading-weight));
+}
+
+.featured-card__subtitle {
+  font-size: var(--cards-subtitle-size, 18px);
+  line-height: var(--cards-subtitle-line-height, 1.3);
+  letter-spacing: var(--cards-subtitle-spacing, normal);
+  text-transform: var(--cards-subtitle-transform, none);
+  font-weight: var(--cards-subtitle-weight, inherit);
+  color: var(--cards-subtitle-color, inherit);
+}
+
+/* The price component colors itself from the scheme, but the card text sits on
+   a photo and uses its own color. */
+.featured-card__price,
+.featured-card__price .price-item {
+  margin: 0;
+  font-size: var(--cards-subtitle-size, 18px);
+  color: inherit;
+}
+
+.featured-card__button {
+  margin-top: 1.2rem;
+  font-size: var(--cards-btn-size, 15px);
+  letter-spacing: var(--cards-btn-spacing, normal);
+  text-transform: var(--cards-btn-transform, none);
+  /* Dawn ships a 12rem min-width and fixed padding; both are released so the
+     padding settings actually drive the button size. */
+  min-width: 0;
+  min-height: 0;
+  padding: var(--cards-btn-padding-y, 1.2rem) var(--cards-btn-padding-x, 2.8rem);
+}
+
+.featured-card__button--full {
+  width: 100%;
+}
+
+@media screen and (max-width: 749px) {
+  /* A phone leaves little room, so the title is capped rather than allowed to
+     overflow the card. The setting still drives it below that cap. */
+  .featured-card__title {
+    font-size: min(var(--cards-title-size, 36px), 9vw);
+  }
+
+  .featured-card__content {
+    padding: min(var(--cards-padding, 3rem), 2rem);
+  }
+}

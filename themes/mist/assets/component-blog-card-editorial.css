@@ -1,0 +1,117 @@
+/* Horizontal editorial blog card: image on the left, text on the right. */
+.blog--editorial .blog__posts {
+  --grid-desktop-horizontal-spacing: var(--blog-card-gap, 4rem);
+}
+
+.blog-card-ed {
+  display: flex;
+  flex-direction: column;
+  gap: var(--blog-card-gap, 4rem);
+  height: 100%;
+}
+
+@media screen and (min-width: 750px) {
+  .blog-card-ed {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .blog-card-ed__media {
+    flex: 0 0 var(--blog-image-width, 45%);
+  }
+}
+
+.blog-card-ed__media {
+  display: block;
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--blog-image-radius, 1.6rem);
+  overflow: hidden;
+  background: rgba(var(--color-foreground), 0.04);
+}
+
+.blog-card-ed__media img,
+.blog-card-ed__media .placeholder-svg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.blog-card-ed__content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.2rem;
+  min-width: 0;
+}
+
+/* Pill badge for the article's first tag. */
+.blog-card-ed__badge {
+  display: inline-block;
+  padding: 0.5rem 1.4rem;
+  border: 0.1rem solid rgba(var(--color-foreground), 0.4);
+  border-radius: 999rem;
+  font-size: 1.1rem;
+  letter-spacing: 0.1rem;
+  text-transform: uppercase;
+}
+
+.blog-card-ed__title {
+  margin: 0;
+  font-size: 2.6rem;
+  line-height: 1.15;
+}
+
+.blog-card-ed__title a {
+  color: rgb(var(--color-foreground));
+  text-decoration: none;
+}
+
+.blog-card-ed__title a:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.3rem;
+}
+
+.blog-card-ed__date,
+.blog-card-ed__author {
+  margin: 0;
+  font-size: 1.4rem;
+  color: rgba(var(--color-foreground), 0.7);
+}
+
+.blog-card-ed__excerpt {
+  margin: 0.4rem 0 0;
+  color: rgba(var(--color-foreground), 0.8);
+}
+
+.blog-card-ed__link {
+  margin-top: 0.6rem;
+  text-underline-offset: 0.4rem;
+}
+
+@media screen and (max-width: 749px) {
+  .blog-card-ed__title {
+    font-size: 2.2rem;
+  }
+}
+
+/* Optional overlap: the text panel rides over the image with a rounded corner,
+   producing the notch look. Desktop only — stacked on mobile there is nothing
+   to overlap. */
+@media screen and (min-width: 750px) {
+  .blog-card-ed--overlap {
+    gap: 0;
+    align-items: stretch;
+  }
+
+  .blog-card-ed--overlap .blog-card-ed__content {
+    position: relative;
+    z-index: 1;
+    justify-content: center;
+    margin-left: calc(var(--blog-overlap, 4rem) * -1);
+    padding: 3rem;
+    background: rgb(var(--color-background));
+    border-radius: var(--blog-image-radius, 1.6rem);
+  }
+}

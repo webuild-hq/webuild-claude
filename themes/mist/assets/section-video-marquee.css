@@ -1,0 +1,138 @@
+.video-marquee {
+  position: relative;
+  height: var(--vm-mobile-height, 420px);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+@media screen and (min-width: 750px) {
+  .video-marquee {
+    height: var(--vm-height, 600px);
+  }
+}
+
+.video-marquee__poster,
+.video-marquee__media,
+.video-marquee__mobile-media {
+  position: absolute;
+  inset: 0;
+}
+
+.video-marquee__poster {
+  z-index: 0;
+}
+
+.video-marquee__media {
+  z-index: 1;
+}
+
+.video-marquee__mobile-media {
+  z-index: 2;
+}
+
+.video-marquee__poster img,
+.video-marquee__poster .placeholder-svg,
+.video-marquee__media video,
+.video-marquee__mobile-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* The mobile image replaces the video on phones so they never download it. */
+.video-marquee__mobile-media {
+  display: none;
+}
+
+@media screen and (max-width: 749px) {
+  .video-marquee--has-mobile-image .video-marquee__media {
+    display: none;
+  }
+
+  .video-marquee--has-mobile-image .video-marquee__mobile-media {
+    display: block;
+  }
+}
+
+/* [aria-hidden] attribute selector, not just decoration: base.css hides every
+   empty div by default (div:empty { display: none }), which otherwise beats a
+   bare class selector on specificity and makes this overlay disappear. */
+.video-marquee__overlay[aria-hidden] {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: var(--vm-overlay, rgba(0, 0, 0, 0.2));
+  pointer-events: none;
+}
+
+.video-marquee__content {
+  position: relative;
+  z-index: 4;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--vm-content-gap, 3rem);
+  /* The strip must span the full width, so only vertical placement varies. */
+  justify-content: center;
+  padding: 4rem 0;
+}
+
+.video-marquee__content--top {
+  justify-content: flex-start;
+}
+
+.video-marquee__content--bottom {
+  justify-content: flex-end;
+}
+
+/* Full-bleed: the strip scrolls edge to edge, ignoring the page gutters. */
+.video-marquee__strip {
+  width: 100%;
+  overflow: hidden;
+}
+
+.video-marquee__cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.6rem;
+  padding: 0 1.5rem;
+  text-align: center;
+}
+
+.video-marquee__subheading {
+  margin: 0;
+  font-size: var(--vm-subheading-size, 20px);
+  font-weight: var(--vm-subheading-weight, inherit);
+  color: var(--vm-subheading-color, #ffffff);
+  line-height: 1.3;
+}
+
+.video-marquee__button {
+  min-width: 0;
+  min-height: 0;
+  padding: 1.2rem 3rem;
+}
+
+@media screen and (max-width: 749px) {
+  /* Large marquee type would overflow a phone; the setting still applies below
+     this cap. */
+  .video-marquee__text,
+  .video-marquee .marquee__text {
+    font-size: min(var(--marquee-text-size, 48px), 9vw);
+  }
+
+  .video-marquee .marquee__image {
+    width: min(var(--marquee-image-size, 9rem), 22vw);
+  }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+  /* The marquee animation is already disabled in component-marquee.css. Hiding
+     the video reveals the cover image underneath, so the section still has a
+     background instead of going blank. */
+  .video-marquee__media {
+    display: none;
+  }
+}

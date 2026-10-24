@@ -1,0 +1,173 @@
+/* Peek carousel of image + title + text cards. Slide width is derived from a
+   fractional "visible slides" count, so a value like 3.3 shows three cards plus
+   a sliver of the next — which is what tells the visitor the row scrolls. */
+
+.content-carousel__slider {
+  position: relative;
+}
+
+.content-carousel__track {
+  display: flex;
+  gap: var(--cc-gap, 2.4rem);
+  margin: 0;
+  padding: 0 var(--cc-edge, 2rem);
+  list-style: none;
+}
+
+/* Percentages in flex-basis resolve against the scroller's content box, which
+   already excludes the padding above — so the edge gutter must not be
+   subtracted a second time here. */
+.content-carousel__slide {
+  flex: 0 0 calc((100% - (var(--cc-visible, 1) - 1) * var(--cc-gap, 2.4rem)) / var(--cc-visible, 1));
+}
+
+/* Dawn snaps slides to centre in .slider--everywhere, which fights a peek
+   layout by parking partial cards on both sides at every stop. */
+.content-carousel .slider.slider--everywhere .slider__slide {
+  scroll-snap-align: start;
+}
+
+.content-carousel__media {
+  position: relative;
+  aspect-ratio: var(--cc-ratio, 1 / 1);
+  border-radius: var(--cc-media-radius, 1.6rem);
+  overflow: hidden;
+  background: var(--cc-media-bg, rgba(var(--color-foreground), 0.05));
+}
+
+.content-carousel__media img,
+.content-carousel__media .placeholder-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: var(--cc-focal, center);
+}
+
+.content-carousel__media .placeholder-svg {
+  object-fit: contain;
+  padding: 20%;
+}
+
+.content-carousel__content {
+  padding-top: var(--cc-media-gap, 1.6rem);
+  text-align: var(--cc-text-align, left);
+}
+
+.content-carousel__title {
+  margin: 0;
+  font-size: var(--cc-title-size, 2.2rem);
+  font-weight: var(--cc-title-weight, inherit);
+  line-height: var(--cc-title-line-height, 1.3);
+  letter-spacing: var(--cc-title-spacing, normal);
+  text-transform: var(--cc-title-transform, none);
+  color: var(--cc-title-color, inherit);
+}
+
+.content-carousel__text {
+  margin: var(--cc-title-gap, 0.8rem) 0 0;
+  font-size: var(--cc-text-size, 1.6rem);
+  line-height: var(--cc-text-line-height, 1.6);
+  color: var(--cc-text-color, inherit);
+}
+
+.content-carousel__text > *:first-child {
+  margin-top: 0;
+}
+
+.content-carousel__text > *:last-child {
+  margin-bottom: 0;
+}
+
+.content-carousel__link {
+  display: inline-block;
+  margin-top: var(--cc-link-gap, 1.2rem);
+  font-size: var(--cc-link-size, 1.5rem);
+  color: var(--cc-link-color, inherit);
+  text-underline-offset: 0.3rem;
+}
+
+/* A whole-card link that keeps the title readable to assistive tech while
+   leaving the visible text unstyled. */
+.content-carousel__card-link {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.content-carousel__slide {
+  position: relative;
+}
+
+/* Arrows -------------------------------------------------------------------
+   Positioned from the top rather than centred on the card, because the card's
+   height includes the text block and a true centre would drop the arrows below
+   the image. The offset is a setting so it keeps tracking the image when the
+   ratio or text length changes. */
+.content-carousel__button {
+  position: absolute;
+  top: var(--cc-arrow-top, 32%);
+  transform: translateY(-50%);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--cc-arrow-size, 4.8rem);
+  height: var(--cc-arrow-size, 4.8rem);
+  padding: 0;
+  border-radius: 50%;
+  border: var(--cc-arrow-border-width, 0.1rem) solid var(--cc-arrow-border-color, rgba(var(--color-foreground), 0.4));
+  background: var(--cc-arrow-bg, rgb(var(--color-background)));
+  color: var(--cc-arrow-color, rgb(var(--color-foreground)));
+  cursor: pointer;
+  transition: border-color var(--duration-short) ease, background-color var(--duration-short) ease,
+    opacity var(--duration-short) ease;
+}
+
+.content-carousel__button:hover:not([disabled]) {
+  border-color: var(--cc-arrow-border-color-hover, rgb(var(--color-foreground)));
+  background: var(--cc-arrow-bg-hover, rgb(var(--color-background)));
+}
+
+.content-carousel__button[disabled] {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.content-carousel__button .svg-wrapper {
+  width: var(--cc-arrow-icon-size, 1.8rem);
+  height: var(--cc-arrow-icon-size, 1.8rem);
+}
+
+.content-carousel__button svg {
+  width: 100%;
+  height: 100%;
+}
+
+.content-carousel__button--prev {
+  left: var(--cc-arrow-offset, 1rem);
+}
+
+.content-carousel__button--prev svg {
+  transform: rotate(180deg);
+}
+
+.content-carousel__button--next {
+  right: var(--cc-arrow-offset, 1rem);
+}
+
+.content-carousel__heading {
+  margin: 0 0 var(--cc-heading-gap, 3.2rem);
+  font-size: var(--cc-heading-size, 3.2rem);
+  font-weight: var(--cc-heading-weight, inherit);
+  color: var(--cc-heading-color, inherit);
+  text-align: var(--cc-heading-align, left);
+}
+
+@media screen and (max-width: 749px) {
+  /* Touch users swipe, so the arrows are dead weight that also sit on top of
+     the cards at phone widths. */
+  .content-carousel--hide-arrows-mobile .content-carousel__button {
+    display: none;
+  }
+}

@@ -1,0 +1,159 @@
+/* Photo collage: a text column beside a stage of freely-positioned, overlapping
+   images. Positions are percentages of the stage, so the whole arrangement
+   scales together instead of individual photos drifting apart at other widths. */
+
+/* clip, not hidden: stops a photo placed near the edge from creating a page-wide
+   horizontal scrollbar, without making the section a scroll container (which
+   `hidden` would, breaking position: sticky for any ancestor). */
+.photo-collage {
+  overflow-x: clip;
+}
+
+.photo-collage__layout {
+  display: grid;
+  gap: var(--pc-gap, 4rem);
+  align-items: center;
+}
+
+.photo-collage__overline {
+  margin: 0 0 var(--pc-overline-gap, 1.6rem);
+  font-size: var(--pc-overline-size, 1.3rem);
+  font-weight: var(--pc-overline-weight, 700);
+  letter-spacing: var(--pc-overline-spacing, 0.1em);
+  text-transform: uppercase;
+  color: var(--pc-overline-color, inherit);
+}
+
+.photo-collage__heading {
+  margin: 0;
+  font-size: var(--pc-heading-size, 4rem);
+  font-weight: var(--pc-heading-weight, 700);
+  line-height: var(--pc-heading-line-height, 1.15);
+  letter-spacing: var(--pc-heading-spacing, normal);
+  color: var(--pc-heading-color, inherit);
+}
+
+.photo-collage__body {
+  margin: var(--pc-body-gap, 2rem) 0 0;
+  font-size: var(--pc-body-size, 1.6rem);
+  line-height: var(--pc-body-line-height, 1.6);
+  color: var(--pc-body-color, rgba(var(--color-foreground), 0.75));
+  max-width: var(--pc-body-width, 44rem);
+}
+
+.photo-collage__body > *:first-child {
+  margin-top: 0;
+}
+
+.photo-collage__body > *:last-child {
+  margin-bottom: 0;
+}
+
+/* Text-style button: no chrome at all, matching the reference's plain "Shop
+   now" label. Kept separate from .button so the two styles never fight over
+   the same properties. */
+.photo-collage__button {
+  display: inline-block;
+  margin-top: var(--pc-button-gap, 2.8rem);
+  font-size: var(--pc-button-size, 1.6rem);
+  font-weight: var(--pc-button-weight, 600);
+  color: var(--pc-button-color, inherit);
+  text-decoration: none;
+}
+
+.photo-collage__button--text {
+  text-underline-offset: 0.3rem;
+}
+
+.photo-collage__button--text:hover {
+  text-decoration: underline;
+}
+
+.photo-collage__button--solid {
+  padding: 0 var(--pc-button-padding, 2.8rem);
+  min-height: var(--pc-button-height, 5rem);
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--pc-button-radius, 999rem);
+  background: var(--pc-button-bg, rgb(var(--color-button)));
+  color: var(--pc-button-text, rgb(var(--color-button-text)));
+}
+
+/* Stage ----------------------------------------------------------------------
+   The padding gives images that touch 0% or 100% room to cast their shadow
+   without it being clipped by the column edge. Height comes from a setting
+   rather than aspect-ratio, since the arrangement's proportions depend on
+   where the merchant places each photo, not on any single image's shape. */
+.photo-collage__stage {
+  position: relative;
+  height: var(--pc-stage-height-mobile, 44rem);
+  padding: var(--pc-stage-padding, 0);
+}
+
+.photo-collage__item {
+  position: absolute;
+  left: var(--item-x, 0%);
+  top: var(--item-y, 0%);
+  width: var(--item-w, 40%);
+  aspect-ratio: var(--item-ratio, 3 / 4);
+  border-radius: var(--item-radius, 1.6rem);
+  overflow: hidden;
+  background: rgba(var(--color-foreground), 0.04);
+}
+
+.photo-collage__item--shadow {
+  box-shadow: var(--pc-shadow-x, 0) var(--pc-shadow-y, 1.6rem) var(--pc-shadow-blur, 3rem)
+    rgba(var(--color-shadow), var(--pc-shadow-opacity, 0.18));
+}
+
+.photo-collage__item img,
+.photo-collage__item .placeholder-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: var(--item-focal, center);
+}
+
+@media screen and (min-width: 750px) {
+  .photo-collage__layout {
+    grid-template-columns: var(--pc-text-width, 40%) 1fr;
+    gap: var(--pc-split-gap, 6rem);
+  }
+
+  .photo-collage__layout--media-left .photo-collage__stage {
+    order: 1;
+  }
+
+  .photo-collage__layout--media-left .photo-collage__content {
+    order: 2;
+  }
+
+  .photo-collage__stage {
+    height: var(--pc-stage-height, 60rem);
+  }
+}
+
+/* Below the split breakpoint, absolute positions would either overlap the text
+   or collapse into an unreadable pile — so the collage becomes a plain 2-up
+   grid instead, ignoring every position/size setting. */
+@media screen and (max-width: 749px) {
+  .photo-collage__stage {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+    height: auto;
+    padding: 0;
+  }
+
+  .photo-collage__item {
+    position: static;
+    width: auto;
+    aspect-ratio: 3 / 4;
+  }
+
+  .photo-collage__item:nth-child(odd):last-child {
+    grid-column: 1 / -1;
+    aspect-ratio: 16 / 10;
+  }
+}

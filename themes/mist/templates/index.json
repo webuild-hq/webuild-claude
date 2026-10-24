@@ -1,0 +1,1000 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "promo_bar_KM74Lm": {
+      "type": "promo-bar",
+      "blocks": {
+        "text_Y3LgH7": {
+          "type": "text",
+          "settings": {
+            "text": "Get 5 Minis and save 20%",
+            "link": "",
+            "text_size": 20,
+            "text_weight": "inherit",
+            "text_transform": "inherit",
+            "text_color": ""
+          }
+        },
+        "text_immERT": {
+          "type": "text",
+          "settings": {
+            "text": "Get 5 Minis and save 20%",
+            "link": "",
+            "text_size": 20,
+            "text_weight": "inherit",
+            "text_transform": "inherit",
+            "text_color": ""
+          }
+        },
+        "text_Bzcday": {
+          "type": "text",
+          "settings": {
+            "text": "Get 5 Minis and save 20%",
+            "link": "",
+            "text_size": 20,
+            "text_weight": "inherit",
+            "text_transform": "inherit",
+            "text_color": ""
+          }
+        }
+      },
+      "block_order": [
+        "text_Y3LgH7",
+        "text_immERT",
+        "text_Bzcday"
+      ],
+      "name": "t:sections.promo-bar.name",
+      "settings": {
+        "overlay_color": "",
+        "overlay_opacity": 70,
+        "min_height": 96,
+        "alignment": "center",
+        "gap": 4,
+        "full_width": false,
+        "show_separators": true,
+        "separator_thickness": 1,
+        "separator_height": 60,
+        "separator_color": "",
+        "separator_opacity": 45,
+        "show_border_top": true,
+        "show_border_bottom": false,
+        "border_thickness": 1,
+        "border_color": "#000000",
+        "border_opacity": 100,
+        "color_scheme": "",
+        "padding_top": 16,
+        "padding_bottom": 16
+      }
+    },
+    "image_banner": {
+      "type": "image-banner",
+      "blocks": {
+        "text_8yHmeA": {
+          "type": "text",
+          "settings": {
+            "text": "Give customers details about the banner.",
+            "text_style": "caption-with-letter-spacing",
+            "text_size": 12,
+            "text_color": "",
+            "text_weight": "inherit",
+            "text_transform": "inherit"
+          }
+        },
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Flower Mist",
+            "heading_size": "hxl",
+            "heading_font_size": 0,
+            "heading_line_height": 0,
+            "heading_color": "",
+            "heading_weight": "inherit",
+            "heading_transform": "inherit"
+          }
+        },
+        "text_8WrmQj": {
+          "type": "text",
+          "settings": {
+            "text": "Give customers details about the banner image(s) or content on the template.",
+            "text_style": "body",
+            "text_size": 22,
+            "text_color": "",
+            "text_weight": "inherit",
+            "text_transform": "inherit"
+          }
+        },
+        "button": {
+          "type": "buttons",
+          "settings": {
+            "button_label_1": "SHOP ALL",
+            "button_link_1": "shopify://collections/all",
+            "button_style_secondary_1": true,
+            "button_label_2": "",
+            "button_link_2": "",
+            "button_style_secondary_2": false,
+            "btn1_custom": true,
+            "btn1_bg": "#000000",
+            "btn1_text": "#ffffff",
+            "btn1_bg_hover": "",
+            "btn1_text_hover": "",
+            "btn1_border": "",
+            "btn1_border_thickness": 0,
+            "btn1_radius": 30,
+            "btn1_weight": "600",
+            "btn2_custom": false,
+            "btn2_bg": "",
+            "btn2_text": "",
+            "btn2_bg_hover": "",
+            "btn2_text_hover": "",
+            "btn2_border": "",
+            "btn2_border_thickness": 0,
+            "btn2_radius": 0,
+            "btn2_weight": "inherit"
+          }
+        },
+        "product_carousel_cPQVKi": {
+          "type": "product_carousel",
+          "settings": {
+            "product_list": [],
+            "title_size": "h3",
+            "show_price": true,
+            "button_label": "Quick view",
+            "card_color_scheme": "scheme-1",
+            "btn_custom": false,
+            "btn_bg": "",
+            "btn_text": "",
+            "btn_bg_hover": "",
+            "btn_text_hover": "",
+            "btn_border": "",
+            "btn_border_thickness": 0,
+            "btn_radius": 0,
+            "btn_weight": "inherit"
+          }
+        }
+      },
+      "block_order": [
+        "text_8yHmeA",
+        "heading",
+        "text_8WrmQj",
+        "button",
+        "product_carousel_cPQVKi"
+      ],
+      "settings": {
+        "image_overlay_opacity": 0,
+        "image_height": "large",
+        "image_behavior": "none",
+        "desktop_content_position": "middle-left",
+        "desktop_content_alignment": "left",
+        "content_width": 40,
+        "show_text_box": false,
+        "color_scheme": "scheme-3",
+        "stack_images_on_mobile": false,
+        "mobile_content_alignment": "center",
+        "show_text_below": false,
+        "card_layout": "carousel",
+        "card_alignment": "left",
+        "card_max_width": 60,
+        "card_image_size": 13,
+        "card_padding": 1.5,
+        "card_gap": 1,
+        "card_spacing": 7,
+        "card_corner_radius": 2,
+        "card_auto_rotate": false,
+        "card_change_slides_speed": 5,
+        "card_arrows_alignment": "left",
+        "card_arrows_size": 4.4,
+        "card_arrows_icon_size": 1.6,
+        "card_arrows_background": "#ffffff",
+        "card_arrows_background_hover": "",
+        "card_arrows_color": "",
+        "show_border_top": true,
+        "show_border_bottom": true,
+        "border_thickness": 1,
+        "border_color": "#000000",
+        "border_opacity": 100
+      }
+    },
+    "featured_cards_RPi68y": {
+      "type": "featured-cards",
+      "blocks": {
+        "card_KnF47P": {
+          "type": "card",
+          "settings": {
+            "product": "",
+            "overline": "POPULAR",
+            "subtitle": "Add a short description",
+            "show_price": false,
+            "button_label": "Shop now",
+            "title": "",
+            "link": "",
+            "content_position": "bottom",
+            "content_alignment": "center",
+            "text_color": "#ffffff"
+          }
+        },
+        "card_F8GCLm": {
+          "type": "card",
+          "settings": {
+            "product": "",
+            "overline": "POPULAR",
+            "subtitle": "Add a short description",
+            "show_price": false,
+            "button_label": "Shop now",
+            "title": "",
+            "link": "",
+            "content_position": "bottom",
+            "content_alignment": "center",
+            "text_color": "#ffffff"
+          }
+        },
+        "card_73fxHp": {
+          "type": "card",
+          "settings": {
+            "product": "",
+            "overline": "POPULAR",
+            "subtitle": "Add a short description",
+            "show_price": false,
+            "button_label": "Shop now",
+            "title": "",
+            "link": "",
+            "content_position": "bottom",
+            "content_alignment": "center",
+            "text_color": "#ffffff"
+          }
+        }
+      },
+      "block_order": [
+        "card_KnF47P",
+        "card_F8GCLm",
+        "card_73fxHp"
+      ],
+      "name": "t:sections.featured-cards.name",
+      "settings": {
+        "heading_alignment": "center",
+        "section_heading_size": 60,
+        "section_heading_line_height": 0,
+        "section_heading_weight": "500",
+        "section_heading_transform": "inherit",
+        "section_heading_color": "#000000",
+        "section_subheading_size": 0,
+        "section_subheading_color": "",
+        "columns_desktop": 3,
+        "columns_mobile": "1",
+        "gap": 2,
+        "full_width": false,
+        "image_ratio": "square",
+        "corner_radius": 1.6,
+        "overlay_opacity": 20,
+        "content_padding": 3,
+        "text_gap": 0.8,
+        "overline_size": 13,
+        "overline_weight": "inherit",
+        "overline_transform": "inherit",
+        "overline_spacing": 13,
+        "overline_color": "",
+        "title_size": 36,
+        "title_weight": "inherit",
+        "title_transform": "inherit",
+        "title_spacing": 0,
+        "title_line_height": 110,
+        "title_color": "",
+        "subtitle_size": 18,
+        "subtitle_weight": "inherit",
+        "subtitle_transform": "inherit",
+        "subtitle_spacing": 0,
+        "subtitle_line_height": 130,
+        "subtitle_color": "",
+        "text_color": "",
+        "btn_custom": true,
+        "btn_bg": "#f6ffa3",
+        "btn_text": "#000000",
+        "btn_bg_hover": "",
+        "btn_text_hover": "",
+        "btn_border": "",
+        "btn_border_thickness": 0,
+        "btn_radius": 35,
+        "btn_weight": "inherit",
+        "btn_font_size": 15,
+        "btn_padding_x": 2.8,
+        "btn_padding_y": 1.2,
+        "btn_spacing": 0,
+        "btn_transform": "inherit",
+        "btn_full_width": false,
+        "color_scheme": "",
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    },
+    "marquee_wgBVrj": {
+      "type": "marquee",
+      "blocks": {
+        "text_m7dJ9F": {
+          "type": "text",
+          "settings": {
+            "text": "Time for that summer glow!"
+          }
+        },
+        "image_6CMk6L": {
+          "type": "image",
+          "settings": {}
+        },
+        "text_D7y43w": {
+          "type": "text",
+          "settings": {
+            "text": "Time for that summer glow!"
+          }
+        },
+        "image_p94KCA": {
+          "type": "image",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "text_m7dJ9F",
+        "image_6CMk6L",
+        "text_D7y43w",
+        "image_p94KCA"
+      ],
+      "name": "t:sections.marquee.name",
+      "settings": {
+        "speed": 30,
+        "direction": "left",
+        "pause_on_hover": true,
+        "gap": 5,
+        "text_size": 28,
+        "text_color": "",
+        "image_size": 12.5,
+        "image_radius": 1.2,
+        "show_border_top": true,
+        "show_border_bottom": true,
+        "border_thickness": 1,
+        "border_color": "",
+        "border_opacity": 100,
+        "color_scheme": "scheme-2",
+        "padding_top": 24,
+        "padding_bottom": 24
+      }
+    },
+    "image_with_products_myf6Rf": {
+      "type": "image-with-products",
+      "name": "t:sections.image-with-products.name",
+      "settings": {
+        "image_link": "",
+        "media_position": "left",
+        "media_width": 50,
+        "media_ratio": "fill",
+        "media_radius": 2,
+        "gap": 4,
+        "full_width": false,
+        "product_list": [],
+        "columns": 2,
+        "card_image_ratio": "portrait",
+        "card_image_radius": 0.8,
+        "card_padding": 2,
+        "card_text_gap": 1,
+        "show_separators": true,
+        "separator_thickness": 1,
+        "separator_color": "",
+        "separator_opacity": 40,
+        "title_size": 15,
+        "title_weight": "600",
+        "title_transform": "inherit",
+        "title_color": "",
+        "show_price": true,
+        "price_size": 15,
+        "price_color": "",
+        "button_label": "Quick view",
+        "btn_custom": true,
+        "btn_bg": "",
+        "btn_text": "",
+        "btn_bg_hover": "",
+        "btn_text_hover": "",
+        "btn_border": "",
+        "btn_border_thickness": 1,
+        "btn_radius": 50,
+        "btn_weight": "inherit",
+        "btn_font_size": 12,
+        "btn_padding_x": 2,
+        "btn_padding_y": 1,
+        "btn_spacing": 8,
+        "btn_transform": "uppercase",
+        "color_scheme": "",
+        "padding_top": 48,
+        "padding_bottom": 48
+      }
+    },
+    "currently_obsessed_AxJgyn": {
+      "type": "currently-obsessed",
+      "blocks": {
+        "edit_6FG7Cz": {
+          "type": "edit",
+          "settings": {
+            "label": "Low-effort glow",
+            "bg_color": "#f5e6e0"
+          }
+        },
+        "edit_xTKcet": {
+          "type": "edit",
+          "settings": {
+            "label": "Main character eyes",
+            "bg_color": "#e8e4dc"
+          }
+        },
+        "edit_eJTj8b": {
+          "type": "edit",
+          "settings": {
+            "label": "Finishing touches",
+            "bg_color": "#efe8d7"
+          }
+        },
+        "edit_8xCCJ7": {
+          "type": "edit",
+          "settings": {
+            "label": "Soft lips club",
+            "bg_color": "#f0ddd9"
+          }
+        }
+      },
+      "block_order": [
+        "edit_6FG7Cz",
+        "edit_xTKcet",
+        "edit_eJTj8b",
+        "edit_8xCCJ7"
+      ],
+      "name": "Currently obsessed",
+      "settings": {
+        "title": "Currently obsessed",
+        "title_size": 56,
+        "title_color": "#1b1714",
+        "description": "<p>Curated edits of our most-worn formulas and shades, thoughtfully grouped so you don't have to overthink it.</p>",
+        "description_size": 15,
+        "description_max_width": 0,
+        "item_size": 32,
+        "items_gap": 8,
+        "layout": "image-right",
+        "gap": 64,
+        "content_padding_left": 0,
+        "image_aspect_ratio": "4 / 3",
+        "image_border_radius": 16,
+        "text_color": "#1b1714",
+        "inactive_color": "#a8a099",
+        "fallback_background": "#f5e6e0",
+        "padding_top": 80,
+        "padding_bottom": 80,
+        "mobile_padding_top": 40,
+        "mobile_padding_bottom": 40,
+        "mobile_title_size": 40,
+        "mobile_item_size": 28,
+        "mobile_image_ratio": "4 / 3"
+      }
+    },
+    "image_with_text_XMGkiy": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_rUwMTi": {
+          "type": "heading",
+          "settings": {
+            "heading": "Image with text",
+            "heading_size": "h1",
+            "heading_font_size": 60,
+            "heading_line_height": 0,
+            "heading_color": "",
+            "heading_weight": "500",
+            "heading_transform": "inherit"
+          }
+        },
+        "text_Uirnym": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Purchase 5 or more and save 20%</p>",
+            "text_style": "body",
+            "text_size": 23,
+            "text_line_height": 0,
+            "text_color": "",
+            "text_weight": "inherit",
+            "text_transform": "inherit"
+          }
+        },
+        "text_UkF3x6": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Pair text with an image to focus on your chosen product, collection, or blog post. Add details on availability, style, or even provide a review.</p>",
+            "text_style": "body",
+            "text_size": 16,
+            "text_line_height": 0,
+            "text_color": "",
+            "text_weight": "inherit",
+            "text_transform": "inherit"
+          }
+        },
+        "button_tM6mhB": {
+          "type": "button",
+          "settings": {
+            "button_label": "BUTTON LABEL",
+            "button_link": "shopify://collections/all",
+            "button_style_secondary": false,
+            "button_label_2": "BUTTON LABEL",
+            "button_link_2": "shopify://collections/all",
+            "button_style_secondary_2": true,
+            "btn1_custom": true,
+            "btn1_bg": "#000000",
+            "btn1_text": "",
+            "btn1_bg_hover": "",
+            "btn1_text_hover": "",
+            "btn1_border": "",
+            "btn1_border_thickness": 0,
+            "btn1_radius": 31,
+            "btn1_weight": "600",
+            "btn2_custom": true,
+            "btn2_bg": "",
+            "btn2_text": "",
+            "btn2_bg_hover": "",
+            "btn2_text_hover": "",
+            "btn2_border": "#000000",
+            "btn2_border_thickness": 1,
+            "btn2_radius": 31,
+            "btn2_weight": "600"
+          }
+        }
+      },
+      "block_order": [
+        "heading_rUwMTi",
+        "text_Uirnym",
+        "text_UkF3x6",
+        "button_tM6mhB"
+      ],
+      "name": "t:sections.image-with-text.presets.name",
+      "settings": {
+        "height": "custom",
+        "desktop_image_width": "medium",
+        "layout": "image_first",
+        "image_behavior": "none",
+        "image_custom_height": 570,
+        "image_focal_point": "center center",
+        "image_radius": 20,
+        "image_border_thickness": 1,
+        "image_border_color": "#000000",
+        "image_border_opacity": 100,
+        "image_overlay_color": "",
+        "image_overlay_opacity": 0,
+        "image_shadow_opacity": 0,
+        "image_shadow_blur": 20,
+        "content_layout": "no-overlap",
+        "desktop_content_position": "middle",
+        "desktop_content_alignment": "left",
+        "mobile_content_alignment": "left",
+        "content_radius": 0,
+        "content_background": "",
+        "content_border_thickness": 0,
+        "content_border_color": "",
+        "content_border_opacity": 100,
+        "content_shadow_opacity": 0,
+        "content_shadow_blur": 20,
+        "section_color_scheme": "",
+        "color_scheme": "",
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    },
+    "multicolumn_r8DhQ6": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_AaKHtb": {
+          "type": "column",
+          "settings": {
+            "title": "Column",
+            "text": "<p>Pair text with an image to focus on your chosen product, collection, or blog post. Add details on availability, style, or even provide a review.</p>",
+            "link_label": "",
+            "link": ""
+          }
+        },
+        "column_gpcbtA": {
+          "type": "column",
+          "settings": {
+            "title": "Column",
+            "text": "<p>Pair text with an image to focus on your chosen product, collection, or blog post. Add details on availability, style, or even provide a review.</p>",
+            "link_label": "",
+            "link": ""
+          }
+        },
+        "column_6exGhJ": {
+          "type": "column",
+          "settings": {
+            "title": "Column",
+            "text": "<p>Pair text with an image to focus on your chosen product, collection, or blog post. Add details on availability, style, or even provide a review.</p>",
+            "link_label": "",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "column_AaKHtb",
+        "column_gpcbtA",
+        "column_6exGhJ"
+      ],
+      "name": "t:sections.multicolumn.presets.name",
+      "settings": {
+        "title": "Multicolumn",
+        "heading_size": "h1",
+        "image_width": "full",
+        "image_ratio": "adapt",
+        "image_custom_ratio": 125,
+        "image_radius": 21,
+        "image_focal_point": "center center",
+        "button_label": "",
+        "button_link": "",
+        "columns_desktop": 3,
+        "column_alignment": "center",
+        "background_style": "none",
+        "color_scheme": "",
+        "columns_mobile": "1",
+        "swipe_on_mobile": false,
+        "column_gap": 10,
+        "row_gap": 8,
+        "card_padding": 0,
+        "image_text_gap": 20,
+        "info_gap": 0,
+        "column_title_size": 24,
+        "column_title_weight": "inherit",
+        "column_title_transform": "inherit",
+        "column_title_color": "",
+        "column_text_size": 18,
+        "column_text_color": "",
+        "link_style": "link",
+        "button_style_secondary": true,
+        "btn_custom": false,
+        "btn_bg": "",
+        "btn_text": "",
+        "btn_bg_hover": "",
+        "btn_text_hover": "",
+        "btn_border": "",
+        "btn_border_thickness": 1,
+        "btn_radius": 50,
+        "btn_weight": "inherit",
+        "btn_font_size": 13,
+        "btn_padding_x": 2.4,
+        "btn_padding_y": 1,
+        "btn_spacing": 8,
+        "btn_transform": "uppercase",
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    },
+    "image_with_text_RqTQLY": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_nz76jj": {
+          "type": "heading",
+          "settings": {
+            "heading": "Image with text",
+            "heading_size": "h1",
+            "heading_font_size": 0,
+            "heading_line_height": 0,
+            "heading_color": "",
+            "heading_weight": "inherit",
+            "heading_transform": "inherit"
+          }
+        },
+        "text_cdhWh4": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Pair text with an image to focus on your chosen product, collection, or blog post. Add details on availability, style, or even provide a review.</p>",
+            "text_style": "body",
+            "text_size": 0,
+            "text_line_height": 0,
+            "text_color": "",
+            "text_weight": "inherit",
+            "text_transform": "inherit"
+          }
+        },
+        "button_RdTEad": {
+          "type": "button",
+          "settings": {
+            "button_label": "Button label",
+            "button_link": "",
+            "button_style_secondary": false,
+            "button_label_2": "",
+            "button_link_2": "",
+            "button_style_secondary_2": true,
+            "btn1_custom": false,
+            "btn1_bg": "",
+            "btn1_text": "",
+            "btn1_bg_hover": "",
+            "btn1_text_hover": "",
+            "btn1_border": "",
+            "btn1_border_thickness": 0,
+            "btn1_radius": 0,
+            "btn1_weight": "inherit",
+            "btn2_custom": false,
+            "btn2_bg": "",
+            "btn2_text": "",
+            "btn2_bg_hover": "",
+            "btn2_text_hover": "",
+            "btn2_border": "",
+            "btn2_border_thickness": 0,
+            "btn2_radius": 0,
+            "btn2_weight": "inherit"
+          }
+        }
+      },
+      "block_order": [
+        "heading_nz76jj",
+        "text_cdhWh4",
+        "button_RdTEad"
+      ],
+      "name": "t:sections.image-with-text.presets.name",
+      "settings": {
+        "height": "custom",
+        "desktop_image_width": "medium",
+        "layout": "image_first",
+        "image_behavior": "none",
+        "image_custom_height": 620,
+        "image_focal_point": "center center",
+        "image_radius": 30,
+        "image_border_thickness": 0,
+        "image_border_color": "",
+        "image_border_opacity": 100,
+        "image_overlay_color": "",
+        "image_overlay_opacity": 0,
+        "image_shadow_opacity": 0,
+        "image_shadow_blur": 20,
+        "content_layout": "no-overlap",
+        "desktop_content_position": "top",
+        "desktop_content_alignment": "left",
+        "mobile_content_alignment": "left",
+        "content_radius": 30,
+        "content_background": "#000000",
+        "content_border_thickness": 0,
+        "content_border_color": "",
+        "content_border_opacity": 100,
+        "content_shadow_opacity": 0,
+        "content_shadow_blur": 20,
+        "section_color_scheme": "scheme-1",
+        "color_scheme": "scheme-4",
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    },
+    "video_marquee_phcQnH": {
+      "type": "video-marquee",
+      "blocks": {
+        "text_NCJ8QK": {
+          "type": "text",
+          "settings": {
+            "text": "Time for that summer glow!"
+          }
+        },
+        "image_L4MiBk": {
+          "type": "image",
+          "settings": {}
+        },
+        "text_rdejXn": {
+          "type": "text",
+          "settings": {
+            "text": "Time for that summer glow!"
+          }
+        },
+        "image_aYwnqG": {
+          "type": "image",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "text_NCJ8QK",
+        "image_L4MiBk",
+        "text_rdejXn",
+        "image_aYwnqG"
+      ],
+      "name": "t:sections.video-marquee.name",
+      "settings": {
+        "height": 600,
+        "mobile_height": 420,
+        "overlay_color": "#000000",
+        "overlay_opacity": 20,
+        "content_position": "middle",
+        "speed": 30,
+        "direction": "left",
+        "pause_on_hover": true,
+        "gap": 5,
+        "text_size": 48,
+        "marquee_text_color": "#ffffff",
+        "image_size": 9,
+        "image_radius": 1.2,
+        "subheading": "Deeply nourishes your skin",
+        "subheading_size": 20,
+        "subheading_weight": "inherit",
+        "subheading_color": "",
+        "content_gap": 3,
+        "button_label": "Shop now",
+        "button_link": "",
+        "btn_custom": false,
+        "btn_bg": "",
+        "btn_text": "",
+        "btn_bg_hover": "",
+        "btn_text_hover": "",
+        "btn_border": "",
+        "btn_border_thickness": 0,
+        "btn_radius": 50,
+        "btn_weight": "600",
+        "color_scheme": ""
+      }
+    },
+    "press_quotes_CL3Gy4": {
+      "type": "press-quotes",
+      "blocks": {
+        "quote_WbfBFY": {
+          "type": "quote",
+          "settings": {
+            "quote": "",
+            "link": ""
+          }
+        },
+        "quote_pmn7if": {
+          "type": "quote",
+          "settings": {
+            "quote": "",
+            "link": ""
+          }
+        },
+        "quote_A6eJjg": {
+          "type": "quote",
+          "settings": {
+            "quote": "",
+            "link": ""
+          }
+        },
+        "quote_zpNTyD": {
+          "type": "quote",
+          "settings": {
+            "quote": "",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "quote_WbfBFY",
+        "quote_pmn7if",
+        "quote_A6eJjg",
+        "quote_zpNTyD"
+      ],
+      "name": "t:sections.press-quotes.name",
+      "settings": {
+        "heading": "",
+        "heading_size": "h2",
+        "alignment": "left",
+        "columns_desktop": 4,
+        "columns_mobile": "1",
+        "column_gap": 5,
+        "row_gap": 4,
+        "full_width": false,
+        "show_separators": true,
+        "separator_thickness": 1,
+        "separator_padding": 1,
+        "separator_color": "",
+        "separator_opacity": 25,
+        "logo_height": 40,
+        "logo_opacity": 100,
+        "logo_gap": 1.6,
+        "quote_size": 18,
+        "quote_line_height": 135,
+        "quote_weight": "inherit",
+        "quote_color": "",
+        "color_scheme": "",
+        "padding_top": 40,
+        "padding_bottom": 40
+      }
+    },
+    "testimonials_RGecFL": {
+      "type": "testimonials",
+      "blocks": {
+        "testimonial_j4Xa8N": {
+          "type": "testimonial",
+          "settings": {
+            "rating": 5,
+            "quote": "<p>Exemple d'avis client, à remplacer par un vrai avis avant publication.</p>",
+            "author": "Prénom N. (exemple)",
+            "product": "",
+            "product_label": ""
+          }
+        },
+        "testimonial_MbyAkK": {
+          "type": "testimonial",
+          "settings": {
+            "rating": 5,
+            "quote": "<p>Exemple d'avis client, à remplacer par un vrai avis avant publication.</p>",
+            "author": "Prénom N. (exemple)",
+            "product": "",
+            "product_label": ""
+          }
+        }
+      },
+      "block_order": [
+        "testimonial_j4Xa8N",
+        "testimonial_MbyAkK"
+      ],
+      "name": "t:sections.testimonials.name",
+      "settings": {
+        "heading": "",
+        "heading_size": "h2",
+        "image_position": "right",
+        "gap": 6,
+        "image_radius": 1.6,
+        "full_width": true,
+        "auto_rotate": false,
+        "change_slides_speed": 6,
+        "star_size": 16,
+        "star_color": "",
+        "quote_size": 32,
+        "quote_line_height": 120,
+        "quote_color": "",
+        "author_color": "",
+        "show_border_top": false,
+        "show_border_bottom": false,
+        "border_thickness": 1,
+        "border_color": "",
+        "border_opacity": 100,
+        "color_scheme": "",
+        "padding_top": 52,
+        "padding_bottom": 52
+      }
+    },
+    "editorial_statement_JH4aLG": {
+      "type": "editorial-statement",
+      "name": "t:sections.editorial-statement.name",
+      "settings": {
+        "overline": "Story",
+        "heading": "A female owned & run label, based in Melbourne, celebrating the diversity of women throughout the world.",
+        "body": "<p>As such, each collection draws its inspiration from a point on the map be it a city, a region, or otherwise & the love our travels ignite for the good things in life.</p>",
+        "alignment": "left",
+        "content_width": 140,
+        "full_width": false,
+        "gap_overline": 1,
+        "gap_body": 2.4,
+        "overline_size": 13,
+        "overline_spacing": 8,
+        "overline_weight": "inherit",
+        "overline_transform": "uppercase",
+        "overline_color": "",
+        "heading_size_px": 44,
+        "heading_line_height": 115,
+        "heading_spacing": 0,
+        "heading_weight": "inherit",
+        "heading_color": "",
+        "body_size": 16,
+        "body_line_height": 155,
+        "body_color": "",
+        "show_border_top": false,
+        "show_border_bottom": false,
+        "border_thickness": 1,
+        "border_color": "",
+        "border_opacity": 100,
+        "color_scheme": "",
+        "padding_top": 40,
+        "padding_bottom": 40
+      }
+    }
+  },
+  "order": [
+    "promo_bar_KM74Lm",
+    "image_banner",
+    "featured_cards_RPi68y",
+    "marquee_wgBVrj",
+    "image_with_products_myf6Rf",
+    "currently_obsessed_AxJgyn",
+    "image_with_text_XMGkiy",
+    "multicolumn_r8DhQ6",
+    "image_with_text_RqTQLY",
+    "video_marquee_phcQnH",
+    "press_quotes_CL3Gy4",
+    "testimonials_RGecFL",
+    "editorial_statement_JH4aLG"
+  ]
+}

@@ -1,0 +1,247 @@
+/* FAQ accordion. Built on <details>/<summary> so it stays keyboard accessible
+   and fully functional with JavaScript disabled; faq.js only layers the
+   animation, single-open behaviour, search and deep links on top. */
+
+.faq__layout {
+  display: grid;
+  gap: var(--faq-layout-gap, 4rem);
+}
+
+.faq__header {
+  text-align: var(--faq-heading-align, center);
+}
+
+.faq__heading {
+  margin: 0;
+  font-size: var(--faq-heading-size, 3.2rem);
+  font-weight: var(--faq-heading-weight, inherit);
+  line-height: var(--faq-heading-line-height, 1.2);
+  letter-spacing: var(--faq-heading-spacing, normal);
+  color: var(--faq-heading-color, inherit);
+}
+
+.faq__subheading {
+  margin: var(--faq-subheading-gap, 1.2rem) 0 0;
+  font-size: var(--faq-subheading-size, 1.6rem);
+  color: var(--faq-subheading-color, rgba(var(--color-foreground), 0.75));
+}
+
+.faq__list {
+  max-width: var(--faq-list-width, none);
+  margin-inline: auto;
+  width: 100%;
+}
+
+/* Top rule sits on the list rather than the first row so it survives the row
+   being hidden by a search filter. */
+.faq__list--divider-top {
+  border-top: var(--faq-divider-width, 0.1rem) solid var(--faq-divider-color, rgba(var(--color-foreground), 0.2));
+}
+
+.faq__list--divider-bottom {
+  border-bottom: var(--faq-divider-width, 0.1rem) solid var(--faq-divider-color, rgba(var(--color-foreground), 0.2));
+}
+
+.faq__item {
+  border-bottom: var(--faq-divider-width, 0.1rem) solid var(--faq-divider-color, rgba(var(--color-foreground), 0.2));
+}
+
+.faq__list--divider-bottom .faq__item:last-of-type,
+.faq__list--no-dividers .faq__item {
+  border-bottom: 0;
+}
+
+/* Hidden by the search filter. A class rather than [hidden] so the rule can't
+   be beaten by Dawn's own display declarations. */
+.faq__item.is-filtered {
+  display: none;
+}
+
+.faq__question {
+  display: flex;
+  align-items: center;
+  gap: var(--faq-icon-gap, 1.6rem);
+  padding: var(--faq-row-padding-y, 2rem) 0;
+  cursor: pointer;
+  list-style: none;
+  font-size: var(--faq-question-size, 1.8rem);
+  font-weight: var(--faq-question-weight, inherit);
+  line-height: var(--faq-question-line-height, 1.4);
+  color: var(--faq-question-color, inherit);
+  transition: color var(--duration-short) ease;
+}
+
+/* Both are needed: Safari uses the pseudo-element, everyone else the property. */
+.faq__question::-webkit-details-marker {
+  display: none;
+}
+
+.faq__question::marker {
+  content: '';
+}
+
+.faq__question:hover {
+  color: var(--faq-question-color-hover, inherit);
+}
+
+.faq__question:focus-visible {
+  outline: 0.2rem solid rgb(var(--color-foreground));
+  outline-offset: 0.4rem;
+}
+
+.faq__question-text {
+  flex: 1 1 auto;
+}
+
+.faq__item--icon-left .faq__question {
+  flex-direction: row-reverse;
+}
+
+.faq__item--icon-left .faq__question-text {
+  text-align: left;
+}
+
+/* Icon ---------------------------------------------------------------------
+   The plus is drawn with two pseudo-element bars instead of an SVG so its
+   size, thickness and colour all stay settings-driven. */
+.faq__icon {
+  position: relative;
+  flex-shrink: 0;
+  width: var(--faq-icon-size, 1.6rem);
+  height: var(--faq-icon-size, 1.6rem);
+  color: var(--faq-icon-color, currentColor);
+}
+
+.faq__icon--plus::before,
+.faq__icon--plus::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background: currentColor;
+  transition: transform var(--faq-speed, 300ms) ease, opacity var(--faq-speed, 300ms) ease;
+}
+
+.faq__icon--plus::before {
+  width: 100%;
+  height: var(--faq-icon-thickness, 0.15rem);
+  transform: translate(-50%, -50%);
+}
+
+.faq__icon--plus::after {
+  width: var(--faq-icon-thickness, 0.15rem);
+  height: 100%;
+  transform: translate(-50%, -50%);
+}
+
+/* Collapsing the upright bar leaves the crossbar alone, so a plus reads as a
+   minus without the whole glyph spinning. */
+.faq__item[open] .faq__icon--plus::after {
+  transform: translate(-50%, -50%) scaleY(0);
+  opacity: 0;
+}
+
+.faq__icon--chevron svg,
+.faq__icon--arrow svg {
+  width: 100%;
+  height: 100%;
+  transition: transform var(--faq-speed, 300ms) ease;
+}
+
+.faq__item[open] .faq__icon--chevron svg {
+  transform: rotate(180deg);
+}
+
+.faq__item[open] .faq__icon--arrow svg {
+  transform: rotate(90deg);
+}
+
+/* Answer -------------------------------------------------------------------
+   The wrapper is what faq.js animates: it sets an explicit height, so the
+   element needs its own overflow clip. The CSS fallback (no JS) simply shows
+   the answer with no transition. */
+.faq__answer-wrap {
+  overflow: hidden;
+}
+
+.faq__answer {
+  padding-bottom: var(--faq-answer-padding-bottom, 2rem);
+  padding-right: var(--faq-answer-padding-right, 0);
+  font-size: var(--faq-answer-size, 1.6rem);
+  line-height: var(--faq-answer-line-height, 1.6);
+  color: var(--faq-answer-color, rgba(var(--color-foreground), 0.8));
+}
+
+.faq__answer > *:first-child {
+  margin-top: 0;
+}
+
+.faq__answer > *:last-child {
+  margin-bottom: 0;
+}
+
+/* Search -------------------------------------------------------------------- */
+.faq__search {
+  position: relative;
+  margin-top: var(--faq-search-gap, 2.4rem);
+}
+
+.faq__search-input {
+  width: 100%;
+  padding: 1.4rem 1.8rem;
+  /* 1.6rem is a hard floor, not a style choice: iOS Safari zooms the whole page
+     when a focused input's text is under 16px. Dawn sets the same value on
+     .field__input for this reason. */
+  font-size: 1.6rem;
+  font-family: inherit;
+  color: rgb(var(--color-foreground));
+  background: transparent;
+  border: 0.1rem solid rgba(var(--color-foreground), 0.25);
+  border-radius: var(--faq-search-radius, 0.8rem);
+}
+
+.faq__search-input:focus {
+  outline: none;
+  border-color: rgb(var(--color-foreground));
+}
+
+.faq__no-results {
+  padding: 2.4rem 0;
+  text-align: center;
+  color: rgba(var(--color-foreground), 0.7);
+}
+
+.faq__no-results[hidden] {
+  display: none;
+}
+
+/* CTA ----------------------------------------------------------------------- */
+.faq__cta {
+  margin-top: var(--faq-cta-gap, 3.2rem);
+  text-align: var(--faq-cta-align, center);
+}
+
+.faq__cta-text {
+  margin: 0 0 1.2rem;
+  color: rgba(var(--color-foreground), 0.8);
+}
+
+/* Split layout -------------------------------------------------------------- */
+@media screen and (min-width: 990px) {
+  .faq__layout--split {
+    grid-template-columns: var(--faq-split-width, 34%) 1fr;
+    gap: var(--faq-split-gap, 8rem);
+    align-items: start;
+  }
+
+  .faq__layout--split .faq__header {
+    text-align: left;
+  }
+
+  /* Sticky only in the split layout: in the stacked one the heading scrolls
+     with the content and pinning it would cover the questions. */
+  .faq__layout--split.faq__layout--sticky .faq__header {
+    position: sticky;
+    top: var(--faq-sticky-top, 3rem);
+  }
+}

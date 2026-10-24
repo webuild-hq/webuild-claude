@@ -1,0 +1,67 @@
+{% comment %}
+  Horizontal editorial blog card for the featured-blog section.
+
+  Accepts:
+  - article: {Object} Article (required)
+  - section: {Object} The featured-blog section, for its settings (required)
+{% endcomment %}
+
+{%- liquid
+  assign badge = ''
+  if section.settings.show_tag and article.tags.size > 0
+    assign badge = article.tags.first
+  endif
+-%}
+
+<article class="blog-card-ed{% if section.settings.image_overlap %} blog-card-ed--overlap{% endif %}">
+  {%- if section.settings.show_image -%}
+    <a href="{{ article.url }}" class="blog-card-ed__media media" aria-label="{{ article.title | escape }}" tabindex="-1">
+      {%- if article.image != blank -%}
+        {{
+          article.image
+          | image_url: width: 1200
+          | image_tag:
+            loading: 'lazy',
+            widths: '300, 450, 600, 800, 1000, 1200',
+            sizes: '(min-width: 750px) 40vw, 90vw',
+            alt: article.image.alt | escape
+        }}
+      {%- else -%}
+        {{ 'blog-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+      {%- endif -%}
+    </a>
+  {%- endif -%}
+
+  <div class="blog-card-ed__content">
+    {%- if badge != blank -%}
+      <span class="blog-card-ed__badge">{{ badge }}</span>
+    {%- endif -%}
+
+    <h3 class="blog-card-ed__title">
+      <a href="{{ article.url }}">{{ article.title }}</a>
+    </h3>
+
+    {%- if section.settings.show_date -%}
+      <p class="blog-card-ed__date">{{ article.published_at | time_tag: format: 'date' }}</p>
+    {%- endif -%}
+
+    {%- if section.settings.show_author and article.author != blank -%}
+      <p class="blog-card-ed__author">{{ article.author }}</p>
+    {%- endif -%}
+
+    {%- if section.settings.show_excerpt -%}
+      {%- assign excerpt = article.excerpt | default: article.content -%}
+      {%- if excerpt != blank -%}
+        <p class="blog-card-ed__excerpt">
+          {{- excerpt | strip_html | truncatewords: section.settings.excerpt_length -}}
+        </p>
+      {%- endif -%}
+    {%- endif -%}
+
+    {%- if section.settings.read_more_label != blank -%}
+      <a href="{{ article.url }}" class="blog-card-ed__link link animate-arrow">
+        {{ section.settings.read_more_label | escape }}
+      </a>
+    {%- endif -%}
+  </div>
+</article>

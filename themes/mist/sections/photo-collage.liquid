@@ -1,0 +1,731 @@
+{{ 'section-photo-collage.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign s = section.settings
+
+  assign shadow_alpha = s.shadow_opacity | divided_by: 100.0
+-%}
+
+{%- style -%}
+  #PhotoCollage-{{ section.id }} {
+    --pc-text-width: {{ s.text_width }}%;
+    --pc-split-gap: {{ s.split_gap }}px;
+    --pc-stage-height: {{ s.stage_height }}px;
+    --pc-stage-height-mobile: {{ s.stage_height_mobile }}px;
+    --pc-stage-padding: {{ s.stage_padding }}px;
+
+    --pc-overline-size: {{ s.overline_size }}px;
+    --pc-overline-spacing: {{ s.overline_spacing | divided_by: 100.0 }}em;
+    --pc-overline-gap: {{ s.overline_gap }}px;
+    --pc-heading-size: {{ s.heading_size | times: 0.75 | round: 0 }}px;
+    --pc-heading-line-height: {{ s.heading_line_height | divided_by: 100.0 }};
+    --pc-heading-spacing: {{ s.heading_spacing | divided_by: 100.0 }}em;
+    --pc-body-size: {{ s.body_size }}px;
+    --pc-body-line-height: {{ s.body_line_height | divided_by: 100.0 }};
+    --pc-body-width: {{ s.body_width }}rem;
+    --pc-body-gap: {{ s.body_gap }}px;
+
+    --pc-button-size: {{ s.button_size }}px;
+    --pc-button-gap: {{ s.button_gap }}px;
+    --pc-button-radius: {{ s.button_radius }}px;
+
+    --pc-shadow-y: {{ s.shadow_y }}px;
+    --pc-shadow-blur: {{ s.shadow_blur }}px;
+    --pc-shadow-opacity: {{ shadow_alpha }};
+
+    {%- if s.overline_weight != 'inherit' %} --pc-overline-weight: {{ s.overline_weight }};{% endif %}
+    {%- if s.heading_weight != 'inherit' %} --pc-heading-weight: {{ s.heading_weight }};{% endif %}
+    {%- if s.button_weight != 'inherit' %} --pc-button-weight: {{ s.button_weight }};{% endif %}
+    {%- if s.overline_color != blank %} --pc-overline-color: {{ s.overline_color }};{% endif %}
+    {%- if s.heading_color != blank %} --pc-heading-color: {{ s.heading_color }};{% endif %}
+    {%- if s.body_color != blank %} --pc-body-color: {{ s.body_color }};{% endif %}
+    {%- if s.button_color != blank %} --pc-button-color: {{ s.button_color }};{% endif %}
+  }
+
+  #PhotoCollage-{{ section.id }} .photo-collage__inner {
+    padding-top: {{ s.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ s.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    #PhotoCollage-{{ section.id }} {
+      --pc-heading-size: {{ s.heading_size }}px;
+    }
+
+    #PhotoCollage-{{ section.id }} .photo-collage__inner {
+      padding-top: {{ s.padding_top }}px;
+      padding-bottom: {{ s.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+<div
+  id="PhotoCollage-{{ section.id }}"
+  class="photo-collage color-{{ s.color_scheme }} gradient{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+>
+  <div class="photo-collage__inner{% unless s.full_width %} page-width{% endunless %}">
+    <div class="photo-collage__layout photo-collage__layout--media-{{ s.media_position }}">
+      <div class="photo-collage__content">
+        {%- if s.overline != blank -%}
+          <p class="photo-collage__overline">{{ s.overline | escape }}</p>
+        {%- endif -%}
+        {%- if s.heading != blank -%}
+          <h2 class="photo-collage__heading inline-richtext">{{ s.heading }}</h2>
+        {%- endif -%}
+        {%- if s.body != blank -%}
+          <div class="photo-collage__body rte">{{ s.body }}</div>
+        {%- endif -%}
+        {%- if s.button_label != blank -%}
+          <a
+            {% if s.button_link != blank %}
+              href="{{ s.button_link }}"
+            {% else %}
+              role="link"
+              aria-disabled="true"
+            {% endif %}
+            class="photo-collage__button photo-collage__button--{{ s.button_style }}"
+          >
+            {{- s.button_label | escape -}}
+          </a>
+        {%- endif -%}
+      </div>
+
+      {%- if section.blocks.size > 0 -%}
+        <div class="photo-collage__stage">
+          {%- for block in section.blocks -%}
+            {%- liquid
+              case block.settings.ratio
+                when 'square'
+                  assign item_ratio = '1 / 1'
+                when 'landscape'
+                  assign item_ratio = '4 / 3'
+                else
+                  assign item_ratio = '3 / 4'
+              endcase
+            -%}
+            {%- capture item_vars -%}
+              --item-x: {{ block.settings.position_x }}%;
+              --item-y: {{ block.settings.position_y }}%;
+              --item-w: {{ block.settings.width }}%;
+              --item-ratio: {{ item_ratio }};
+              --item-radius: {{ block.settings.radius }}px;
+              z-index: {{ forloop.index }};
+              {%- if block.settings.image != blank %} --item-focal: {{ block.settings.image.presentation.focal_point }};{% endif -%}
+            {%- endcapture -%}
+            <div
+              class="photo-collage__item{% if s.show_shadow %} photo-collage__item--shadow{% endif %}"
+              style="{{ item_vars | strip_newlines }}"
+              {{ block.shopify_attributes }}
+            >
+              {%- if block.settings.image != blank -%}
+                {{
+                  block.settings.image
+                  | image_url: width: 1000
+                  | image_tag:
+                    loading: 'lazy',
+                    widths: '200, 300, 400, 500, 700, 1000',
+                    sizes: '(min-width: 750px) 40vw, 50vw',
+                    alt: block.settings.image.alt | escape
+                }}
+              {%- else -%}
+                {%- liquid
+                  assign placeholder_index = forloop.index | modulo: 2 | plus: 1
+                -%}
+                {{ 'lifestyle-' | append: placeholder_index | placeholder_svg_tag: 'placeholder-svg' }}
+              {%- endif -%}
+            </div>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.photo-collage.name",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "overline",
+      "default": "New day - new you",
+      "label": "t:sections.photo-collage.settings.overline.label"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "default": "Popular styles for every season",
+      "label": "t:sections.photo-collage.settings.heading.label"
+    },
+    {
+      "type": "richtext",
+      "id": "body",
+      "default": "<p>We will take over your social media feeds with killer looks and next-level aesthetic. Be the center of attention regardless of the season.</p>",
+      "label": "t:sections.photo-collage.settings.body.label"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "default": "Shop now",
+      "label": "t:sections.photo-collage.settings.button_label.label"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "t:sections.photo-collage.settings.button_link.label"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "options": [
+        {
+          "value": "text",
+          "label": "t:sections.photo-collage.settings.button_style.options__text.label"
+        },
+        {
+          "value": "solid",
+          "label": "t:sections.photo-collage.settings.button_style.options__solid.label"
+        }
+      ],
+      "default": "text",
+      "label": "t:sections.photo-collage.settings.button_style.label"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme-1",
+      "label": "t:sections.all.colors.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.photo-collage.settings.header__layout.content"
+    },
+    {
+      "type": "select",
+      "id": "media_position",
+      "options": [
+        {
+          "value": "left",
+          "label": "t:sections.photo-collage.settings.media_position.options__left.label"
+        },
+        {
+          "value": "right",
+          "label": "t:sections.photo-collage.settings.media_position.options__right.label"
+        }
+      ],
+      "default": "right",
+      "label": "t:sections.photo-collage.settings.media_position.label"
+    },
+    {
+      "type": "range",
+      "id": "text_width",
+      "min": 25,
+      "max": 55,
+      "step": 1,
+      "unit": "%",
+      "default": 40,
+      "label": "t:sections.photo-collage.settings.text_width.label"
+    },
+    {
+      "type": "range",
+      "id": "split_gap",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 60,
+      "label": "t:sections.photo-collage.settings.split_gap.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "default": false,
+      "label": "t:sections.photo-collage.settings.full_width.label"
+    },
+    {
+      "type": "range",
+      "id": "stage_height",
+      "min": 300,
+      "max": 900,
+      "step": 10,
+      "unit": "px",
+      "default": 600,
+      "label": "t:sections.photo-collage.settings.stage_height.label",
+      "info": "t:sections.photo-collage.settings.stage_height.info"
+    },
+    {
+      "type": "range",
+      "id": "stage_height_mobile",
+      "min": 250,
+      "max": 700,
+      "step": 10,
+      "unit": "px",
+      "default": 440,
+      "label": "t:sections.photo-collage.settings.stage_height_mobile.label",
+      "info": "t:sections.photo-collage.settings.stage_height_mobile.info"
+    },
+    {
+      "type": "range",
+      "id": "stage_padding",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 0,
+      "label": "t:sections.photo-collage.settings.stage_padding.label",
+      "info": "t:sections.photo-collage.settings.stage_padding.info"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.photo-collage.settings.header__text.content"
+    },
+    {
+      "type": "range",
+      "id": "overline_size",
+      "min": 8,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 13,
+      "label": "t:sections.photo-collage.settings.overline_size.label"
+    },
+    {
+      "type": "select",
+      "id": "overline_weight",
+      "options": [
+        {
+          "value": "inherit",
+          "label": "t:sections.image-banner.settings_shared.button_weight.options__default.label"
+        },
+        {
+          "value": "300",
+          "label": "300"
+        },
+        {
+          "value": "400",
+          "label": "400"
+        },
+        {
+          "value": "500",
+          "label": "500"
+        },
+        {
+          "value": "600",
+          "label": "600"
+        },
+        {
+          "value": "700",
+          "label": "700"
+        },
+        {
+          "value": "800",
+          "label": "800"
+        }
+      ],
+      "default": "700",
+      "label": "t:sections.photo-collage.settings.overline_weight.label"
+    },
+    {
+      "type": "range",
+      "id": "overline_spacing",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "default": 10,
+      "label": "t:sections.photo-collage.settings.overline_spacing.label"
+    },
+    {
+      "type": "range",
+      "id": "overline_gap",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 16,
+      "label": "t:sections.photo-collage.settings.overline_gap.label"
+    },
+    {
+      "type": "color",
+      "id": "overline_color",
+      "label": "t:sections.photo-collage.settings.overline_color.label"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "min": 18,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "default": 40,
+      "label": "t:sections.photo-collage.settings.heading_size.label",
+      "info": "t:sections.photo-collage.settings.heading_size.info"
+    },
+    {
+      "type": "select",
+      "id": "heading_weight",
+      "options": [
+        {
+          "value": "inherit",
+          "label": "t:sections.image-banner.settings_shared.button_weight.options__default.label"
+        },
+        {
+          "value": "300",
+          "label": "300"
+        },
+        {
+          "value": "400",
+          "label": "400"
+        },
+        {
+          "value": "500",
+          "label": "500"
+        },
+        {
+          "value": "600",
+          "label": "600"
+        },
+        {
+          "value": "700",
+          "label": "700"
+        },
+        {
+          "value": "800",
+          "label": "800"
+        }
+      ],
+      "default": "700",
+      "label": "t:sections.photo-collage.settings.heading_weight.label"
+    },
+    {
+      "type": "range",
+      "id": "heading_line_height",
+      "min": 90,
+      "max": 180,
+      "step": 5,
+      "unit": "%",
+      "default": 115,
+      "label": "t:sections.photo-collage.settings.heading_line_height.label"
+    },
+    {
+      "type": "range",
+      "id": "heading_spacing",
+      "min": -5,
+      "max": 15,
+      "step": 1,
+      "default": 0,
+      "label": "t:sections.photo-collage.settings.heading_spacing.label"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "t:sections.photo-collage.settings.heading_color.label"
+    },
+    {
+      "type": "range",
+      "id": "body_size",
+      "min": 12,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 16,
+      "label": "t:sections.photo-collage.settings.body_size.label"
+    },
+    {
+      "type": "range",
+      "id": "body_line_height",
+      "min": 100,
+      "max": 220,
+      "step": 5,
+      "unit": "%",
+      "default": 160,
+      "label": "t:sections.photo-collage.settings.body_line_height.label"
+    },
+    {
+      "type": "range",
+      "id": "body_width",
+      "min": 20,
+      "max": 70,
+      "step": 1,
+      "unit": "rem",
+      "default": 44,
+      "label": "t:sections.photo-collage.settings.body_width.label"
+    },
+    {
+      "type": "range",
+      "id": "body_gap",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 20,
+      "label": "t:sections.photo-collage.settings.body_gap.label"
+    },
+    {
+      "type": "color",
+      "id": "body_color",
+      "label": "t:sections.photo-collage.settings.body_color.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.photo-collage.settings.header__button.content"
+    },
+    {
+      "type": "range",
+      "id": "button_size",
+      "min": 10,
+      "max": 26,
+      "step": 1,
+      "unit": "px",
+      "default": 16,
+      "label": "t:sections.photo-collage.settings.button_size.label"
+    },
+    {
+      "type": "select",
+      "id": "button_weight",
+      "options": [
+        {
+          "value": "inherit",
+          "label": "t:sections.image-banner.settings_shared.button_weight.options__default.label"
+        },
+        {
+          "value": "300",
+          "label": "300"
+        },
+        {
+          "value": "400",
+          "label": "400"
+        },
+        {
+          "value": "500",
+          "label": "500"
+        },
+        {
+          "value": "600",
+          "label": "600"
+        },
+        {
+          "value": "700",
+          "label": "700"
+        },
+        {
+          "value": "800",
+          "label": "800"
+        }
+      ],
+      "default": "600",
+      "label": "t:sections.photo-collage.settings.button_weight.label"
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "t:sections.photo-collage.settings.button_color.label",
+      "info": "t:sections.photo-collage.settings.button_color.info"
+    },
+    {
+      "type": "range",
+      "id": "button_radius",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "default": 50,
+      "label": "t:sections.photo-collage.settings.button_radius.label",
+      "info": "t:sections.photo-collage.settings.button_radius.info"
+    },
+    {
+      "type": "range",
+      "id": "button_gap",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 28,
+      "label": "t:sections.photo-collage.settings.button_gap.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.photo-collage.settings.header__shadow.content"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_shadow",
+      "default": true,
+      "label": "t:sections.photo-collage.settings.show_shadow.label"
+    },
+    {
+      "type": "range",
+      "id": "shadow_y",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 16,
+      "label": "t:sections.photo-collage.settings.shadow_y.label"
+    },
+    {
+      "type": "range",
+      "id": "shadow_blur",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 30,
+      "label": "t:sections.photo-collage.settings.shadow_blur.label"
+    },
+    {
+      "type": "range",
+      "id": "shadow_opacity",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "%",
+      "default": 18,
+      "label": "t:sections.photo-collage.settings.shadow_opacity.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.padding.section_padding_heading"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 60,
+      "label": "t:sections.all.padding.padding_top"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 60,
+      "label": "t:sections.all.padding.padding_bottom"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "name": "t:sections.photo-collage.blocks.image.name",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:sections.photo-collage.blocks.image.settings.image.label"
+        },
+        {
+          "type": "range",
+          "id": "width",
+          "min": 15,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "default": 40,
+          "label": "t:sections.photo-collage.blocks.image.settings.width.label"
+        },
+        {
+          "type": "select",
+          "id": "ratio",
+          "options": [
+            {
+              "value": "portrait",
+              "label": "t:sections.photo-collage.blocks.image.settings.ratio.options__portrait.label"
+            },
+            {
+              "value": "square",
+              "label": "t:sections.photo-collage.blocks.image.settings.ratio.options__square.label"
+            },
+            {
+              "value": "landscape",
+              "label": "t:sections.photo-collage.blocks.image.settings.ratio.options__landscape.label"
+            }
+          ],
+          "default": "portrait",
+          "label": "t:sections.photo-collage.blocks.image.settings.ratio.label"
+        },
+        {
+          "type": "range",
+          "id": "position_x",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "default": 0,
+          "label": "t:sections.photo-collage.blocks.image.settings.position_x.label",
+          "info": "t:sections.photo-collage.blocks.image.settings.position_x.info"
+        },
+        {
+          "type": "range",
+          "id": "position_y",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "default": 0,
+          "label": "t:sections.photo-collage.blocks.image.settings.position_y.label"
+        },
+        {
+          "type": "range",
+          "id": "radius",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "default": 16,
+          "label": "t:sections.photo-collage.blocks.image.settings.radius.label"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 6,
+  "presets": [
+    {
+      "name": "t:sections.photo-collage.presets.name",
+      "blocks": [
+        {
+          "type": "image",
+          "settings": {
+            "width": 30,
+            "ratio": "portrait",
+            "position_x": 6,
+            "position_y": 0
+          }
+        },
+        {
+          "type": "image",
+          "settings": {
+            "width": 32,
+            "ratio": "portrait",
+            "position_x": 0,
+            "position_y": 34
+          }
+        },
+        {
+          "type": "image",
+          "settings": {
+            "width": 52,
+            "ratio": "portrait",
+            "position_x": 38,
+            "position_y": 10
+          }
+        },
+        {
+          "type": "image",
+          "settings": {
+            "width": 26,
+            "ratio": "portrait",
+            "position_x": 58,
+            "position_y": 58
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

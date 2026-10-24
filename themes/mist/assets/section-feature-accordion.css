@@ -1,0 +1,176 @@
+/* Feature accordion: a pinned statement on the left, disclosure rows on the
+   right. Shares accordion.js with the FAQ section but keeps its own class
+   names, so neither stylesheet can reach into the other's markup. */
+
+.feature-accordion__layout {
+  display: grid;
+  gap: var(--fa-gap, 4rem);
+}
+
+.feature-accordion__overline {
+  margin: 0 0 var(--fa-overline-gap, 1.6rem);
+  font-size: var(--fa-overline-size, 1.3rem);
+  font-weight: var(--fa-overline-weight, 700);
+  letter-spacing: var(--fa-overline-spacing, 0.1em);
+  text-transform: var(--fa-overline-transform, uppercase);
+  color: var(--fa-overline-color, inherit);
+}
+
+.feature-accordion__heading {
+  margin: 0;
+  font-size: var(--fa-heading-size, 3.6rem);
+  font-weight: var(--fa-heading-weight, 700);
+  line-height: var(--fa-heading-line-height, 1.15);
+  letter-spacing: var(--fa-heading-spacing, normal);
+  color: var(--fa-heading-color, inherit);
+}
+
+.feature-accordion__body {
+  margin: var(--fa-body-gap, 1.6rem) 0 0;
+  font-size: var(--fa-body-size, 1.6rem);
+  line-height: 1.6;
+  color: var(--fa-body-color, rgba(var(--color-foreground), 0.75));
+}
+
+/* Rows ---------------------------------------------------------------------- */
+.feature-accordion__item {
+  border-bottom: var(--fa-divider-width, 0.1rem) solid
+    var(--fa-divider-color, rgba(var(--color-foreground), 0.15));
+}
+
+.feature-accordion__item:first-child {
+  border-top: var(--fa-divider-width, 0.1rem) solid
+    var(--fa-divider-color, rgba(var(--color-foreground), 0.15));
+}
+
+.feature-accordion__list--no-outer .feature-accordion__item:first-child {
+  border-top: 0;
+}
+
+.feature-accordion__list--no-outer .feature-accordion__item:last-child {
+  border-bottom: 0;
+}
+
+.feature-accordion__question {
+  display: flex;
+  align-items: center;
+  gap: var(--fa-title-gap, 1.2rem);
+  padding: var(--fa-row-padding-y, 2rem) 0;
+  cursor: pointer;
+  list-style: none;
+}
+
+/* Both are needed: Safari uses the pseudo-element, everyone else the property. */
+.feature-accordion__question::-webkit-details-marker {
+  display: none;
+}
+
+.feature-accordion__question::marker {
+  content: '';
+}
+
+.feature-accordion__question:focus-visible {
+  outline: 0.2rem solid rgb(var(--color-foreground));
+  outline-offset: 0.4rem;
+}
+
+.feature-accordion__icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--fa-icon-size, 2.4rem);
+  height: var(--fa-icon-size, 2.4rem);
+  color: var(--fa-icon-color, currentColor);
+}
+
+.feature-accordion__icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.feature-accordion__title {
+  flex: 1 1 auto;
+  margin: 0;
+  font-size: var(--fa-title-size, 2rem);
+  font-weight: var(--fa-title-weight, 700);
+  line-height: 1.3;
+  color: var(--fa-title-color, inherit);
+}
+
+/* The chevron sits in its own disc, which is what separates this from the
+   FAQ's bare glyph and gives the row a visible affordance at its far edge. */
+.feature-accordion__toggle {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--fa-toggle-size, 3.2rem);
+  height: var(--fa-toggle-size, 3.2rem);
+  border-radius: 50%;
+  background: var(--fa-toggle-bg, rgba(var(--color-foreground), 0.06));
+  color: var(--fa-toggle-color, rgb(var(--color-foreground)));
+  transition: background-color var(--duration-short) ease;
+}
+
+.feature-accordion__question:hover .feature-accordion__toggle {
+  background: var(--fa-toggle-bg-hover, rgba(var(--color-foreground), 0.12));
+}
+
+/* icon-caret.svg's own viewBox is 10x6 (not square). Forcing it into a square
+   box leaves it geometrically centered but visually floating in extra vertical
+   space — Dawn never squares this icon either (see .select .svg-wrapper,
+   1rem x 0.6rem, the same 5:3 ratio) for the same reason. Height is derived
+   from the ratio rather than hardcoded, so it still tracks the size setting. */
+.feature-accordion__toggle svg {
+  width: var(--fa-toggle-icon-size, 1.2rem);
+  height: calc(var(--fa-toggle-icon-size, 1.2rem) * 0.6);
+  transition: transform var(--fa-speed, 300ms) ease;
+}
+
+.feature-accordion__item[open] .feature-accordion__toggle svg {
+  transform: rotate(180deg);
+}
+
+/* Panel --------------------------------------------------------------------
+   accordion.js animates this element's height, so it needs its own clip. */
+.feature-accordion__panel {
+  overflow: hidden;
+}
+
+.feature-accordion__answer {
+  padding-bottom: var(--fa-answer-padding-bottom, 2rem);
+  padding-left: var(--fa-answer-indent, 0);
+  font-size: var(--fa-answer-size, 1.6rem);
+  line-height: var(--fa-answer-line-height, 1.6);
+  color: var(--fa-answer-color, rgba(var(--color-foreground), 0.75));
+}
+
+.feature-accordion__answer > *:first-child {
+  margin-top: 0;
+}
+
+.feature-accordion__answer > *:last-child {
+  margin-bottom: 0;
+}
+
+.feature-accordion__answer ul {
+  padding-left: 1.8rem;
+}
+
+.feature-accordion__answer li {
+  margin-bottom: 0.6rem;
+}
+
+@media screen and (min-width: 990px) {
+  .feature-accordion__layout {
+    grid-template-columns: var(--fa-split-width, 38%) 1fr;
+    gap: var(--fa-split-gap, 8rem);
+    align-items: start;
+  }
+
+  .feature-accordion__layout--sticky .feature-accordion__intro {
+    position: sticky;
+    top: var(--fa-sticky-top, 4rem);
+  }
+}

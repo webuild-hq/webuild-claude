@@ -1,0 +1,477 @@
+{{ 'component-cart.css' | asset_url | stylesheet_tag }}
+{{ 'component-totals.css' | asset_url | stylesheet_tag }}
+{{ 'section-main-cart.css' | asset_url | stylesheet_tag }}
+{{ 'component-price.css' | asset_url | stylesheet_tag }}
+{{ 'component-discounts.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+{%- style -%}
+  #main-cart-footer,
+  #MainContent:has(.cart-section--footer) {
+    --cart-summary-width: {{ section.settings.summary_width }}rem;
+    --cart-sticky-top: {{ section.settings.sticky_top }}px;
+    --cart-card-radius: {{ section.settings.card_radius }}px;
+    --cart-card-padding: {{ section.settings.card_padding }}px;
+    --cart-shipping-size: {{ section.settings.shipping_size }}px;
+    --cart-shipping-icon-size: {{ section.settings.shipping_icon_size }}px;
+    --cart-shipping-bar-height: {{ section.settings.shipping_bar_height }}px;
+    --cart-subtotal-size: {{ section.settings.subtotal_size }}px;
+    --cart-subtotal-label-size: {{ section.settings.subtotal_label_size }}px;
+    --cart-checkout-radius: {{ section.settings.checkout_radius }}px;
+    --cart-checkout-height: {{ section.settings.checkout_height }}px;
+    --cart-checkout-size: {{ section.settings.checkout_size }}px;
+    --cart-checkout-transform: {% if section.settings.checkout_uppercase %}uppercase{% else %}none{% endif %};
+    {%- if section.settings.subtotal_weight != 'inherit' %} --cart-subtotal-weight: {{ section.settings.subtotal_weight }};{% endif %}
+    {%- if section.settings.checkout_weight != 'inherit' %} --cart-checkout-weight: {{ section.settings.checkout_weight }};{% endif %}
+    {%- if section.settings.card_bg != blank %} --cart-card-bg: {{ section.settings.card_bg }};{% endif %}
+    {%- if section.settings.shipping_fill != blank %} --cart-shipping-fill: {{ section.settings.shipping_fill }};{% endif %}
+    {%- if section.settings.shipping_track != blank %} --cart-shipping-track: {{ section.settings.shipping_track }};{% endif %}
+  }
+{%- endstyle -%}
+
+<div
+  class="gradient color-{{ section.settings.color_scheme }}{% if cart == empty %} is-empty{% endif %}"
+  id="main-cart-footer"
+  data-id="{{ section.id }}"
+>
+  <div class="page-width">
+    <div class="cart__footer isolate section-{{ section.id }}-padding">
+      {%- render 'cart-free-shipping', section: section -%}
+
+      {%- if settings.show_cart_note -%}
+        {%- comment -%}
+          Collapsed by default so the summary leads with the total and the
+          checkout button; a note is a minority action.
+        {%- endcomment -%}
+        <details class="cart__note-details">
+          <summary class="cart__note-summary">
+            <span class="cart__note-icon" aria-hidden="true"></span>
+            {{ 'sections.cart.note' | t }}
+          </summary>
+          <cart-note class="cart__note field">
+            <label class="visually-hidden" for="Cart-note">{{ 'sections.cart.note' | t }}</label>
+            <textarea
+              class="text-area field__input"
+              name="note"
+              form="cart"
+              id="Cart-note"
+              placeholder="{{ 'sections.cart.note' | t }}"
+            >{{ cart.note }}</textarea>
+          </cart-note>
+        </details>
+      {%- endif -%}
+
+      <div class="cart__blocks">
+        {% for block in section.blocks %}
+          {%- case block.type -%}
+            {%- when '@app' -%}
+              {% render block %}
+            {%- when 'subtotal' -%}
+              <div class="js-contents" {{ block.shopify_attributes }}>
+                <div>
+                  {%- if cart.cart_level_discount_applications.size > 0 -%}
+                    <ul class="discounts list-unstyled" role="list" aria-label="{{ 'customer.order.discount' | t }}">
+                      {%- for discount in cart.cart_level_discount_applications -%}
+                        <li class="discounts__discount discounts__discount--position">
+                          {{- 'icon-discount.svg' | inline_asset_content -}}
+                          {{ discount.title | escape }}
+                          (-{{ discount.total_allocated_amount | money }})
+                        </li>
+                      {%- endfor -%}
+                    </ul>
+                  {%- endif -%}
+                </div>
+
+                <div class="totals">
+                  <h2 class="totals__total">{{ 'sections.cart.estimated_total' | t }}</h2>
+                  <p class="totals__total-value">{{ cart.total_price | money_with_currency }}</p>
+                </div>
+
+                <small class="tax-note caption-large rte">
+                  {%- if cart.duties_included and cart.taxes_included -%}
+                    {%- if shop.shipping_policy.body == blank -%}
+                      {{ 'sections.cart.duties_and_taxes_included_shipping_at_checkout_without_policy' | t }}
+                    {%- else -%}
+                      {{
+                        'sections.cart.duties_and_taxes_included_shipping_at_checkout_with_policy_html'
+                        | t: link: shop.shipping_policy.url
+                      }}
+                    {%- endif -%}
+                  {%- elsif cart.duties_included == false and cart.taxes_included -%}
+                    {%- if shop.shipping_policy.body == blank -%}
+                      {{ 'sections.cart.taxes_included_shipping_at_checkout_without_policy' | t }}
+                    {%- else -%}
+                      {{
+                        'sections.cart.taxes_included_shipping_at_checkout_with_policy_html'
+                        | t: link: shop.shipping_policy.url
+                      }}
+                    {%- endif -%}
+                  {%- elsif cart.duties_included and cart.taxes_included == false -%}
+                    {%- if shop.shipping_policy.body == blank -%}
+                      {{ 'sections.cart.duties_included_taxes_at_checkout_shipping_at_checkout_without_policy' | t }}
+                    {%- else -%}
+                      {{
+                        'sections.cart.duties_included_taxes_at_checkout_shipping_at_checkout_with_policy_html'
+                        | t: link: shop.shipping_policy.url
+                      }}
+                    {%- endif -%}
+                  {%- elsif cart.duties_included == false and cart.taxes_included == false -%}
+                    {%- if shop.shipping_policy.body == blank -%}
+                      {{ 'sections.cart.taxes_at_checkout_shipping_at_checkout_without_policy' | t }}
+                    {%- else -%}
+                      {{
+                        'sections.cart.taxes_at_checkout_shipping_at_checkout_with_policy_html'
+                        | t: link: shop.shipping_policy.url
+                      }}
+                    {%- endif -%}
+                  {%- endif -%}
+                </small>
+              </div>
+            {%- else -%}
+              <div class="cart__ctas" {{ block.shopify_attributes }}>
+                <button
+                  type="submit"
+                  id="checkout"
+                  class="cart__checkout-button button"
+                  name="checkout"
+                  {% if cart == empty %}
+                    disabled
+                  {% endif %}
+                  form="cart"
+                >
+                  {{ 'sections.cart.checkout' | t }}
+                </button>
+              </div>
+
+              {%- if additional_checkout_buttons -%}
+                <div class="cart__dynamic-checkout-buttons additional-checkout-buttons">
+                  {{ content_for_additional_checkout_buttons }}
+                </div>
+              {%- endif -%}
+          {%- endcase -%}
+        {% endfor %}
+
+        <div id="cart-errors"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.main-cart-footer.name",
+  "class": "cart__footer-wrapper cart-section--footer",
+  "blocks": [
+    {
+      "type": "subtotal",
+      "name": "t:sections.main-cart-footer.blocks.subtotal.name",
+      "limit": 1
+    },
+    {
+      "type": "buttons",
+      "name": "t:sections.main-cart-footer.blocks.buttons.name",
+      "limit": 1
+    },
+    {
+      "type": "@app"
+    }
+  ],
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme-1",
+      "label": "t:sections.all.colors.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.main-cart-footer.settings.header__shipping.content"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_free_shipping",
+      "default": true,
+      "label": "t:sections.main-cart-footer.settings.show_free_shipping.label"
+    },
+    {
+      "type": "range",
+      "id": "free_shipping_threshold",
+      "min": 0,
+      "max": 500,
+      "step": 5,
+      "default": 250,
+      "label": "t:sections.main-cart-footer.settings.free_shipping_threshold.label",
+      "info": "t:sections.main-cart-footer.settings.free_shipping_threshold.info"
+    },
+    {
+      "type": "text",
+      "id": "free_shipping_text",
+      "default": "Only [amount] away from free shipping!",
+      "label": "t:sections.main-cart-footer.settings.free_shipping_text.label",
+      "info": "t:sections.main-cart-footer.settings.free_shipping_text.info"
+    },
+    {
+      "type": "text",
+      "id": "free_shipping_reached",
+      "default": "You have earned free shipping!",
+      "label": "t:sections.main-cart-footer.settings.free_shipping_reached.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_shipping_icon",
+      "default": true,
+      "label": "t:sections.main-cart-footer.settings.show_shipping_icon.label"
+    },
+    {
+      "type": "range",
+      "id": "shipping_icon_size",
+      "min": 10,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 20,
+      "label": "t:sections.main-cart-footer.settings.shipping_icon_size.label"
+    },
+    {
+      "type": "range",
+      "id": "shipping_size",
+      "min": 10,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 15,
+      "label": "t:sections.main-cart-footer.settings.shipping_size.label"
+    },
+    {
+      "type": "range",
+      "id": "shipping_bar_height",
+      "min": 2,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 6,
+      "label": "t:sections.main-cart-footer.settings.shipping_bar_height.label"
+    },
+    {
+      "type": "color",
+      "id": "shipping_fill",
+      "label": "t:sections.main-cart-footer.settings.shipping_fill.label"
+    },
+    {
+      "type": "color",
+      "id": "shipping_track",
+      "label": "t:sections.main-cart-footer.settings.shipping_track.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.main-cart-footer.settings.header__summary.content"
+    },
+    {
+      "type": "range",
+      "id": "summary_width",
+      "min": 26,
+      "max": 52,
+      "step": 1,
+      "unit": "rem",
+      "default": 38,
+      "label": "t:sections.main-cart-footer.settings.summary_width.label"
+    },
+    {
+      "type": "range",
+      "id": "sticky_top",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "default": 24,
+      "label": "t:sections.main-cart-footer.settings.sticky_top.label"
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 12,
+      "label": "t:sections.main-cart-footer.settings.card_radius.label"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "t:sections.main-cart-footer.settings.card_bg.label"
+    },
+    {
+      "type": "range",
+      "id": "card_padding",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 20,
+      "label": "t:sections.main-cart-footer.settings.card_padding.label"
+    },
+    {
+      "type": "range",
+      "id": "subtotal_size",
+      "min": 14,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "default": 24,
+      "label": "t:sections.main-cart-footer.settings.subtotal_size.label"
+    },
+    {
+      "type": "range",
+      "id": "subtotal_label_size",
+      "min": 12,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 18,
+      "label": "t:sections.main-cart-footer.settings.subtotal_label_size.label"
+    },
+    {
+      "type": "select",
+      "id": "subtotal_weight",
+      "options": [
+        {
+          "value": "inherit",
+          "label": "t:sections.image-banner.settings_shared.button_weight.options__default.label"
+        },
+        {
+          "value": "300",
+          "label": "300"
+        },
+        {
+          "value": "400",
+          "label": "400"
+        },
+        {
+          "value": "500",
+          "label": "500"
+        },
+        {
+          "value": "600",
+          "label": "600"
+        },
+        {
+          "value": "700",
+          "label": "700"
+        }
+      ],
+      "default": "500",
+      "label": "t:sections.main-cart-footer.settings.subtotal_weight.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.main-cart-footer.settings.header__checkout.content"
+    },
+    {
+      "type": "range",
+      "id": "checkout_radius",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "default": 50,
+      "label": "t:sections.main-cart-footer.settings.checkout_radius.label"
+    },
+    {
+      "type": "range",
+      "id": "checkout_height",
+      "min": 36,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 54,
+      "label": "t:sections.main-cart-footer.settings.checkout_height.label"
+    },
+    {
+      "type": "range",
+      "id": "checkout_size",
+      "min": 10,
+      "max": 26,
+      "step": 1,
+      "unit": "px",
+      "default": 15,
+      "label": "t:sections.main-cart-footer.settings.checkout_size.label"
+    },
+    {
+      "type": "select",
+      "id": "checkout_weight",
+      "options": [
+        {
+          "value": "inherit",
+          "label": "t:sections.image-banner.settings_shared.button_weight.options__default.label"
+        },
+        {
+          "value": "300",
+          "label": "300"
+        },
+        {
+          "value": "400",
+          "label": "400"
+        },
+        {
+          "value": "500",
+          "label": "500"
+        },
+        {
+          "value": "600",
+          "label": "600"
+        },
+        {
+          "value": "700",
+          "label": "700"
+        }
+      ],
+      "default": "600",
+      "label": "t:sections.main-cart-footer.settings.checkout_weight.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "checkout_uppercase",
+      "default": true,
+      "label": "t:sections.main-cart-footer.settings.checkout_uppercase.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.padding.section_padding_heading"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 36,
+      "label": "t:sections.all.padding.padding_top"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 36,
+      "label": "t:sections.all.padding.padding_bottom"
+    }
+  ]
+}
+{% endschema %}

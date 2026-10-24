@@ -1,0 +1,137 @@
+.image-products {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ip-gap, 4rem);
+}
+
+@media screen and (min-width: 750px) {
+  .image-products {
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .image-products--media-right {
+    flex-direction: row-reverse;
+  }
+
+  .image-products__media {
+    flex: 0 0 var(--ip-media-width, 50%);
+  }
+
+  .image-products__grid {
+    flex: 1 1 auto;
+  }
+}
+
+/* Dawn's .media absolutely positions its children, so the box needs a height of
+   its own. 'fill' lets it stretch to the height of the product grid instead. */
+.image-products__media {
+  position: relative;
+  aspect-ratio: var(--ip-media-ratio, auto);
+  border-radius: var(--ip-media-radius, 0);
+  overflow: hidden;
+}
+
+.image-products__media img,
+.image-products__media .placeholder-svg {
+  object-fit: cover;
+}
+
+.image-products__media-link {
+  display: block;
+  position: absolute;
+  inset: 0;
+}
+
+@media screen and (max-width: 749px) {
+  /* Stacked on mobile there is no neighbouring grid to stretch against, so
+     'Fill height' would collapse to nothing — it falls back to a square. */
+  .image-products--media-fill .image-products__media {
+    aspect-ratio: 1 / 1;
+  }
+}
+
+.image-products__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.image-products__cell {
+  display: flex;
+  min-width: 0;
+}
+
+.image-products__card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: var(--ip-card-padding, 2rem);
+  text-align: center;
+}
+
+.image-products__card-media {
+  display: block;
+  position: relative;
+  width: 100%;
+  aspect-ratio: var(--ip-card-ratio, 4 / 5);
+  border-radius: var(--ip-card-image-radius, 0.8rem);
+  overflow: hidden;
+}
+
+.image-products__card-media img,
+.image-products__card-media .placeholder-svg {
+  object-fit: cover;
+}
+
+.image-products__card-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ip-card-text-gap, 1rem);
+  margin-top: var(--ip-card-text-gap, 1rem);
+}
+
+.image-products__card-title {
+  margin: 0;
+  font-size: var(--ip-title-size, 16px);
+  font-weight: var(--ip-title-weight, inherit);
+  text-transform: var(--ip-title-transform, none);
+  line-height: 1.2;
+}
+
+.image-products__card-title a {
+  color: var(--ip-title-color, rgb(var(--color-foreground)));
+  text-decoration: none;
+}
+
+.image-products__card-title a:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.3rem;
+}
+
+.image-products__card-price {
+  margin: 0;
+  font-size: var(--ip-price-size, 15px);
+  color: var(--ip-price-color, inherit);
+}
+
+.image-products__card-price .price-item {
+  font-size: inherit;
+}
+
+.image-products__card-button {
+  /* Dawn's 12rem min-width and 4.5rem min-height are released so the padding
+     settings actually size the button. */
+  min-width: 0;
+  min-height: 0;
+  font-size: var(--ip-btn-size, 12px);
+  letter-spacing: var(--ip-btn-spacing, 0.08em);
+  text-transform: var(--ip-btn-transform, uppercase);
+  padding: var(--ip-btn-padding-y, 1rem) var(--ip-btn-padding-x, 2rem);
+}
+
+@media screen and (max-width: 749px) {
+  .image-products__card {
+    padding: min(var(--ip-card-padding, 2rem), 1.2rem);
+  }
+}

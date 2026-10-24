@@ -1,0 +1,80 @@
+<span class="field-currency">{{ cart.currency.symbol }}</span>
+
+<div class="field">
+  <input
+    class="field__input"
+    name="{{ filter.min_value.param_name }}"
+    id="{{ id_prefix }}{{ filter.label | escape }}-GTE"
+    {%- if filter.min_value.value -%}
+      value="{{ filter.min_value.value | money_without_currency }}"
+    {%- endif -%}
+    type="text"
+    inputmode="decimal"
+    placeholder="0"
+    data-pattern="\d| |,|\."
+    data-min="0"
+    data-max="{{ filter.range_max | money_without_currency }}"
+  >
+  <label class="field__label" for="{{ id_prefix }}{{ filter.label | escape }}-GTE">
+    {{- 'products.facets.from' | t -}}
+  </label>
+</div>
+
+{%- if filter_type != 'vertical' -%}
+  <span class="field-currency">{{ cart.currency.symbol }}</span>
+{%- endif -%}
+
+<div class="field">
+  <input
+    class="field__input"
+    name="{{ filter.max_value.param_name }}"
+    id="{{ id_prefix }}{{ filter.label | escape }}-LTE"
+    {%- if filter.max_value.value -%}
+      value="{{ filter.max_value.value | money_without_currency }}"
+    {%- endif -%}
+    type="text"
+    inputmode="decimal"
+    placeholder="{{ filter.range_max | money_without_currency }}"
+    data-pattern="\d| |,|\."
+    data-min="0"
+    data-max="{{ filter.range_max | money_without_currency }}"
+  >
+  <label class="field__label" for="{{ id_prefix }}{{ filter.label | escape }}-LTE">
+    {{- 'products.facets.to' | t -}}
+  </label>
+</div>
+
+{%- comment -%}
+  Dual-handle slider driving the two number fields above. Two stacked range
+  inputs: pointer-events are disabled on the tracks and re-enabled on the thumbs
+  only, so both handles stay grabbable where they overlap.
+{%- endcomment -%}
+{%- assign range_max = filter.range_max | money_without_currency | replace: ',', '' -%}
+<price-range-slider
+  class="price-slider"
+  data-max="{{ range_max }}"
+  data-min-input="{{ id_prefix }}{{ filter.label | escape }}-GTE"
+  data-max-input="{{ id_prefix }}{{ filter.label | escape }}-LTE"
+>
+  <div class="price-slider__track" aria-hidden="true">
+    <div class="price-slider__fill" data-slider-fill></div>
+  </div>
+  <input
+    class="price-slider__input price-slider__input--min"
+    type="range"
+    min="0"
+    max="{{ range_max }}"
+    value="{{ filter.min_value.value | default: 0 | money_without_currency | replace: ',', '' }}"
+    data-slider-min
+    aria-label="{{ 'products.facets.from' | t }}"
+  >
+  <input
+    class="price-slider__input price-slider__input--max"
+    type="range"
+    min="0"
+    max="{{ range_max }}"
+    value="{{ filter.max_value.value | default: filter.range_max | money_without_currency | replace: ',', '' }}"
+    data-slider-max
+    aria-label="{{ 'products.facets.to' | t }}"
+  >
+</price-range-slider>

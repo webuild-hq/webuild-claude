@@ -1,0 +1,165 @@
+.testimonials__heading {
+  margin: 0 0 3rem;
+  text-align: center;
+}
+
+/* Arrows sit at the far edges, vertically centered on the row. The horizontal
+   padding lives on the wrapper — never on the scroll track, where it would make
+   each 100%-wide slide narrower than the viewport and let the next one peek. */
+.testimonials__slideshow {
+  position: relative;
+  padding: 0 5.5rem;
+}
+
+.testimonials__controls {
+  position: static;
+}
+
+.testimonials__slideshow .slider-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: 4.4rem;
+  height: 4.4rem;
+}
+
+.testimonials__slideshow .slider-button--prev {
+  left: 0;
+}
+
+.testimonials__slideshow .slider-button--next {
+  right: 0;
+}
+
+.testimonials__slideshow .slideshow__autoplay {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  z-index: 2;
+}
+
+.testimonials__track {
+  margin: 0;
+  scroll-behavior: auto;
+  /* Dawn's grid keeps a column-gap; removed here so one slide fills the view
+     exactly and the next never peeks in. */
+  column-gap: 0;
+}
+
+/* Each slide is exactly the track width (the track has no padding), so one
+   testimonial fills the view and Dawn's center snap lines it up. */
+.testimonials__track > .testimonials__slide {
+  flex: 0 0 100%;
+  width: 100%;
+  max-width: 100%;
+}
+
+
+.testimonials__slide {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--tm-gap, 6rem);
+  align-items: center;
+}
+
+.testimonials__slide .testimonials__text {
+  order: 2;
+}
+
+.testimonials__slide .testimonials__media-col {
+  order: 1;
+}
+
+@media screen and (min-width: 750px) {
+  .testimonials__slide {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .testimonials__slide--image-right .testimonials__text {
+    order: 1;
+  }
+
+  .testimonials__slide--image-right .testimonials__media-col {
+    order: 2;
+  }
+}
+
+.testimonials__stars {
+  display: flex;
+  gap: 0.2rem;
+  margin-bottom: 2rem;
+  color: var(--tm-star-color, rgb(var(--color-foreground)));
+  font-size: var(--tm-star-size, 16px);
+  line-height: 1;
+}
+
+.testimonials__star--empty {
+  opacity: 0.25;
+}
+
+.testimonials__quote {
+  margin: 0 0 2rem;
+  border: 0;
+  padding: 0;
+  font-style: normal;
+  font-size: var(--tm-quote-size, 32px);
+  line-height: var(--tm-quote-line-height, 1.2);
+  color: var(--tm-quote-color, rgb(var(--color-foreground)));
+  font-family: var(--font-heading-family);
+  font-weight: var(--font-heading-weight);
+}
+
+.testimonials__quote > *:first-child {
+  margin-top: 0;
+}
+
+.testimonials__quote > *:last-child {
+  margin-bottom: 0;
+}
+
+.testimonials__author {
+  margin: 0;
+  color: var(--tm-author-color, rgba(var(--color-foreground), 0.7));
+}
+
+.testimonials__media {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--tm-image-radius, 1.6rem);
+  overflow: hidden;
+}
+
+.testimonials__media img,
+.testimonials__media .placeholder-svg {
+  object-fit: cover;
+}
+
+.testimonials__product-label {
+  display: inline-block;
+  margin: 1.4rem 0 0;
+  font-weight: 500;
+  color: rgb(var(--color-foreground));
+  text-decoration: none;
+}
+
+a.testimonials__product-label:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.3rem;
+}
+
+@media screen and (max-width: 749px) {
+  .testimonials__slideshow {
+    padding: 0 4.2rem;
+  }
+
+  .testimonials__slideshow .slider-button {
+    width: 3.6rem;
+    height: 3.6rem;
+  }
+
+  /* Big display quotes have to shrink on a phone. */
+  .testimonials__quote {
+    font-size: min(var(--tm-quote-size, 32px), 7vw);
+  }
+}

@@ -1,0 +1,182 @@
+/* Two-panel promise block: a coloured text panel beside a full-bleed image.
+   Every value reads from a --pr-* custom property emitted by the section, so
+   the same stylesheet serves any number of instances with different settings. */
+
+.promise__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  /* Clips the image to the rounded corners; the radius lives on the grid rather
+     than on each panel so the two halves share one continuous outline. */
+  overflow: hidden;
+  border-radius: var(--pr-radius, 1.2rem);
+}
+
+.promise__panel {
+  display: flex;
+  align-items: var(--pr-vertical-align, center);
+  /* Padding is scaled down on small screens by the section's own media query. */
+  padding: var(--pr-pad-y, 6.4rem) var(--pr-pad-x, 4rem);
+}
+
+.promise__content {
+  width: 100%;
+  max-width: var(--pr-content-width, 44rem);
+}
+
+.promise__content--center {
+  margin-inline: auto;
+  text-align: center;
+}
+
+.promise__heading {
+  margin: 0;
+  font-size: var(--pr-heading-size, 4.8rem);
+  font-weight: var(--pr-heading-weight, inherit);
+  text-transform: var(--pr-heading-transform, none);
+  letter-spacing: var(--pr-heading-spacing, normal);
+  line-height: var(--pr-heading-line-height, 1.15);
+  color: var(--pr-heading-color, inherit);
+}
+
+/* A plain element rather than <hr> so it can be sized and coloured freely
+   without fighting the browser's default border rendering. The [role]
+   attribute selector is load-bearing, not decoration: base.css hides every
+   empty div by default (div:empty { display: none }), and that rule outranks
+   a bare class selector on specificity. Matching on the attribute we already
+   render brings this above it without an !important or a duplicated class. */
+.promise__divider[role] {
+  width: var(--pr-divider-width, 100%);
+  height: var(--pr-divider-thickness, 0.1rem);
+  margin: var(--pr-divider-gap-top, 3.2rem) 0 var(--pr-divider-gap-bottom, 3.2rem);
+  background: var(--pr-divider-color, rgba(var(--color-foreground), 0.4));
+  border: 0;
+}
+
+.promise__content--center .promise__divider {
+  margin-inline: auto;
+}
+
+.promise__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pr-item-gap, 2.4rem);
+}
+
+.promise__item {
+  display: flex;
+  align-items: baseline;
+  gap: var(--pr-marker-gap, 1.2rem);
+  margin: 0;
+  font-size: var(--pr-item-size, 1.8rem);
+  font-weight: var(--pr-item-weight, inherit);
+  line-height: var(--pr-item-line-height, 1.5);
+  color: var(--pr-item-color, inherit);
+}
+
+.promise__content--center .promise__item {
+  justify-content: center;
+}
+
+/* Markers ------------------------------------------------------------------ */
+
+.promise__marker {
+  flex-shrink: 0;
+  color: var(--pr-marker-color, currentColor);
+}
+
+.promise__marker--dot {
+  width: var(--pr-marker-size, 0.6rem);
+  height: var(--pr-marker-size, 0.6rem);
+  border-radius: 50%;
+  background: currentColor;
+  /* Nudged up to sit optically centred against the text's x-height rather than
+     on the baseline, where a round marker reads as sitting too low. */
+  transform: translateY(-0.2em);
+}
+
+.promise__marker--dash {
+  width: var(--pr-marker-size, 1.4rem);
+  height: var(--pr-marker-thickness, 0.1rem);
+  background: currentColor;
+  transform: translateY(-0.3em);
+}
+
+.promise__marker--check {
+  width: var(--pr-marker-size, 1.6rem);
+  height: var(--pr-marker-size, 1.6rem);
+  transform: translateY(0.15em);
+}
+
+.promise__marker--check svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Media -------------------------------------------------------------------- */
+
+.promise__media {
+  position: relative;
+  /* On mobile the image has no panel to match, so it needs its own proportions.
+     Cleared at the desktop breakpoint where the grid supplies the height. */
+  aspect-ratio: var(--pr-mobile-ratio, 4 / 3);
+  /* auto (disabled) leaves the ratio above in charge; a definite px value
+     overrides it directly — a set height always beats aspect-ratio for the
+     axis it controls, no extra rule needed. */
+  height: var(--pr-mobile-height, auto);
+  background: rgba(var(--color-foreground), 0.04);
+}
+
+.promise__media img,
+.promise__media .placeholder-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: var(--pr-focal, center);
+}
+
+@media screen and (max-width: 749px) {
+  .promise__grid--mobile-media-first .promise__media {
+    order: -1;
+  }
+}
+
+@media screen and (min-width: 750px) {
+  .promise__grid {
+    grid-template-columns: var(--pr-text-col, 50%) 1fr;
+    min-height: var(--pr-min-height, auto);
+  }
+
+  /* Reversing with order keeps the panel first in the DOM, so the heading is
+     still what a screen reader meets first regardless of the visual side. */
+  .promise__grid--media-left .promise__panel {
+    order: 2;
+  }
+
+  .promise__grid--media-left .promise__media {
+    order: 1;
+  }
+
+  /* auto (the default) reproduces the original behaviour: no ratio of its own,
+     so the image simply stretches to whatever height the grid row ends up
+     being — set by the text panel, or by --pr-min-height below. Any other
+     value gives the image a size independent of the text beside it. */
+  .promise__media {
+    aspect-ratio: var(--pr-desktop-ratio, auto);
+    /* Same override as the mobile rule above: auto (disabled) changes nothing,
+       a definite value wins over both the ratio and the grid's stretch. */
+    height: var(--pr-height, auto);
+  }
+
+  /* A grid item stretches to fill its row's height by default, which would
+     silently override the ratio above (a definite stretched height beats an
+     aspect-ratio computed from the auto axis). align-self: start opts back
+     into "auto" height, letting the ratio actually take effect. Scoped to a
+     modifier class so the default auto behaviour is untouched. */
+  .promise__media--sized {
+    align-self: start;
+  }
+}

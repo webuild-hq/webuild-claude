@@ -1,0 +1,93 @@
+.promo-bar {
+  position: relative;
+  isolation: isolate;
+}
+
+.promo-bar__media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.promo-bar__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.promo-bar__inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  min-height: var(--pb-min-height, 96px);
+}
+
+.promo-bar__items {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--pb-gap, 4rem);
+  width: 100%;
+}
+
+.promo-bar__items--left {
+  justify-content: flex-start;
+}
+.promo-bar__items--center {
+  justify-content: center;
+}
+.promo-bar__items--between {
+  justify-content: space-between;
+}
+
+.promo-bar__item {
+  position: relative;
+  margin: 0;
+  font-size: var(--pb-text-size, 20px);
+  line-height: 1.3;
+  font-weight: var(--pb-text-weight, inherit);
+  text-transform: var(--pb-text-transform, none);
+  color: var(--pb-text-color, rgb(var(--color-foreground)));
+}
+
+.promo-bar__item--link {
+  text-decoration: none;
+}
+
+.promo-bar__item--link:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.3rem;
+}
+
+/* Divider drawn in the middle of the gap between items, so it never hugs one
+   side. Only between items — the first one has none. */
+.promo-bar__items--separated .promo-bar__item + .promo-bar__item::before {
+  content: '';
+  position: absolute;
+  left: calc(var(--pb-gap, 4rem) / -2);
+  top: 50%;
+  transform: translateY(-50%);
+  width: var(--pb-sep-thickness, 1px);
+  height: var(--pb-sep-height, 60%);
+  min-height: 1.6em;
+  background: var(--pb-sep-color, rgba(var(--color-foreground), 0.45));
+}
+
+@media screen and (max-width: 749px) {
+  .promo-bar__items {
+    flex-direction: column;
+    gap: calc(var(--pb-gap, 4rem) / 2);
+    text-align: center;
+  }
+
+  /* Stacked on a phone, a vertical rule between items makes no sense. */
+  .promo-bar__items--separated .promo-bar__item + .promo-bar__item::before {
+    content: none;
+  }
+
+  .promo-bar__item {
+    font-size: min(var(--pb-text-size, 20px), 5vw);
+  }
+}

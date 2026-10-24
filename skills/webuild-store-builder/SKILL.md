@@ -18,6 +18,10 @@ modifications sur la boutique. Webuild n'a jamais accès à la boutique.
   demande laquelle utiliser et passe son slug dans `agency`.
 - **Images** : uniquement pour l'ambiance (hero, bannières, éditorial, lifestyle). Ne remplace jamais les vraies
   photos des produits par des images générées.
+- **Avis clients, témoignages, citations presse, notes** : n'invente jamais un avis présenté comme réel. Utilise les
+  avis et citations fournis par l'utilisateur. S'il n'en a pas, remplis la section avec des exemples clairement
+  marqués (auteur "Prénom N. (exemple)", texte qui dit qu'il est à remplacer), sans logo ni nom de média réel, et
+  signale ces sections dans le résumé : l'agence doit les remplacer ou les masquer avant la publication.
 - Ne modifie pas `snippets/webuild-license.liquid` ni ses appels dans `layout/` : c'est la licence du thème.
 
 ## Déroulé
@@ -38,8 +42,10 @@ modifications sur la boutique. Webuild n'a jamais accès à la boutique.
 7. **Images** : pour chaque emplacement `image_picker` utile, `generate_section_image(theme, section, setting,
    brief)`, puis `fileCreate(files: { originalSource, filename, contentType: IMAGE, alt })`, attends `fileStatus:
    READY`, et mets `"shopify://shop_images/<filename>"` comme valeur du réglage.
-8. **Aperçu** : donne `https://<domaine>/?preview_theme_id=<id>` et un résumé de ce qui a été fait.
-9. **Publication** : après validation explicite, `themePublish(id)`.
+8. **Aperçu** : donne `https://<domaine>/?preview_theme_id=<id>` et un résumé de ce qui a été fait, avec la liste
+   des sections qui contiennent encore des exemples à remplacer (avis, citations).
+9. **Publication** : après validation explicite, `themePublish(id)`. S'il reste des exemples d'avis ou de
+   citations, rappelle-le avant de publier et demande confirmation.
 
 ## En cas de problème
 

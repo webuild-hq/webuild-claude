@@ -1,0 +1,61 @@
+{% comment %}
+  Renders a single product card for the image-banner product carousel.
+
+  Accepts:
+  - card_product: {Object} Product to render (required)
+  - block: {Object} product_carousel block holding the shared card settings (required)
+{% endcomment %}
+
+<div class="banner__product-card color-{{ block.settings.card_color_scheme }} gradient">
+  {%- if card_product != blank -%}
+    <a
+      href="{{ card_product.url }}"
+      class="banner__product-media media"
+      aria-label="{{ card_product.title | escape }}"
+      tabindex="-1"
+    >
+      {%- if card_product.featured_media != blank -%}
+        {{
+          card_product.featured_media
+          | image_url: width: 800
+          | image_tag:
+            loading: 'lazy',
+            widths: '200, 300, 400, 600, 800',
+            sizes: '(min-width: 750px) 28rem, 40vw',
+            alt: card_product.featured_media.alt | escape
+        }}
+      {%- else -%}
+        {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+      {%- endif -%}
+    </a>
+    <div class="banner__product-info">
+      <p class="banner__product-title {{ block.settings.title_size }}">
+        <a href="{{ card_product.url }}">{{ card_product.title | escape }}</a>
+      </p>
+      {%- if block.settings.show_price -%}
+        {%- render 'price', product: card_product, price_class: 'banner__product-price' -%}
+      {%- endif -%}
+      {%- if block.settings.button_label != blank -%}
+        {%- capture btn_style -%}
+          {%- render 'button-custom-style', settings: block.settings, prefix: 'btn_' -%}
+        {%- endcapture -%}
+        <a
+          href="{{ card_product.url }}"
+          class="button button--primary banner__product-button{% if block.settings.btn_custom %} button--custom{% endif %}"
+          {%- if btn_style != blank %} style="{{ btn_style | strip_newlines | strip }}"{% endif %}
+        >
+          {{- block.settings.button_label | escape -}}
+        </a>
+      {%- endif -%}
+    </div>
+  {%- else -%}
+    <div class="banner__product-media media">
+      {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+    </div>
+    <div class="banner__product-info">
+      <p class="banner__product-title {{ block.settings.title_size }}">
+        {{ 'onboarding.product_title' | t }}
+      </p>
+    </div>
+  {%- endif -%}
+</div>

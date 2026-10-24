@@ -1,0 +1,191 @@
+/* Media panel with floating sticker badges beside a text column. */
+
+.feature-image__layout {
+  display: grid;
+  gap: var(--fi-gap, 4rem);
+  align-items: center;
+}
+
+/* overflow-x: clip rather than hidden — clip prevents a badge that overhangs the
+   viewport from creating a page-wide horizontal scrollbar, without turning the
+   section into a scroll container (which `hidden` would, breaking position:
+   sticky for any ancestor). Badge positions are percentages while their size is
+   in px, so on a narrow screen the two can't help but disagree; this is the
+   backstop for whatever the merchant configures. */
+.feature-image {
+  overflow-x: clip;
+}
+
+/* Media ---------------------------------------------------------------------
+   The stage is a padded box so a badge parked at 0% or 100% still has room to
+   sit outside the image instead of being clipped by the column edge. */
+.feature-image__stage {
+  position: relative;
+  padding: var(--fi-stage-padding, 4rem);
+}
+
+.feature-image__media {
+  position: relative;
+  aspect-ratio: var(--fi-ratio, 1 / 1);
+  overflow: hidden;
+  background: rgba(var(--color-foreground), 0.04);
+}
+
+.feature-image__media--circle {
+  border-radius: 50%;
+}
+
+.feature-image__media--rounded {
+  border-radius: var(--fi-media-radius, 2.4rem);
+}
+
+.feature-image__media img,
+.feature-image__media .placeholder-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: var(--fi-focal, center);
+}
+
+/* Badges --------------------------------------------------------------------
+   Positioned as percentages of the stage so they keep their relationship to
+   the image at every screen width, instead of drifting as a fixed offset
+   would. translate(-50%,-50%) makes the stored value the badge's centre. */
+.feature-image__badge {
+  position: absolute;
+  left: var(--badge-x, 50%);
+  top: var(--badge-y, 50%);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--badge-size, 11rem) * var(--fi-badge-scale, 1));
+  height: calc(var(--badge-size, 11rem) * var(--fi-badge-scale, 1));
+  transform: translate(-50%, -50%) rotate(var(--badge-rotate, 0deg));
+  color: var(--badge-color, rgb(var(--color-foreground)));
+  pointer-events: none;
+}
+
+/* The shape is painted by an SVG behind the label rather than by clip-path, so
+   a scalloped edge stays exact and the label is never clipped with it. */
+.feature-image__badge-shape {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  color: var(--badge-bg, rgb(var(--color-background)));
+}
+
+.feature-image__badge-text {
+  position: relative;
+  z-index: 1;
+  padding: 0 12%;
+  text-align: center;
+  font-size: calc(var(--badge-font-size, 1.5rem) * var(--fi-badge-scale, 1));
+  font-weight: var(--badge-weight, 600);
+  line-height: 1.2;
+}
+
+/* Text ----------------------------------------------------------------------- */
+.feature-image__overline {
+  margin: 0 0 var(--fi-overline-gap, 1.6rem);
+  font-size: var(--fi-overline-size, 1.3rem);
+  font-weight: var(--fi-overline-weight, 700);
+  letter-spacing: var(--fi-overline-spacing, 0.1em);
+  text-transform: uppercase;
+  color: var(--fi-overline-color, inherit);
+}
+
+.feature-image__heading {
+  margin: 0;
+  font-size: var(--fi-heading-size, 4rem);
+  font-weight: var(--fi-heading-weight, 700);
+  line-height: var(--fi-heading-line-height, 1.15);
+  letter-spacing: var(--fi-heading-spacing, normal);
+  color: var(--fi-heading-color, inherit);
+}
+
+.feature-image__body {
+  margin: var(--fi-body-gap, 2rem) 0 0;
+  font-size: var(--fi-body-size, 1.6rem);
+  line-height: var(--fi-body-line-height, 1.6);
+  color: var(--fi-body-color, rgba(var(--color-foreground), 0.75));
+}
+
+.feature-image__body > *:first-child {
+  margin-top: 0;
+}
+
+.feature-image__body > *:last-child {
+  margin-bottom: 0;
+}
+
+/* Button with a trailing disc ------------------------------------------------
+   Dawn paints button borders with ::before/::after reading --buttons-radius,
+   so rounding the element alone would leave a square outline around the pill —
+   the variables are scoped here for the same reason as on the cart button. */
+.feature-image__button {
+  --buttons-radius: var(--fi-button-radius, 999rem);
+  --buttons-radius-outset: calc(var(--fi-button-radius, 999rem) + var(--buttons-border-width));
+  display: inline-flex;
+  align-items: center;
+  gap: var(--fi-button-gap, 1.2rem);
+  margin-top: var(--fi-button-margin, 2.8rem);
+  min-height: var(--fi-button-height, 5.2rem);
+  padding: 0 var(--fi-button-padding, 2.4rem);
+  border-radius: var(--fi-button-radius, 999rem);
+  font-size: var(--fi-button-size, 1.5rem);
+  font-weight: var(--fi-button-weight, 600);
+}
+
+.feature-image__button-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--fi-button-icon-size, 2.4rem);
+  height: var(--fi-button-icon-size, 2.4rem);
+  border-radius: 50%;
+  background: var(--fi-button-icon-bg, rgb(var(--color-background)));
+  color: var(--fi-button-icon-color, rgb(var(--color-foreground)));
+  transition: transform var(--duration-short) ease;
+}
+
+.feature-image__button-icon svg {
+  width: 55%;
+  height: 55%;
+}
+
+.feature-image__button:hover .feature-image__button-icon {
+  transform: translateX(0.2rem);
+}
+
+@media screen and (min-width: 750px) {
+  .feature-image__layout {
+    grid-template-columns: var(--fi-media-width, 50%) 1fr;
+    gap: var(--fi-split-gap, 6rem);
+  }
+
+  /* Order swap rather than DOM order, so the heading still comes first for
+     screen readers whichever side the image is on. */
+  .feature-image__layout--media-right .feature-image__stage {
+    order: 2;
+  }
+
+  .feature-image__layout--media-right .feature-image__content {
+    order: 1;
+  }
+}
+
+@media screen and (max-width: 749px) {
+  .feature-image__stage {
+    padding: var(--fi-stage-padding-mobile, 2.4rem);
+  }
+
+  /* Badges keep percentage positions on mobile, so shrinking them is what keeps
+     one parked near an edge from running past the screen. */
+  .feature-image__badge {
+    --fi-badge-scale: var(--fi-badge-scale-mobile, 0.65);
+  }
+}

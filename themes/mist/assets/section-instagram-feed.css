@@ -1,0 +1,139 @@
+/* Instagram feed: a responsive grid of square images with a hover overlay.
+   No live API connection — Shopify apps that pull a real feed (Instafeed,
+   Foursixty, etc.) render into a section like this one anyway, so a merchant
+   who adds one later loses nothing by starting here first. */
+
+.instagram-feed__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: var(--ig-header-gap, 3.2rem);
+}
+
+.instagram-feed__heading-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.instagram-feed__heading {
+  margin: 0;
+  font-size: var(--ig-heading-size, 3.2rem);
+  font-weight: var(--ig-heading-weight, inherit);
+  color: var(--ig-heading-color, inherit);
+}
+
+.instagram-feed__handle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: fit-content;
+  font-size: var(--ig-handle-size, 1.5rem);
+  color: var(--ig-handle-color, rgba(var(--color-foreground), 0.7));
+  text-decoration: none;
+}
+
+.instagram-feed__handle:hover {
+  color: rgb(var(--color-foreground));
+}
+
+.instagram-feed__handle .svg-wrapper {
+  width: 1.6rem;
+  height: 1.6rem;
+}
+
+.instagram-feed__follow.button {
+  flex-shrink: 0;
+  min-height: var(--ig-follow-height, 4.4rem);
+  padding: 0 var(--ig-follow-padding, 2.2rem);
+  border-radius: var(--ig-follow-radius, 999rem);
+  font-size: var(--ig-follow-size, 1.4rem);
+}
+
+.instagram-feed__grid {
+  display: grid;
+  grid-template-columns: repeat(var(--ig-columns-mobile, 2), 1fr);
+  gap: var(--ig-gap, 0.4rem);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.instagram-feed__item {
+  position: relative;
+  display: block;
+  aspect-ratio: var(--ig-ratio, 1 / 1);
+  border-radius: var(--ig-radius, 0);
+  overflow: hidden;
+  background: rgba(var(--color-foreground), 0.04);
+}
+
+/* A plain div rather than an <a> when the block has no link, so the grid never
+   ships a keyboard focus stop or a cursor:pointer for nothing to click. */
+a.instagram-feed__item {
+  cursor: pointer;
+}
+
+.instagram-feed__item img,
+.instagram-feed__item .placeholder-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  transition: transform var(--duration-long, 500ms) ease;
+}
+
+@media (hover: hover) {
+  a.instagram-feed__item:hover img {
+    transform: scale(1.06);
+  }
+}
+
+.instagram-feed__overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  background: var(--ig-overlay-color, rgba(0, 0, 0, 0.35));
+  transition: opacity var(--duration-short) ease;
+}
+
+@media (hover: hover) {
+  a.instagram-feed__item:hover .instagram-feed__overlay,
+  a.instagram-feed__item:focus-visible .instagram-feed__overlay {
+    opacity: 1;
+  }
+}
+
+/* Always visible on touch devices, where :hover can't be relied on to signal
+   that the tile links out — this keeps that affordance visible instead of
+   hidden behind a gesture the visitor may not think to try. */
+@media (hover: none) {
+  .instagram-feed__overlay {
+    opacity: 1;
+    background: var(--ig-overlay-color, rgba(0, 0, 0, 0.15));
+  }
+}
+
+.instagram-feed__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--ig-icon-size, 3.2rem);
+  height: var(--ig-icon-size, 3.2rem);
+  color: var(--ig-icon-color, #fff);
+}
+
+.instagram-feed__icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+@media screen and (min-width: 750px) {
+  .instagram-feed__grid {
+    grid-template-columns: repeat(var(--ig-columns-desktop, 5), 1fr);
+  }
+}

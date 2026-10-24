@@ -1,0 +1,38 @@
+{% comment %}
+  Builds the inline CSS custom properties for a button whose style is overridden
+  in the editor. Outputs nothing when the merchant left the custom style off, so
+  the button keeps the theme's default look.
+
+  Accepts:
+  - settings: {Object} block.settings holding the values (required)
+  - prefix: {String} setting id prefix, e.g. 'btn1_' (required)
+
+  Usage:
+  {%- capture btn_style %}{% render 'button-custom-style', settings: block.settings, prefix: 'btn1_' %}{% endcapture -%}
+{% endcomment %}
+
+{%- liquid
+  assign key_enabled = prefix | append: 'custom'
+  assign key_bg = prefix | append: 'bg'
+  assign key_text = prefix | append: 'text'
+  assign key_bg_hover = prefix | append: 'bg_hover'
+  assign key_text_hover = prefix | append: 'text_hover'
+  assign key_border = prefix | append: 'border'
+  assign key_border_width = prefix | append: 'border_thickness'
+  assign key_radius = prefix | append: 'radius'
+  assign key_weight = prefix | append: 'weight'
+-%}
+{%- if settings[key_enabled] -%}
+  {%- if settings[key_bg] != blank %}--btn-bg: {{ settings[key_bg] }};{% endif -%}
+  {%- if settings[key_text] != blank %}--btn-text: {{ settings[key_text] }};{% endif -%}
+  {%- if settings[key_bg_hover] != blank %}--btn-bg-hover: {{ settings[key_bg_hover] }};{% endif -%}
+  {%- if settings[key_text_hover] != blank %}--btn-text-hover: {{ settings[key_text_hover] }};{% endif -%}
+  {%- if settings[key_border] != blank %}--btn-border-color: {{ settings[key_border] }};{% endif -%}
+  --btn-border-width: {{ settings[key_border_width] | default: 0 }}px;
+  --btn-radius: {{ settings[key_radius] | default: 0 }}px;
+  {%- comment -%}
+    'inherit' is the opt-out: the theme's own weight already comes through
+    Dawn's `font: inherit` on .button, so it keeps the default look.
+  {%- endcomment -%}
+  --btn-weight: {{ settings[key_weight] | default: 'inherit' }};
+{%- endif -%}

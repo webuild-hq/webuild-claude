@@ -1,0 +1,81 @@
+{% comment %}
+  Product highlights: a bordered panel of icon + value + label chips.
+
+  Rendered as one panel from every "highlight" block in the section, rather than
+  once per block, so the merchant still adds and reorders each chip in the
+  editor while the output stays a single group. Each chip carries its own
+  shopify_attributes, which is what keeps editor selection pointing at the right
+  one.
+
+  Accepts:
+  - section: {Object} the product section, for its settings and blocks (required)
+{% endcomment %}
+
+{%- liquid
+  assign s = section.settings
+
+  assign chip_count = 0
+  for block in section.blocks
+    if block.type == 'highlight'
+      assign chip_count = chip_count | plus: 1
+    endif
+  endfor
+-%}
+
+{%- if chip_count > 0 -%}
+  {%- capture highlight_vars -%}
+    --ph-radius: {{ s.highlights_radius }}px;
+    --ph-padding: {{ s.highlights_padding }}px;
+    --ph-border-width: {{ s.highlights_border_width }}px;
+    --ph-gap: {{ s.highlights_gap }}px;
+    --ph-card-radius: {{ s.highlights_card_radius }}px;
+    --ph-card-padding-x: {{ s.highlights_card_padding_x }}px;
+    --ph-card-padding-y: {{ s.highlights_card_padding_y }}px;
+    --ph-icon-size: {{ s.highlights_icon_size }}px;
+    --ph-icon-gap: {{ s.highlights_icon_gap }}px;
+    --ph-value-size: {{ s.highlights_value_size }}px;
+    --ph-label-size: {{ s.highlights_label_size }}px;
+    --ph-title-size: {{ s.highlights_title_size }}px;
+    {%- if s.highlights_border_color != blank %} --ph-border-color: {{ s.highlights_border_color }};{% endif -%}
+    {%- if s.highlights_card_bg != blank %} --ph-card-bg: {{ s.highlights_card_bg }};{% endif -%}
+    {%- if s.highlights_icon_color != blank %} --ph-icon-color: {{ s.highlights_icon_color }};{% endif -%}
+    {%- if s.highlights_value_color != blank %} --ph-value-color: {{ s.highlights_value_color }};{% endif -%}
+    {%- if s.highlights_label_color != blank %} --ph-label-color: {{ s.highlights_label_color }};{% endif -%}
+    {%- if s.highlights_title_color != blank %} --ph-title-color: {{ s.highlights_title_color }};{% endif -%}
+    {%- if s.highlights_title_bg != blank %} --ph-title-bg: {{ s.highlights_title_bg }};{% endif -%}
+    {%- if s.highlights_value_weight != 'inherit' %} --ph-value-weight: {{ s.highlights_value_weight }};{% endif -%}
+  {%- endcapture -%}
+
+  <div
+    class="product-highlights{% if s.highlights_title == blank %} product-highlights--untitled{% endif %}"
+    style="{{ highlight_vars | strip_newlines }}"
+  >
+    {%- if s.highlights_title != blank -%}
+      <h2 class="product-highlights__title">{{ s.highlights_title | escape }}</h2>
+    {%- endif -%}
+
+    <ul class="product-highlights__list" role="list">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'highlight' -%}
+          <li class="product-highlights__item" {{ block.shopify_attributes }}>
+            {%- if block.settings.icon != 'none' -%}
+              {%- assign icon_file = 'icon-' | append: block.settings.icon | append: '.svg' -%}
+              <span class="product-highlights__icon" aria-hidden="true">
+                {{- icon_file | inline_asset_content -}}
+              </span>
+            {%- endif -%}
+
+            <span class="product-highlights__text">
+              {%- if block.settings.value != blank -%}
+                <span class="product-highlights__value">{{ block.settings.value | escape }}</span>
+              {%- endif -%}
+              {%- if block.settings.label != blank -%}
+                <span class="product-highlights__label">{{ block.settings.label | escape }}</span>
+              {%- endif -%}
+            </span>
+          </li>
+        {%- endif -%}
+      {%- endfor -%}
+    </ul>
+  </div>
+{%- endif -%}

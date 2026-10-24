@@ -1,0 +1,83 @@
+.press-quotes__heading {
+  margin: 0 0 3rem;
+}
+
+.press-quotes__heading--center {
+  text-align: center;
+}
+
+.press-quotes__grid {
+  display: grid;
+  grid-template-columns: repeat(var(--pq-columns-mobile, 1), minmax(0, 1fr));
+  column-gap: var(--pq-column-gap, 5rem);
+  row-gap: var(--pq-row-gap, 4rem);
+}
+
+@media screen and (min-width: 750px) {
+  .press-quotes__grid {
+    grid-template-columns: repeat(var(--pq-columns, 4), minmax(0, 1fr));
+  }
+}
+
+.press-quotes__item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pq-logo-gap, 1.6rem);
+  min-width: 0;
+  /* Anchors the separator pseudo-elements drawn in the section's style block. */
+  position: relative;
+}
+
+.press-quotes__grid--center .press-quotes__item {
+  align-items: center;
+  text-align: center;
+}
+
+/* A fixed-height box with a contained image: logos keep their own proportions
+   and all sit on the same optical size, however wide or narrow they are. */
+.press-quotes__logo {
+  display: flex;
+  align-items: center;
+  height: var(--pq-logo-height, 40px);
+  opacity: var(--pq-logo-opacity, 1);
+}
+
+.press-quotes__grid--center .press-quotes__logo {
+  justify-content: center;
+}
+
+.press-quotes__logo img {
+  max-height: 100%;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  /* object-position keeps a narrow logo flush with the text below it. */
+  object-position: left center;
+}
+
+.press-quotes__grid--center .press-quotes__logo img {
+  object-position: center;
+}
+
+.press-quotes__logo-link {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  max-width: 100%;
+}
+
+.press-quotes__quote {
+  margin: 0;
+  font-size: var(--pq-quote-size, 16px);
+  line-height: var(--pq-quote-line-height, 1.5);
+  font-weight: var(--pq-quote-weight, inherit);
+  color: var(--pq-quote-color, inherit);
+}
+
+.press-quotes__quote > *:first-child {
+  margin-top: 0;
+}
+
+.press-quotes__quote > *:last-child {
+  margin-bottom: 0;
+}

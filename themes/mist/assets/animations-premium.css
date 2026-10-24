@@ -1,0 +1,305 @@
+/* ===========================================================================
+   Premium animation engine.
+
+   Loaded after base.css, so it overrides Dawn's two-style reveal (fade /
+   slide-up at a fixed duration) with a variable-driven system. Every value
+   below comes from a --anim-* custom property emitted in theme.liquid from the
+   theme settings, and every fallback equals Dawn's original hardcoded value —
+   so a merchant who never opens the Animations panel keeps stock Dawn.
+
+   Only transform, opacity, filter and clip-path are animated: all four are
+   composited by the GPU and never trigger layout.
+   =========================================================================== */
+
+@media (prefers-reduced-motion: no-preference) {
+  /* -------------------------------------------------------------------------
+     Offscreen state.
+
+     This must match each keyframe's `from` exactly, otherwise the element
+     paints in its resting position for one frame before the animation starts.
+     Rather than duplicating the values, theme.liquid emits the same
+     --anim-from-* set that the keyframes read.
+     ------------------------------------------------------------------------- */
+  .scroll-trigger.animate--slide-in {
+    opacity: var(--anim-from-opacity, 0.01);
+    transform: var(--anim-from-transform, translateY(2rem));
+    filter: var(--anim-from-filter, none);
+    clip-path: var(--anim-from-clip, none);
+  }
+
+  /* Dawn applies this where a transform would break positioning (sliders,
+     sticky columns), so it stays a pure opacity fade — only its timing is
+     taken from the settings. */
+  .scroll-trigger.animate--fade-in {
+    opacity: 0.01;
+  }
+
+  .scroll-trigger:not(.scroll-trigger--offscreen).animate--slide-in {
+    animation-delay: calc(var(--animation-order, 0) * var(--anim-stagger, 75ms));
+    will-change: transform, opacity;
+  }
+
+  /* Dropped once the reveal is done: a permanent will-change keeps a
+     compositing layer alive for every revealed element on the page. */
+  .scroll-trigger--revealed.animate--slide-in,
+  .scroll-trigger--revealed.animate--fade-in {
+    will-change: auto;
+  }
+
+  /* -------------------------------------------------------------------------
+     Reveal keyframes. theme.liquid picks one by name via --animation-slide-in.
+     ------------------------------------------------------------------------- */
+  @keyframes revealFade {
+    from {
+      opacity: 0.01;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes revealUp {
+    from {
+      opacity: 0.01;
+      transform: translateY(var(--anim-distance, 2rem));
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes revealDown {
+    from {
+      opacity: 0.01;
+      transform: translateY(calc(var(--anim-distance, 2rem) * -1));
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* "Left" describes the direction of travel: the element starts to the right
+     of its resting place and moves left into it. */
+  @keyframes revealLeft {
+    from {
+      opacity: 0.01;
+      transform: translateX(var(--anim-distance, 2rem));
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes revealRight {
+    from {
+      opacity: 0.01;
+      transform: translateX(calc(var(--anim-distance, 2rem) * -1));
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes revealZoomIn {
+    from {
+      opacity: 0.01;
+      transform: scale(var(--anim-zoom-from, 0.92));
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes revealZoomOut {
+    from {
+      opacity: 0.01;
+      transform: scale(var(--anim-zoom-out-from, 1.08));
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* A short rise carries the blur, otherwise a pure defocus reads as a
+     rendering glitch rather than an intentional entrance. */
+  @keyframes revealBlur {
+    from {
+      opacity: 0.01;
+      filter: blur(var(--anim-blur, 12px));
+      transform: translateY(calc(var(--anim-distance, 2rem) * 0.4));
+    }
+    to {
+      opacity: 1;
+      filter: blur(0);
+      transform: translateY(0);
+    }
+  }
+
+  /* Curtain reveal: the element is fully opaque the whole time and is instead
+     uncovered from its bottom edge upwards, sliding slightly as it goes. */
+  @keyframes revealMask {
+    from {
+      opacity: 1;
+      clip-path: inset(100% 0 0 0);
+      transform: translateY(var(--anim-distance, 2rem));
+    }
+    to {
+      opacity: 1;
+      clip-path: inset(0 0 0 0);
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes revealFlip {
+    from {
+      opacity: 0.01;
+      transform: perspective(100rem) rotateX(var(--anim-flip, -12deg))
+        translateY(var(--anim-distance, 2rem));
+    }
+    to {
+      opacity: 1;
+      transform: perspective(100rem) rotateX(0deg) translateY(0);
+    }
+  }
+
+  /* -------------------------------------------------------------------------
+     Image load reveal.
+
+     --pending is added by JS only, and removed by the same JS on load or
+     error, so an image can never be left invisible if the script fails to run
+     or the request 404s.
+     ------------------------------------------------------------------------- */
+  .img-reveal--pending {
+    opacity: var(--img-from-opacity, 0.01);
+    transform: var(--img-from-transform, none);
+    filter: var(--img-from-filter, none);
+    clip-path: var(--img-from-clip, none);
+  }
+
+  .img-reveal--done {
+    animation: var(--animation-image-reveal, imgRevealFade var(--img-duration, 600ms) var(--anim-easing, ease) forwards);
+  }
+
+  @keyframes imgRevealFade {
+    from {
+      opacity: 0.01;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes imgRevealBlur {
+    from {
+      opacity: 0.01;
+      filter: blur(var(--img-blur, 16px));
+      transform: scale(var(--img-zoom-from, 1.04));
+    }
+    to {
+      opacity: 1;
+      filter: blur(0);
+      transform: scale(1);
+    }
+  }
+
+  @keyframes imgRevealZoom {
+    from {
+      opacity: 0.01;
+      transform: scale(var(--img-zoom-from, 1.08));
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes imgRevealMask {
+    from {
+      opacity: 1;
+      clip-path: inset(100% 0 0 0);
+    }
+    to {
+      opacity: 1;
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  /* -------------------------------------------------------------------------
+     Heading reveal, word by word or line by line.
+
+     JS wraps each unit in .anim-word > .anim-word__inner and only then adds
+     --active to the heading, so unsplit headings are never hidden.
+     ------------------------------------------------------------------------- */
+  .anim-split {
+    /* Each unit is clipped by its own overflow, letting the inner span rise
+       from behind the baseline instead of simply fading in place. */
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: top;
+  }
+
+  .anim-split__inner {
+    display: inline-block;
+    transform: translateY(110%);
+    opacity: 0.01;
+  }
+
+  .anim-split-ready .anim-split__inner {
+    animation: revealSplit var(--heading-duration, 700ms) var(--anim-easing, ease) forwards;
+    animation-delay: calc(var(--split-order, 0) * var(--heading-stagger, 40ms));
+  }
+
+  @keyframes revealSplit {
+    from {
+      transform: translateY(110%);
+      opacity: 0.01;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Skeleton shimmer, shown in the space an image will occupy while it loads.
+
+   Deliberately outside the reduced-motion query for the base tint: users who
+   asked for less motion should still get the placeholder, just without the
+   sweep, so the layout does not read as broken mid-load.
+   --------------------------------------------------------------------------- */
+.img-skeleton {
+  position: relative;
+  background-color: var(--img-skeleton-color, rgba(var(--color-foreground), 0.06));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .img-skeleton::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--img-skeleton-sheen, rgba(var(--color-foreground), 0.09)) 50%,
+      transparent 100%
+    );
+    animation: imgSkeletonSweep 1.4s linear infinite;
+  }
+
+  @keyframes imgSkeletonSweep {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(100%);
+    }
+  }
+}

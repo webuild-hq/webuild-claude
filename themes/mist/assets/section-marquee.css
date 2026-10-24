@@ -1,0 +1,9 @@
+/* Marquee mechanics live in component-marquee.css, shared with other sections. */
+
+.marquee {
+  overflow: hidden;
+}
+
+.marquee__inner {
+  overflow: hidden;
+}

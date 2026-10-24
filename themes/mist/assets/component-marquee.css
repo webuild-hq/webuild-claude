@@ -1,0 +1,70 @@
+/* Shared scrolling-marquee mechanics, used by the marquee section and by any
+   section that overlays a marquee (e.g. video-marquee). */
+
+.marquee__track {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll var(--marquee-duration, 30s) linear infinite;
+  /* Promotes the track to its own layer so the loop stays smooth. */
+  will-change: transform;
+}
+
+.marquee--right .marquee__track {
+  animation-direction: reverse;
+}
+
+.marquee--pause:hover .marquee__track {
+  animation-play-state: paused;
+}
+
+.marquee__group {
+  display: flex;
+  align-items: center;
+  gap: var(--marquee-gap, 5rem);
+  padding-right: var(--marquee-gap, 5rem);
+  flex-shrink: 0;
+}
+
+/* The track holds four copies of the block list, so shifting it by a quarter of
+   its own width lands exactly on the next copy — the seam is invisible. */
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-25%);
+  }
+}
+
+.marquee__item {
+  flex-shrink: 0;
+}
+
+.marquee__text {
+  font-size: var(--marquee-text-size, 28px);
+  line-height: 1.2;
+  white-space: nowrap;
+  color: var(--marquee-text-color, rgb(var(--color-foreground)));
+  font-family: var(--font-heading-family);
+  font-style: var(--font-heading-style);
+  font-weight: var(--font-heading-weight);
+}
+
+.marquee__image {
+  width: var(--marquee-image-size, 10rem);
+  aspect-ratio: 1 / 1;
+  border-radius: var(--marquee-image-radius, 1.2rem);
+  overflow: hidden;
+}
+
+.marquee__image img,
+.marquee__image .placeholder-svg {
+  object-fit: cover;
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+  /* Honour the OS setting: the content stays readable, just static. */
+  .marquee__track {
+    animation: none;
+  }
+}

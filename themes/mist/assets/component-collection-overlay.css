@@ -1,0 +1,104 @@
+/* Overlay collection card: title and button sit on top of the image. */
+.collection-overlay {
+  position: relative;
+  display: flex;
+  height: 100%;
+  /* The image is absolutely positioned, so the card carries the height. */
+  aspect-ratio: var(--co-ratio, 1 / 1);
+  border-radius: var(--co-radius, 1.6rem);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.collection-overlay__media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.collection-overlay__media img,
+.collection-overlay__media .placeholder-svg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Covers the card when there is no button, making the whole tile clickable. */
+.collection-overlay__link {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.collection-overlay__content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: var(--co-gap, 1.6rem);
+  width: 100%;
+  padding: var(--co-padding, 3rem);
+  /* Only the button should intercept clicks, so the card link underneath keeps
+     working when there is no button. */
+  pointer-events: none;
+}
+
+.collection-overlay__content .button {
+  pointer-events: auto;
+}
+
+.collection-overlay__content--top {
+  justify-content: flex-start;
+}
+.collection-overlay__content--middle {
+  justify-content: center;
+}
+.collection-overlay__content--bottom {
+  justify-content: flex-end;
+}
+
+.collection-overlay__content--align-left {
+  align-items: flex-start;
+  text-align: left;
+}
+.collection-overlay__content--align-center {
+  align-items: center;
+  text-align: center;
+}
+.collection-overlay__content--align-right {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.collection-overlay__title {
+  margin: 0;
+  font-size: var(--co-title-size, 32px);
+  line-height: 1.1;
+  color: var(--co-title-color, #ffffff);
+  font-weight: var(--co-title-weight, inherit);
+  text-transform: var(--co-title-transform, none);
+  font-family: var(--font-heading-family);
+  font-style: var(--font-heading-style);
+}
+
+.collection-overlay__button.button {
+  /* Dawn's 12rem min-width and 4.5rem min-height are released so the padding
+     settings actually size the button. */
+  min-width: 0;
+  min-height: 0;
+  font-size: var(--co-btn-size, 13px);
+  letter-spacing: var(--co-btn-spacing, 0.05em);
+  text-transform: var(--co-btn-transform, uppercase);
+  padding: var(--co-btn-padding-y, 1.1rem) var(--co-btn-padding-x, 2.4rem);
+}
+
+@media screen and (max-width: 749px) {
+  .collection-overlay__content {
+    padding: min(var(--co-padding, 3rem), 1.8rem);
+  }
+
+  .collection-overlay__title {
+    font-size: min(var(--co-title-size, 32px), 7vw);
+  }
+}

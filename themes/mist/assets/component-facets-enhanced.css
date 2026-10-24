@@ -1,0 +1,305 @@
+/* ---------- Dual-handle price slider ---------- */
+.price-slider {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 2.4rem;
+  margin-top: 1.6rem;
+}
+
+.price-slider__track {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 0.2rem;
+  transform: translateY(-50%);
+  background: rgba(var(--color-foreground), 0.2);
+  border-radius: 999rem;
+}
+
+/* [data-slider-fill] attribute selector, not just decoration: base.css hides
+   every empty div by default (div:empty { display: none }), which otherwise
+   beats a bare class selector on specificity and makes the fill disappear. */
+.price-slider__fill[data-slider-fill] {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: rgb(var(--color-foreground));
+  border-radius: 999rem;
+}
+
+/* Both range inputs are stacked. Their tracks ignore the pointer so the handle
+   underneath stays reachable; only the thumbs accept input. */
+.price-slider__input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2.4rem;
+  margin: 0;
+  background: none;
+  pointer-events: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.price-slider__input:focus {
+  outline: none;
+}
+
+.price-slider__input::-webkit-slider-thumb {
+  pointer-events: auto;
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 50%;
+  background: rgb(var(--color-background));
+  border: 0.2rem solid rgb(var(--color-foreground));
+  cursor: grab;
+}
+
+.price-slider__input::-moz-range-thumb {
+  pointer-events: auto;
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 50%;
+  background: rgb(var(--color-background));
+  border: 0.2rem solid rgb(var(--color-foreground));
+  cursor: grab;
+}
+
+.price-slider__input:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 0.3rem rgba(var(--color-foreground), 0.3);
+}
+
+.price-slider__input:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 0.3rem rgba(var(--color-foreground), 0.3);
+}
+
+/* ---------- Filters shown as pills ----------
+   Sized entirely from --facet-pill-* variables, each with a fallback equal to
+   the original hardcoded value — so leaving the settings untouched reproduces
+   exactly what shipped before they existed. */
+.facets__list--pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+.facets__list--pills .facets__item {
+  margin: 0;
+}
+
+/* The checkbox stays in the DOM for screen readers and keyboard use; only its
+   visual box is hidden, and the label becomes the pill. */
+.facets__list--pills .facets__item input[type='checkbox'] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.facets__list--pills .facets__item label,
+.facets__list--pills .facets__item .facet-checkbox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--facet-pill-size, 1.4rem);
+  padding: var(--facet-pill-padding-y, 1rem) var(--facet-pill-padding-x, 1.8rem);
+  border: var(--facet-pill-border-width, 0.1rem) solid var(--facet-pill-border-color, rgba(var(--color-foreground), 0.25));
+  border-radius: var(--facet-pill-radius, 0.8rem);
+  cursor: pointer;
+  transition: border-color var(--duration-short) ease, background-color var(--duration-short) ease;
+}
+
+.facets__list--pills .facets__item label::before,
+.facets__list--pills .facets__item label::after,
+.facets__list--pills .facets__item .facet-checkbox__box {
+  display: none;
+}
+
+.facets__list--pills .facets__item label:hover {
+  border-color: rgb(var(--color-foreground));
+}
+
+.facets__list--pills .facets__item input[type='checkbox']:checked + label,
+.facets__list--pills .facets__item input[type='checkbox']:checked ~ label,
+.facets__list--pills .facets__item label:has(input[type='checkbox']:checked) {
+  border-color: var(--facet-pill-active-border, rgb(var(--color-foreground)));
+  background: var(--facet-pill-active-bg, rgba(var(--color-foreground), 0.06));
+}
+
+.facets__list--pills .facets__item label:has(input[type='checkbox']:focus-visible) {
+  outline: 0.2rem solid rgba(var(--color-foreground), 0.5);
+  outline-offset: 0.2rem;
+}
+
+/* The result count is noise inside a compact pill. */
+.facets__list--pills .facets__item label .facet-checkbox__text-label + span,
+.facets__list--pills .facets__item .facets__label-count {
+  display: none;
+}
+
+/* ---------- Filter group headings ("Product type", "Price"...) ---------- */
+.facets__summary,
+.facets__heading,
+.facets__heading--vertical {
+  font-size: var(--facet-heading-size, 1.5rem);
+  color: var(--facet-heading-color, rgba(var(--color-foreground), 0.75));
+}
+
+.facets__disclosure[open] .facets__summary,
+.facets__summary:hover {
+  color: var(--facet-heading-color, rgb(var(--color-foreground)));
+}
+
+/* ---------- Checkbox label text + row spacing ---------- */
+.facet-checkbox {
+  font-size: var(--facet-option-size, 1.4rem);
+  padding-top: calc(var(--facet-row-gap, 2rem) / 2);
+  padding-bottom: calc(var(--facet-row-gap, 2rem) / 2);
+}
+
+/* ---------- Checkbox box: size, border, corner radius, checked colour ----------
+   .facet-checkbox__box wraps the box svg + checkmark (see facets.liquid) so both
+   can be resized as a pair. It is repositioned to percentage-based centring here
+   — robust at any size — overriding component-facets.css's fixed rem offsets,
+   which only lined up at Dawn's original 1.6rem default. */
+.facet-checkbox__box {
+  position: relative;
+  width: var(--facet-box-size, 1.6rem);
+  height: var(--facet-box-size, 1.6rem);
+}
+
+.facet-checkbox__box > svg {
+  width: 100%;
+  height: 100%;
+  color: var(--facet-box-border-color, currentColor);
+}
+
+.facet-checkbox__box > svg rect {
+  stroke-width: var(--facet-box-border-width, 0.1rem);
+  rx: var(--facet-box-radius, 0);
+}
+
+.facet-checkbox__box .svg-wrapper {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 62%;
+  height: 44%;
+}
+
+.facet-checkbox:has(> input[type='checkbox']:checked) .facet-checkbox__box > svg {
+  color: var(--facet-checked-color, currentColor);
+}
+
+.facet-checkbox:has(> input[type='checkbox']:checked) .svg-wrapper > .icon-checkmark {
+  color: var(--facet-checked-color, currentColor);
+}
+
+/* ---------- Separator lines between filter groups ---------- */
+.facets__disclosure-vertical {
+  border-top-width: var(--facet-separator-width, 0.1rem);
+  border-top-color: var(--facet-separator-color, rgba(var(--color-foreground), 0.1));
+}
+
+/* ---------- Pagination as numbered circles ---------- */
+.collection .pagination__list {
+  gap: 0.8rem;
+}
+
+.collection .pagination__item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.4rem;
+  height: 4.4rem;
+  border-radius: 999rem;
+  border: 0.1rem solid rgba(var(--color-foreground), 0.3);
+  text-decoration: none;
+  transition: border-color var(--duration-short) ease, background-color var(--duration-short) ease;
+}
+
+.collection .pagination__item:hover {
+  border-color: rgb(var(--color-foreground));
+  text-decoration: none;
+}
+
+.collection .pagination__item--current {
+  border-color: rgb(var(--color-foreground));
+  background: rgba(var(--color-foreground), 0.06);
+}
+
+/* Dawn underlines the active page; the circle carries that role now. */
+.collection .pagination__item--current::after,
+.collection .pagination__item::after {
+  display: none;
+}
+
+/* ---------- Filters toggle ---------- */
+.facets-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  color: var(--toolbar-color, rgb(var(--color-foreground)));
+  font-size: var(--toolbar-font-size, 1.5rem);
+}
+
+.facets-toggle .svg-wrapper {
+  width: var(--toolbar-icon-size, 2rem);
+  height: var(--toolbar-icon-size, 2rem);
+}
+
+/* ---------- Toolbar text: "Sort by:", the select, "N products" ----------
+   One shared size/colour so the whole row reads as a single control bar. */
+.facets-vertical-sort .facet-filters__label,
+.facets-vertical-sort .facet-filters__sort,
+.facets-vertical-sort .product-count__text {
+  font-size: var(--toolbar-font-size, 1.4rem);
+}
+
+.facets-vertical-sort .facet-filters__label,
+.facets-vertical-sort .product-count__text {
+  color: var(--toolbar-color, rgba(var(--color-foreground), 0.85));
+}
+
+.facets-vertical-sort .facet-filters__sort {
+  color: var(--toolbar-color, rgb(var(--color-foreground)));
+}
+
+.facets-vertical-sort .select .icon-caret {
+  width: calc(var(--toolbar-font-size, 1.4rem) * 0.7);
+}
+
+.facets-toggle__label--hide {
+  display: inline;
+}
+
+.facets-toggle__label--show {
+  display: none;
+}
+
+/* When the sidebar is collapsed the labels swap and the grid takes the width. */
+.facets-vertical.facets-hidden .facets-wrapper {
+  display: none;
+}
+
+.facets-vertical.facets-hidden .facets-toggle__label--hide {
+  display: none;
+}
+
+.facets-vertical.facets-hidden .facets-toggle__label--show {
+  display: inline;
+}

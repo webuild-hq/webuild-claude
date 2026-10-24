@@ -1,0 +1,478 @@
+{{ 'section-instagram-feed.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign s = section.settings
+
+  assign handle_url = s.handle_link
+  if handle_url == blank and settings.social_instagram_link != blank
+    assign handle_url = settings.social_instagram_link
+  endif
+
+  case s.image_ratio
+    when 'portrait'
+      assign ig_ratio = '4 / 5'
+    when 'landscape'
+      assign ig_ratio = '5 / 4'
+    else
+      assign ig_ratio = '1 / 1'
+  endcase
+
+  assign overlay_alpha = s.overlay_opacity | divided_by: 100.0
+  if s.overlay_color != blank
+    assign overlay_paint = s.overlay_color | color_modify: 'alpha', overlay_alpha
+  else
+    assign overlay_paint = 'rgba(0, 0, 0, ' | append: overlay_alpha | append: ')'
+  endif
+-%}
+
+{%- style -%}
+  #InstagramFeed-{{ section.id }} {
+    --ig-columns-desktop: {{ s.columns_desktop }};
+    --ig-columns-mobile: {{ s.columns_mobile }};
+    --ig-gap: {{ s.gap }}px;
+    --ig-ratio: {{ ig_ratio }};
+    --ig-radius: {{ s.image_radius }}px;
+    --ig-header-gap: {{ s.header_gap }}px;
+    --ig-heading-size: {{ s.heading_size | times: 0.75 | round: 0 }}px;
+    --ig-handle-size: {{ s.handle_size }}px;
+    --ig-icon-size: {{ s.icon_size }}px;
+    --ig-icon-color: {{ s.icon_color }};
+    --ig-overlay-color: {{ overlay_paint }};
+    {%- if s.heading_weight != 'inherit' %} --ig-heading-weight: {{ s.heading_weight }};{% endif %}
+    {%- if s.heading_color != blank %} --ig-heading-color: {{ s.heading_color }};{% endif %}
+    {%- if s.handle_color != blank %} --ig-handle-color: {{ s.handle_color }};{% endif %}
+  }
+
+  #InstagramFeed-{{ section.id }} .instagram-feed__inner {
+    padding-top: {{ s.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ s.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    #InstagramFeed-{{ section.id }} {
+      --ig-heading-size: {{ s.heading_size }}px;
+    }
+
+    #InstagramFeed-{{ section.id }} .instagram-feed__inner {
+      padding-top: {{ s.padding_top }}px;
+      padding-bottom: {{ s.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+<div
+  id="InstagramFeed-{{ section.id }}"
+  class="instagram-feed color-{{ s.color_scheme }} gradient{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+>
+  <div class="instagram-feed__inner{% unless s.full_width %} page-width{% endunless %}">
+    {%- if s.heading != blank or s.handle != blank or s.show_follow_button -%}
+      <div class="instagram-feed__header">
+        <div class="instagram-feed__heading-group">
+          {%- if s.heading != blank -%}
+            <h2 class="instagram-feed__heading inline-richtext">{{ s.heading }}</h2>
+          {%- endif -%}
+          {%- if s.handle != blank -%}
+            <a
+              {% if handle_url != blank %}
+                href="{{ handle_url }}"
+                target="_blank"
+                rel="noopener"
+              {% else %}
+                role="link"
+                aria-disabled="true"
+              {% endif %}
+              class="instagram-feed__handle"
+            >
+              <span class="svg-wrapper" aria-hidden="true">
+                {{- 'icon-instagram.svg' | inline_asset_content -}}
+              </span>
+              {{- s.handle | escape -}}
+            </a>
+          {%- endif -%}
+        </div>
+
+        {%- if s.show_follow_button and handle_url != blank -%}
+          <a href="{{ handle_url }}" target="_blank" rel="noopener" class="instagram-feed__follow button button--secondary">
+            {{- s.follow_button_label | escape -}}
+          </a>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- if section.blocks.size > 0 -%}
+      <ul class="instagram-feed__grid" role="list">
+        {%- for block in section.blocks -%}
+          <li>
+            {%- assign alt_text = block.settings.alt | default: block.settings.image.alt | escape -%}
+            {%- if block.settings.link != blank -%}
+              <a
+                href="{{ block.settings.link }}"
+                target="_blank"
+                rel="noopener"
+                class="instagram-feed__item"
+                aria-label="{{ alt_text | default: 'Instagram post' }}"
+                {{ block.shopify_attributes }}
+              >
+            {%- else -%}
+              <div class="instagram-feed__item" {{ block.shopify_attributes }}>
+            {%- endif -%}
+
+              {%- if block.settings.image != blank -%}
+                {{
+                  block.settings.image
+                  | image_url: width: 600
+                  | image_tag: loading: 'lazy', widths: '200, 300, 400, 600', sizes: '(min-width: 750px) 20vw, 50vw', alt: alt_text
+                }}
+              {%- else -%}
+                {%- liquid
+                  assign placeholder_index = forloop.index | modulo: 2 | plus: 1
+                -%}
+                {{ 'product-apparel-' | append: placeholder_index | placeholder_svg_tag: 'placeholder-svg' }}
+              {%- endif -%}
+
+              {%- if s.hover_icon != 'none' -%}
+                <span class="instagram-feed__overlay" aria-hidden="true">
+                  <span class="instagram-feed__icon">
+                    {%- if s.hover_icon == 'plus' -%}
+                      {{- 'icon-plus.svg' | inline_asset_content -}}
+                    {%- else -%}
+                      {{- 'icon-instagram.svg' | inline_asset_content -}}
+                    {%- endif -%}
+                  </span>
+                </span>
+              {%- endif -%}
+
+            {%- if block.settings.link != blank -%}
+              </a>
+            {%- else -%}
+              </div>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.instagram-feed.name",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "default": "Follow us on Instagram",
+      "label": "t:sections.instagram-feed.settings.heading.label"
+    },
+    {
+      "type": "text",
+      "id": "handle",
+      "default": "@yourstore",
+      "label": "t:sections.instagram-feed.settings.handle.label"
+    },
+    {
+      "type": "url",
+      "id": "handle_link",
+      "label": "t:sections.instagram-feed.settings.handle_link.label",
+      "info": "t:sections.instagram-feed.settings.handle_link.info"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_follow_button",
+      "default": false,
+      "label": "t:sections.instagram-feed.settings.show_follow_button.label"
+    },
+    {
+      "type": "text",
+      "id": "follow_button_label",
+      "default": "Follow",
+      "label": "t:sections.instagram-feed.settings.follow_button_label.label"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme-1",
+      "label": "t:sections.all.colors.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.instagram-feed.settings.header__layout.content"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 3,
+      "max": 8,
+      "step": 1,
+      "default": 5,
+      "label": "t:sections.instagram-feed.settings.columns_desktop.label"
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "options": [
+        {
+          "value": "2",
+          "label": "2"
+        },
+        {
+          "value": "3",
+          "label": "3"
+        }
+      ],
+      "default": "2",
+      "label": "t:sections.instagram-feed.settings.columns_mobile.label"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "min": 0,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 4,
+      "label": "t:sections.instagram-feed.settings.gap.label"
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "options": [
+        {
+          "value": "square",
+          "label": "t:sections.instagram-feed.settings.image_ratio.options__square.label"
+        },
+        {
+          "value": "portrait",
+          "label": "t:sections.instagram-feed.settings.image_ratio.options__portrait.label"
+        },
+        {
+          "value": "landscape",
+          "label": "t:sections.instagram-feed.settings.image_ratio.options__landscape.label"
+        }
+      ],
+      "default": "square",
+      "label": "t:sections.instagram-feed.settings.image_ratio.label"
+    },
+    {
+      "type": "range",
+      "id": "image_radius",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 0,
+      "label": "t:sections.instagram-feed.settings.image_radius.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "default": true,
+      "label": "t:sections.instagram-feed.settings.full_width.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.instagram-feed.settings.header__header.content"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "min": 16,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "default": 32,
+      "label": "t:sections.instagram-feed.settings.heading_size.label"
+    },
+    {
+      "type": "select",
+      "id": "heading_weight",
+      "options": [
+        {
+          "value": "inherit",
+          "label": "t:sections.image-banner.settings_shared.button_weight.options__default.label"
+        },
+        {
+          "value": "400",
+          "label": "400"
+        },
+        {
+          "value": "500",
+          "label": "500"
+        },
+        {
+          "value": "600",
+          "label": "600"
+        },
+        {
+          "value": "700",
+          "label": "700"
+        },
+        {
+          "value": "800",
+          "label": "800"
+        }
+      ],
+      "default": "inherit",
+      "label": "t:sections.instagram-feed.settings.heading_weight.label"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "t:sections.instagram-feed.settings.heading_color.label"
+    },
+    {
+      "type": "range",
+      "id": "handle_size",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 15,
+      "label": "t:sections.instagram-feed.settings.handle_size.label"
+    },
+    {
+      "type": "color",
+      "id": "handle_color",
+      "label": "t:sections.instagram-feed.settings.handle_color.label"
+    },
+    {
+      "type": "range",
+      "id": "header_gap",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 32,
+      "label": "t:sections.instagram-feed.settings.header_gap.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.instagram-feed.settings.header__hover.content"
+    },
+    {
+      "type": "select",
+      "id": "hover_icon",
+      "options": [
+        {
+          "value": "instagram",
+          "label": "t:sections.instagram-feed.settings.hover_icon.options__instagram.label"
+        },
+        {
+          "value": "plus",
+          "label": "t:sections.instagram-feed.settings.hover_icon.options__plus.label"
+        },
+        {
+          "value": "none",
+          "label": "t:sections.instagram-feed.settings.hover_icon.options__none.label"
+        }
+      ],
+      "default": "instagram",
+      "label": "t:sections.instagram-feed.settings.hover_icon.label"
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "min": 16,
+      "max": 64,
+      "step": 1,
+      "unit": "px",
+      "default": 32,
+      "label": "t:sections.instagram-feed.settings.icon_size.label"
+    },
+    {
+      "type": "color",
+      "id": "icon_color",
+      "default": "#FFFFFF",
+      "label": "t:sections.instagram-feed.settings.icon_color.label"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "t:sections.instagram-feed.settings.overlay_color.label"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "default": 35,
+      "label": "t:sections.instagram-feed.settings.overlay_opacity.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.padding.section_padding_heading"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 60,
+      "label": "t:sections.all.padding.padding_top"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 60,
+      "label": "t:sections.all.padding.padding_bottom"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "name": "t:sections.instagram-feed.blocks.image.name",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:sections.instagram-feed.blocks.image.settings.image.label"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "t:sections.instagram-feed.blocks.image.settings.link.label",
+          "info": "t:sections.instagram-feed.blocks.image.settings.link.info"
+        },
+        {
+          "type": "text",
+          "id": "alt",
+          "label": "t:sections.instagram-feed.blocks.image.settings.alt.label"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 16,
+  "presets": [
+    {
+      "name": "t:sections.instagram-feed.presets.name",
+      "blocks": [
+        {
+          "type": "image"
+        },
+        {
+          "type": "image"
+        },
+        {
+          "type": "image"
+        },
+        {
+          "type": "image"
+        },
+        {
+          "type": "image"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

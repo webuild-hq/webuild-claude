@@ -1,0 +1,44 @@
+{% comment %}
+  Spec rows: paired label/value lines inside a bordered box.
+
+  Labels and values come from two textareas read line by line, so row N pairs
+  the Nth line of each. A label with no matching value still renders, which is
+  what lets a merchant leave a value blank without the rows sliding out of sync.
+
+  Accepts:
+  - block: {Object} the specs block, for its settings (required)
+{% endcomment %}
+
+{%- liquid
+  assign s = block.settings
+  assign labels = s.labels | newline_to_br | split: '<br />'
+  assign values = s.values | newline_to_br | split: '<br />'
+-%}
+
+{%- if labels.size > 0 -%}
+  {%- capture specs_vars -%}
+    --ps-radius: {{ s.radius }}rem;
+    --ps-padding-x: {{ s.padding_x }}px;
+    --ps-row-padding-y: {{ s.row_padding_y }}px;
+    {%- if s.max_width > 0 %} --ps-max-width: {{ s.max_width }}px;{% endif -%}
+    {%- if s.font_size > 0 %} font-size: {{ s.font_size }}px;{% endif -%}
+    {%- if s.label_size > 0 %} --ps-label-size: {{ s.label_size }}px;{% endif -%}
+    {%- if s.label_weight != 'inherit' %} --ps-label-weight: {{ s.label_weight }};{% endif -%}
+    {%- if s.label_color != blank %} --ps-label-color: {{ s.label_color }};{% endif -%}
+    {%- if s.value_weight != 'inherit' %} --ps-value-weight: {{ s.value_weight }};{% endif -%}
+    {%- if s.value_color != blank %} --ps-value-color: {{ s.value_color }};{% endif -%}
+    {%- if s.background != blank %} --ps-bg: {{ s.background }};{% endif -%}
+  {%- endcapture -%}
+
+  <div class="product-specs" style="{{ specs_vars | strip_newlines }}" {{ block.shopify_attributes }}>
+    {%- for label in labels -%}
+      {%- assign label_text = label | strip -%}
+      {%- if label_text != blank -%}
+        <div class="product-specs__row">
+          <span class="product-specs__label">{{ label_text }}</span>
+          <span class="product-specs__value">{{ values[forloop.index0] | strip }}</span>
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+{%- endif -%}

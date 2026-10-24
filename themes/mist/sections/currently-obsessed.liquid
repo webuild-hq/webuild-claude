@@ -1,0 +1,570 @@
+{%- liquid
+  assign first_block = section.blocks.first
+  assign default_bg = first_block.settings.bg_color | default: section.settings.fallback_background
+-%}
+
+{%- comment -%}
+  Ported from GlowRise. The original used GSAP + a glowrise:ready bootstrap that
+  does not exist here, so the reveal is wired to Dawn's own scroll-trigger
+  system instead — it follows the theme's global animation setting.
+{%- endcomment -%}
+<section
+  class="obsessed full-width{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}"
+  data-layout="{{ section.settings.layout }}"
+  style="
+    background-color: {{ default_bg }};
+    --ob-padding-top: {{ section.settings.padding_top }}px;
+    --ob-padding-bottom: {{ section.settings.padding_bottom }}px;
+    --ob-mobile-padding-top: {{ section.settings.mobile_padding_top }}px;
+    --ob-mobile-padding-bottom: {{ section.settings.mobile_padding_bottom }}px;
+    --ob-fg: {{ section.settings.text_color }};
+    --ob-fg-inactive: {{ section.settings.inactive_color }};
+    --ob-title-color: {{ section.settings.title_color }};
+    --ob-title-size: {{ section.settings.title_size }}px;
+    --ob-description-size: {{ section.settings.description_size }}px;
+    --ob-item-size: {{ section.settings.item_size }}px;
+    --ob-aspect: {{ section.settings.image_aspect_ratio }};
+    --ob-radius: {{ section.settings.image_border_radius }}px;
+    --ob-gap: {{ section.settings.gap }}px;
+    --ob-items-gap: {{ section.settings.items_gap }}px;
+    --ob-desc-max-width: {% if section.settings.description_max_width > 0 %}{{ section.settings.description_max_width }}ch{% else %}none{% endif %};
+    --ob-content-pl: {{ section.settings.content_padding_left }}px;
+    --ob-mobile-title-size: {{ section.settings.mobile_title_size }}px;
+    --ob-mobile-item-size: {{ section.settings.mobile_item_size }}px;
+    --ob-mobile-aspect: {{ section.settings.mobile_image_ratio }};
+    --ob-height: {% if section.settings.image_height > 0 %}{{ section.settings.image_height }}px{% else %}auto{% endif %};
+    --ob-mobile-height: {% if section.settings.image_height_mobile > 0 %}{{ section.settings.image_height_mobile }}px{% elsif section.settings.image_height > 0 %}{{ section.settings.image_height }}px{% else %}auto{% endif %};
+  "
+>
+  <div class="obsessed__inner">
+    <div class="obsessed__content">
+      {%- if section.settings.title != blank -%}
+        <h2 class="obsessed__title">{{ section.settings.title | escape }}</h2>
+      {%- endif -%}
+
+      {%- if section.settings.description != blank -%}
+        <div class="obsessed__description">{{ section.settings.description }}</div>
+      {%- endif -%}
+
+      {%- if section.blocks.size > 0 -%}
+        <ul class="obsessed__items" data-obsessed-items>
+          {%- for block in section.blocks -%}
+            <li>
+              <button
+                type="button"
+                class="obsessed__item{% if forloop.first %} is-active{% endif %}"
+                data-obsessed-id="{{ block.id }}"
+                data-obsessed-bg="{{ block.settings.bg_color }}"
+                {{ block.shopify_attributes }}
+              >
+                {{ block.settings.label | escape }}
+              </button>
+            </li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+    </div>
+
+    <div class="obsessed__media">
+      {%- if section.blocks.size > 0 -%}
+        {%- for block in section.blocks -%}
+          {%- assign img = block.settings.image -%}
+          {%- if img != blank -%}
+            <img
+              class="obsessed__image{% if forloop.first %} is-active{% endif %}"
+              data-obsessed-image="{{ block.id }}"
+              src="{{ img | image_url: width: 1200 }}"
+              srcset="{{ img | image_url: width: 600 }} 600w, {{ img | image_url: width: 900 }} 900w, {{ img | image_url: width: 1200 }} 1200w, {{ img | image_url: width: 1600 }} 1600w"
+              sizes="(max-width: 768px) 100vw, 50vw"
+              alt="{{ block.settings.label | escape }}"
+              width="{{ img.width }}"
+              height="{{ img.height }}"
+              loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+            >
+          {%- endif -%}
+        {%- endfor -%}
+      {%- else -%}
+        <div class="obsessed__image is-active obsessed__placeholder">
+          {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+<script>
+  (function () {
+    var section = document.currentScript.previousElementSibling;
+    if (!section || !section.classList.contains('obsessed')) return;
+
+    var items = section.querySelectorAll('[data-obsessed-id]');
+    var images = section.querySelectorAll('[data-obsessed-image]');
+    if (items.length === 0) return;
+
+    function activate(item) {
+      var id = item.getAttribute('data-obsessed-id');
+      var bg = item.getAttribute('data-obsessed-bg');
+
+      items.forEach(function (i) { i.classList.toggle('is-active', i === item); });
+      images.forEach(function (img) {
+        img.classList.toggle('is-active', img.getAttribute('data-obsessed-image') === id);
+      });
+      if (bg) section.style.backgroundColor = bg;
+    }
+
+    items.forEach(function (item) {
+      item.addEventListener('mouseenter', function () { activate(item); });
+      item.addEventListener('focus', function () { activate(item); });
+      /* Fallback touch */
+      item.addEventListener('click', function () { activate(item); });
+    });
+  })();
+</script>
+
+{% stylesheet %}
+  .obsessed {
+    color: var(--ob-fg);
+    padding: var(--ob-padding-top) 0 var(--ob-padding-bottom);
+    width: 100%;
+    transition: background-color 0.5s ease;
+  }
+
+  .obsessed__inner {
+    /* Dawn has no --page-margin; these match its own .page-width rule. */
+    max-width: var(--page-width);
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--ob-gap);
+    align-items: center;
+  }
+
+  .obsessed[data-layout='image-left'] .obsessed__media   { order: 1; }
+  .obsessed[data-layout='image-left'] .obsessed__content { order: 2; }
+
+  /* Content (left by default) */
+  .obsessed__content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding-left: var(--ob-content-pl, 0px);
+  }
+
+  .obsessed__title {
+    margin: 0;
+    color: var(--ob-title-color, inherit);
+    font-size: var(--ob-title-size);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+  }
+
+  .obsessed__description {
+    color: inherit;
+    font-size: var(--ob-description-size);
+    line-height: 1.5;
+    max-width: var(--ob-desc-max-width, none);
+    opacity: 0.85;
+  }
+  .obsessed__description p { margin: 0; }
+  .obsessed__description p + p { margin-top: 0.5rem; }
+
+  /* Items list */
+  .obsessed__items {
+    list-style: none;
+    margin: 0.75rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--ob-items-gap, 0.5rem);
+  }
+
+  .obsessed__item {
+    background: transparent;
+    border: 0;
+    padding: 0;
+    text-align: left;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: var(--ob-item-size);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--ob-fg-inactive);
+    transition: color 0.25s ease, transform 0.25s ease;
+  }
+
+  .obsessed__item.is-active {
+    color: var(--ob-fg);
+  }
+
+  /* Media */
+  .obsessed__media {
+    position: relative;
+    aspect-ratio: var(--ob-aspect);
+    /* height: auto (the default) lets aspect-ratio govern as before; a definite
+       px value here takes priority over aspect-ratio for this axis without
+       needing to remove it — the ratio setting simply becomes inert while a
+       fixed height is set. */
+    height: var(--ob-height, auto);
+    border-radius: var(--ob-radius);
+    overflow: hidden;
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+
+  .obsessed__image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+  .obsessed__image.is-active {
+    opacity: 1;
+  }
+
+  .obsessed__placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* --color-surface was never defined in GlowRise either; mapped to Dawn's. */
+    background-color: rgba(var(--color-foreground), 0.06);
+    opacity: 1;
+  }
+  .obsessed__placeholder svg { width: 60%; height: 60%; }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    .obsessed {
+      padding-top: var(--ob-mobile-padding-top);
+      padding-bottom: var(--ob-mobile-padding-bottom);
+    }
+    .obsessed__inner {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    .obsessed[data-layout='image-left'] .obsessed__media,
+    .obsessed[data-layout='image-right'] .obsessed__media {
+      order: 0;
+    }
+    .obsessed[data-layout='image-left'] .obsessed__content,
+    .obsessed[data-layout='image-right'] .obsessed__content {
+      order: 1;
+    }
+    .obsessed__title {
+      font-size: var(--ob-mobile-title-size, calc(var(--ob-title-size) * 0.7));
+    }
+    .obsessed__item {
+      font-size: var(--ob-mobile-item-size, calc(var(--ob-item-size) * 0.9));
+    }
+    .obsessed__media {
+      aspect-ratio: var(--ob-mobile-aspect, var(--ob-aspect));
+      height: var(--ob-mobile-height, auto);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Currently obsessed",
+  "tag": "section",
+  "max_blocks": 8,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Contenu"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Titre",
+      "default": "Currently obsessed"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "label": "Taille du titre",
+      "min": 24,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 56,
+      "info": "Sur mobile : auto-réduit à 70%."
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Couleur du titre",
+      "default": "#1B1714"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>Curated edits of our most-worn formulas and shades, thoughtfully grouped so you don't have to overthink it.</p>"
+    },
+    {
+      "type": "range",
+      "id": "description_size",
+      "label": "Taille de la description",
+      "min": 12,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "description_max_width",
+      "label": "Largeur max description (0 = illimitée)",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "ch",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "item_size",
+      "label": "Taille des items (menu)",
+      "min": 16,
+      "max": 56,
+      "step": 2,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "items_gap",
+      "label": "Espacement entre les items",
+      "min": 0,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Position de l'image",
+      "options": [
+        { "value": "image-right", "label": "Droite" },
+        { "value": "image-left",  "label": "Gauche" }
+      ],
+      "default": "image-right"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "Espacement contenu / image",
+      "min": 16,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "content_padding_left",
+      "label": "Content padding left",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0,
+      "info": "Extra indent added on top of the page margin."
+    },
+    {
+      "type": "select",
+      "id": "image_aspect_ratio",
+      "label": "Ratio de l'image",
+      "options": [
+        { "value": "1 / 1",  "label": "Carré 1:1" },
+        { "value": "4 / 3",  "label": "Paysage 4:3" },
+        { "value": "16 / 9", "label": "Paysage 16:9" },
+        { "value": "4 / 5",  "label": "Portrait 4:5" },
+        { "value": "3 / 4",  "label": "Portrait 3:4" }
+      ],
+      "default": "4 / 3"
+    },
+    {
+      "type": "range",
+      "id": "image_height",
+      "label": "Hauteur fixe de l'image (desktop)",
+      "info": "Remplace le ratio ci-dessus quand la valeur est supérieure à 0. Laisser à 0 pour utiliser le ratio.",
+      "min": 0,
+      "max": 800,
+      "step": 10,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "image_border_radius",
+      "label": "Border radius image",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Couleurs"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Texte (item actif + titre + description)",
+      "default": "#1B1714"
+    },
+    {
+      "type": "color",
+      "id": "inactive_color",
+      "label": "Texte des items inactifs",
+      "default": "#A8A099"
+    },
+    {
+      "type": "color",
+      "id": "fallback_background",
+      "label": "Background fallback",
+      "default": "#F5E6E0",
+      "info": "Utilisé seulement si aucun bloc n'a de couleur définie."
+    },
+    {
+      "type": "header",
+      "content": "Section"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding haut",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bas",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "mobile_padding_top",
+      "label": "Padding haut (mobile)",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "mobile_padding_bottom",
+      "label": "Padding bas (mobile)",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "mobile_title_size",
+      "label": "Taille du titre (mobile)",
+      "min": 18,
+      "max": 72,
+      "step": 2,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "mobile_item_size",
+      "label": "Taille des items (mobile)",
+      "min": 14,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 28
+    },
+    {
+      "type": "select",
+      "id": "mobile_image_ratio",
+      "label": "Format de l'image (mobile)",
+      "options": [
+        { "value": "1 / 1",  "label": "Carré 1:1" },
+        { "value": "4 / 3",  "label": "Paysage 4:3" },
+        { "value": "16 / 9", "label": "Paysage 16:9" },
+        { "value": "4 / 5",  "label": "Portrait 4:5" },
+        { "value": "3 / 4",  "label": "Portrait 3:4" }
+      ],
+      "default": "4 / 3"
+    },
+    {
+      "type": "range",
+      "id": "image_height_mobile",
+      "label": "Hauteur fixe de l'image (mobile)",
+      "info": "Laisser à 0 pour reprendre la hauteur desktop (ou le ratio si celle-ci est aussi à 0).",
+      "min": 0,
+      "max": 600,
+      "step": 10,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "blocks": [
+    {
+      "type": "edit",
+      "name": "Edit (item)",
+      "limit": 8,
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label de l'item",
+          "default": "Low-effort glow"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image associée"
+        },
+        {
+          "type": "color",
+          "id": "bg_color",
+          "label": "Background section quand cet item est actif",
+          "default": "#F5E6E0"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Currently obsessed",
+      "blocks": [
+        { "type": "edit", "settings": { "label": "Low-effort glow",       "bg_color": "#F5E6E0" } },
+        { "type": "edit", "settings": { "label": "Main character eyes",   "bg_color": "#E8E4DC" } },
+        { "type": "edit", "settings": { "label": "Finishing touches",     "bg_color": "#EFE8D7" } },
+        { "type": "edit", "settings": { "label": "Soft lips club",        "bg_color": "#F0DDD9" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

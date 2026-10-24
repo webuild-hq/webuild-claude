@@ -1,0 +1,158 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "promo_bar_VF8EaV": {
+      "type": "promo-bar",
+      "blocks": {
+        "text_fGxbNL": {
+          "type": "text",
+          "settings": {
+            "text": "Get 5 Minis and save 20%",
+            "link": "",
+            "text_size": 20,
+            "text_weight": "inherit",
+            "text_transform": "inherit",
+            "text_color": ""
+          }
+        },
+        "text_xViK6B": {
+          "type": "text",
+          "settings": {
+            "text": "Get 5 Minis and save 20%",
+            "link": "",
+            "text_size": 20,
+            "text_weight": "inherit",
+            "text_transform": "inherit",
+            "text_color": ""
+          }
+        }
+      },
+      "block_order": [
+        "text_fGxbNL",
+        "text_xViK6B"
+      ],
+      "name": "t:sections.promo-bar.name",
+      "settings": {
+        "overlay_color": "",
+        "overlay_opacity": 70,
+        "min_height": 96,
+        "alignment": "center",
+        "gap": 4,
+        "full_width": false,
+        "show_separators": true,
+        "separator_thickness": 1,
+        "separator_height": 60,
+        "separator_color": "",
+        "separator_opacity": 45,
+        "show_border_top": true,
+        "show_border_bottom": true,
+        "border_thickness": 1,
+        "border_color": "#000000",
+        "border_opacity": 100,
+        "color_scheme": "",
+        "padding_top": 16,
+        "padding_bottom": 16
+      }
+    },
+    "banner": {
+      "type": "main-collection-banner",
+      "settings": {
+        "show_collection_description": true,
+        "show_collection_image": false,
+        "color_scheme": "scheme-1"
+      }
+    },
+    "product-grid": {
+      "type": "main-collection-product-grid",
+      "settings": {
+        "products_per_page": 16,
+        "columns_desktop": 3,
+        "columns_mobile": "2",
+        "card_style": "showcase",
+        "showcase_radius": 1.6,
+        "showcase_badge_text": "",
+        "showcase_badge_scope": "all",
+        "showcase_badge_tag": "",
+        "showcase_badge_scheme": "",
+        "showcase_badge_radius": 2,
+        "show_variant_count": true,
+        "variant_count_label": "options",
+        "show_quick_view": true,
+        "quick_view_label": "Quick view",
+        "show_variant_pills": true,
+        "quickview_bg_color": "#FFFFFF",
+        "quickview_text_color": "#000000",
+        "quickview_border_width": 1,
+        "quickview_border_color": "#000000",
+        "quickview_radius": 30,
+        "quickview_font_size": 0,
+        "quickview_height": 0,
+        "quickview_padding_x": 0,
+        "quickview_inset_x": 0,
+        "quickview_uppercase": true,
+        "card_pill_bg_color": "#FFFFFF",
+        "card_pill_text_color": "#000000",
+        "card_pill_border_width": 1,
+        "card_pill_border_color": "#000000",
+        "card_pill_hover_border_color": "#000000",
+        "card_pill_radius": 8,
+        "card_pill_font_size": 13,
+        "card_pill_padding_x": 0,
+        "card_pill_padding_y": 0,
+        "color_scheme": "scheme-1",
+        "image_ratio": "portrait",
+        "image_shape": "default",
+        "show_secondary_image": true,
+        "hover_image_animation": "zoom-out",
+        "hover_image_speed": 500,
+        "show_vendor": false,
+        "show_rating": false,
+        "quick_add": "none",
+        "enable_filtering": true,
+        "filter_type": "vertical",
+        "pill_filters": "",
+        "show_filters_toggle": true,
+        "toolbar_font_size": 19,
+        "toolbar_icon_size": 0,
+        "toolbar_color": "",
+        "facet_heading_size": 21,
+        "facet_heading_color": "#000000",
+        "facet_option_font_size": 17,
+        "facet_option_row_gap": 0,
+        "facet_checkbox_size": 15,
+        "facet_checkbox_border_width": 0,
+        "facet_checkbox_border_color": "",
+        "facet_checkbox_radius": 0,
+        "facet_checkbox_checked_color": "",
+        "show_facet_separators": true,
+        "facet_separator_width": 1,
+        "facet_separator_color": "",
+        "facet_separator_opacity": 10,
+        "pill_font_size": 17,
+        "pill_padding_x": 0,
+        "pill_padding_y": 0,
+        "pill_radius": 0,
+        "pill_border_width": 0,
+        "pill_border_color": "",
+        "pill_active_bg": "",
+        "pill_active_border_color": "",
+        "enable_sorting": true,
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    }
+  },
+  "order": [
+    "promo_bar_VF8EaV",
+    "banner",
+    "product-grid"
+  ]
+}

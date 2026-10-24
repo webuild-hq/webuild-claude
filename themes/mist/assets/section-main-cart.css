@@ -1,0 +1,411 @@
+/* Cart page: two-column layout with a sticky summary, rounded cards and the
+   showcase language used on the product and collection pages.
+
+   Loaded by both cart sections. Dawn renders them as two sibling
+   .shopify-section wrappers, so the two-column grid has to be applied to their
+   shared parent — see the :has() rule below, which is also what scopes all of
+   this to the cart page without a body class. */
+
+#MainContent:has(.cart-section--items) {
+  --cart-gap: 4rem;
+}
+
+@media screen and (min-width: 990px) {
+  #MainContent:has(.cart-section--items):has(.cart-section--footer) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--cart-summary-width, 38rem);
+    gap: 0 var(--cart-gap, 4rem);
+    align-items: start;
+    max-width: var(--page-width);
+    margin-inline: auto;
+    padding-inline: 5rem;
+  }
+
+  /* The sections already carry page-width internally; that has to be undone
+     once they become grid columns or each one re-centres inside its own track. */
+  #MainContent:has(.cart-section--items) .cart-section--items .page-width,
+  #MainContent:has(.cart-section--items) .cart-section--footer .page-width {
+    max-width: none;
+    padding-inline: 0;
+    margin-inline: 0;
+  }
+
+  .cart-section--footer {
+    position: sticky;
+    top: var(--cart-sticky-top, 2.4rem);
+  }
+}
+
+/* Header ------------------------------------------------------------------- */
+.cart__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2rem;
+  padding-bottom: var(--cart-header-padding, 2rem);
+  border-bottom: var(--cart-divider-width, 0.1rem) solid
+    var(--cart-divider-color, rgba(var(--color-foreground), 0.2));
+}
+
+.cart__header .title {
+  margin: 0;
+  font-size: var(--cart-title-size, 4rem);
+  font-weight: var(--cart-title-weight, inherit);
+  color: var(--cart-title-color, inherit);
+}
+
+.cart__count {
+  flex-shrink: 0;
+  font-size: var(--cart-count-size, 1.5rem);
+  color: var(--cart-count-color, rgba(var(--color-foreground), 0.7));
+}
+
+/* Line items ---------------------------------------------------------------
+   Dawn's header row labels each column; the reference reads as a plain list,
+   so the row is dropped visually while staying available to screen readers. */
+.cart-items thead {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+.cart-item {
+  border-bottom: var(--cart-divider-width, 0.1rem) solid
+    var(--cart-divider-color, rgba(var(--color-foreground), 0.2));
+}
+
+.cart-item__image {
+  border-radius: var(--cart-image-radius, 1.2rem);
+}
+
+.cart-item__image-container {
+  border-radius: var(--cart-image-radius, 1.2rem);
+  background: var(--cart-image-bg, rgba(var(--color-foreground), 0.04));
+}
+
+.cart-item__name {
+  font-size: var(--cart-item-title-size, 1.7rem);
+  font-weight: var(--cart-item-title-weight, 500);
+  text-decoration: none;
+}
+
+.cart-item__name:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.3rem;
+}
+
+.cart-item .product-option {
+  font-size: var(--cart-option-size, 1.4rem);
+  color: var(--cart-option-color, rgba(var(--color-foreground), 0.6));
+}
+
+.cart-item__price-wrapper > * {
+  font-size: var(--cart-price-size, 1.6rem);
+}
+
+/* Quantity pill: same radius trick as the product page — .quantity is only a
+   clipping frame, its border and fill are pseudo-elements reading the global
+   --inputs-radius pair, so those are what must be scoped. */
+.cart-item .quantity,
+cart-drawer .quantity {
+  --inputs-radius: var(--cart-quantity-radius, 0.8rem);
+  --inputs-radius-outset: calc(var(--cart-quantity-radius, 0.8rem) + var(--inputs-border-width));
+  border-radius: var(--cart-quantity-radius, 0.8rem);
+  overflow: hidden;
+}
+
+.cart-item cart-remove-button a {
+  font-size: var(--cart-remove-size, 1.4rem);
+  color: var(--cart-remove-color, rgba(var(--color-foreground), 0.7));
+  text-decoration: underline;
+  text-underline-offset: 0.3rem;
+}
+
+.cart-item cart-remove-button a:hover {
+  color: rgb(var(--color-foreground));
+}
+
+/* Free shipping progress ---------------------------------------------------- */
+.cart-shipping-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  padding: var(--cart-card-padding, 2rem);
+  border-radius: var(--cart-card-radius, 1.2rem);
+  background: var(--cart-card-bg, rgba(var(--color-foreground), 0.04));
+}
+
+.cart-shipping-bar__message {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0;
+  font-size: var(--cart-shipping-size, 1.5rem);
+  color: var(--cart-shipping-color, inherit);
+}
+
+.cart-shipping-bar__message .svg-wrapper {
+  flex-shrink: 0;
+  width: var(--cart-shipping-icon-size, 2rem);
+  height: var(--cart-shipping-icon-size, 2rem);
+}
+
+.cart-shipping-bar__track {
+  position: relative;
+  height: var(--cart-shipping-bar-height, 0.6rem);
+  border-radius: 999rem;
+  background: var(--cart-shipping-track, rgba(var(--color-foreground), 0.15));
+  overflow: hidden;
+}
+
+.cart-shipping-bar__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 999rem;
+  background: var(--cart-shipping-fill, rgb(var(--color-foreground)));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cart-shipping-bar__fill {
+    animation: cartShippingFill var(--cart-shipping-speed, 800ms) cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes cartShippingFill {
+    from {
+      width: 0;
+    }
+  }
+}
+
+/* Summary card --------------------------------------------------------------
+   Dawn lays .cart__footer out as a flex row with 35rem children, which was
+   built for a full-width footer under the items. In a narrow sticky column it
+   parks the shipping bar beside the totals and crushes both, so the column is
+   restacked here. */
+.cart-section--footer .cart__footer {
+  display: block;
+}
+
+.cart-section--footer .cart__footer > * {
+  width: 100%;
+  margin-left: 0;
+}
+
+.cart-section--footer .cart__footer > * + * {
+  margin-left: 0;
+  margin-top: var(--cart-card-gap, 1.6rem);
+}
+
+.cart__footer .cart__blocks {
+  padding: var(--cart-card-padding, 2rem);
+  border-radius: var(--cart-card-radius, 1.2rem);
+  background: var(--cart-card-bg, rgba(var(--color-foreground), 0.04));
+}
+
+/* Dawn centres the totals row; the reference reads label-left / amount-right.
+   min-width:0 lets the label shrink by wrapping between words instead of being
+   squeezed one character per line, which is what a flex item does by default
+   once its content is narrower than the track. */
+.cart__footer .totals {
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1.6rem;
+}
+
+.cart__footer .totals__total {
+  min-width: 0;
+  font-size: var(--cart-subtotal-label-size, 1.8rem);
+  font-weight: var(--cart-subtotal-weight, 500);
+}
+
+.cart__footer .totals__total-value {
+  flex-shrink: 0;
+  text-align: right;
+  font-size: var(--cart-subtotal-size, 2.4rem);
+  font-weight: var(--cart-subtotal-weight, 500);
+}
+
+.cart__footer .tax-note {
+  font-size: var(--cart-tax-note-size, 1.3rem);
+  color: var(--cart-tax-note-color, rgba(var(--color-foreground), 0.65));
+}
+
+/* Dawn draws a button's border and shadow with ::before/::after that read the
+   global --buttons-radius pair, not the element's own border-radius — so
+   rounding the button alone leaves a square outline floating around the pill.
+   Scoping those two variables is what makes the border follow. */
+.cart__checkout-button {
+  --buttons-radius: var(--cart-checkout-radius, 999rem);
+  --buttons-radius-outset: calc(var(--cart-checkout-radius, 999rem) + var(--buttons-border-width));
+  border-radius: var(--cart-checkout-radius, 999rem);
+  min-height: var(--cart-checkout-height, 5.4rem);
+  font-size: var(--cart-checkout-size, 1.5rem);
+  font-weight: var(--cart-checkout-weight, 600);
+  letter-spacing: var(--cart-checkout-spacing, 0.08em);
+  text-transform: var(--cart-checkout-transform, uppercase);
+}
+
+/* Order notes as a disclosure ----------------------------------------------- */
+.cart__note-details {
+  margin-bottom: 1.6rem;
+}
+
+.cart__note-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  list-style: none;
+  cursor: pointer;
+  font-size: var(--cart-note-size, 1.5rem);
+  text-decoration: underline;
+  text-underline-offset: 0.3rem;
+}
+
+.cart__note-summary::-webkit-details-marker {
+  display: none;
+}
+
+.cart__note-summary::marker {
+  content: '';
+}
+
+/* Drawn rather than an SVG so its size and weight follow the note's own type. */
+.cart__note-icon {
+  position: relative;
+  flex-shrink: 0;
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.cart__note-icon::before,
+.cart__note-icon::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background: currentColor;
+  transition: transform var(--duration-short) ease;
+}
+
+.cart__note-icon::before {
+  width: 100%;
+  height: 0.15rem;
+  transform: translate(-50%, -50%);
+}
+
+.cart__note-icon::after {
+  width: 0.15rem;
+  height: 100%;
+  transform: translate(-50%, -50%);
+}
+
+.cart__note-details[open] .cart__note-icon::after {
+  transform: translate(-50%, -50%) scaleY(0);
+}
+
+.cart__note-details .cart__note {
+  margin-top: 1.2rem;
+}
+
+.cart__note-details .text-area {
+  border-radius: var(--cart-quantity-radius, 0.8rem);
+}
+
+/* Upsell -------------------------------------------------------------------- */
+.cart-upsell {
+  margin-top: var(--cart-upsell-gap, 4rem);
+}
+
+.cart-upsell__heading {
+  margin: 0 0 var(--cart-upsell-heading-gap, 2rem);
+  font-size: var(--cart-upsell-heading-size, 2.4rem);
+  font-weight: var(--cart-upsell-heading-weight, inherit);
+  color: var(--cart-upsell-heading-color, inherit);
+}
+
+.cart-upsell__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cart-upsell-row-gap, 1.2rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cart-upsell__item {
+  display: flex;
+  align-items: center;
+  gap: 1.6rem;
+  padding: var(--cart-upsell-padding, 1.2rem);
+  border-radius: var(--cart-card-radius, 1.2rem);
+  background: var(--cart-card-bg, rgba(var(--color-foreground), 0.04));
+}
+
+.cart-upsell__media {
+  flex-shrink: 0;
+  width: var(--cart-upsell-image-size, 6rem);
+  height: var(--cart-upsell-image-size, 6rem);
+  border-radius: var(--cart-upsell-image-radius, 0.8rem);
+  overflow: hidden;
+  background: rgb(var(--color-background));
+}
+
+.cart-upsell__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cart-upsell__info {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.cart-upsell__title {
+  margin: 0;
+  font-size: var(--cart-upsell-title-size, 1.6rem);
+  color: rgb(var(--color-foreground));
+  text-decoration: none;
+}
+
+.cart-upsell__title:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.3rem;
+}
+
+.cart-upsell__price {
+  margin: 0.2rem 0 0;
+  font-size: var(--cart-upsell-price-size, 1.5rem);
+  color: rgba(var(--color-foreground), 0.7);
+}
+
+.cart-upsell__form {
+  flex-shrink: 0;
+  margin: 0;
+}
+
+.cart-upsell__button {
+  /* 4.4rem floor: the 44px minimum tap target on iOS and Android. */
+  min-height: var(--cart-upsell-button-height, 4.4rem);
+  padding: 0 var(--cart-upsell-button-padding, 2.4rem);
+  border-radius: var(--cart-upsell-button-radius, 999rem);
+  font-size: var(--cart-upsell-button-size, 1.3rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+@media screen and (max-width: 749px) {
+  .cart-upsell__item {
+    flex-wrap: wrap;
+  }
+
+  .cart-upsell__form,
+  .cart-upsell__button {
+    width: 100%;
+  }
+}

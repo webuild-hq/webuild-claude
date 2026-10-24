@@ -1,0 +1,67 @@
+.related-products {
+  display: block;
+}
+
+.related-products__heading {
+  margin: 0 0 3rem;
+}
+
+.related-products__slider {
+  position: relative;
+}
+
+/* Edge arrows: circular buttons straddling the row's own left/right edge,
+   vertically biased toward the image rather than true centre — a true centre
+   would land the arrows over the title/price sitting below each card. Every
+   value is a CSS variable set from the section settings, with fallbacks that
+   reproduce Dawn's own control-bar arrow if a merchant switches styles. */
+.related-products--edge-arrows .related-products__slider {
+  overflow: visible;
+}
+
+.related-products--edge-arrows .slider-buttons {
+  position: static;
+}
+
+.related-products--edge-arrows .slider-button {
+  position: absolute;
+  top: var(--rp-arrow-top, 40%);
+  transform: translateY(-50%);
+  z-index: 3;
+  width: var(--rp-arrow-size, 4.8rem);
+  height: var(--rp-arrow-size, 4.8rem);
+  border-radius: 999rem;
+  border-width: var(--rp-arrow-border-width, 0.1rem);
+  border-style: solid;
+  border-color: var(--rp-arrow-border-color, rgba(var(--color-foreground), 0.4));
+  background: var(--rp-arrow-bg, rgb(var(--color-background)));
+  color: var(--rp-arrow-color, rgb(var(--color-foreground)));
+}
+
+.related-products--edge-arrows .slider-button:hover:not([disabled]) {
+  border-color: var(--rp-arrow-border-color-hover, rgb(var(--color-foreground)));
+}
+
+.related-products--edge-arrows .slider-button .svg-wrapper {
+  width: var(--rp-arrow-icon-size, 1.4rem);
+  height: var(--rp-arrow-icon-size, 1.4rem);
+}
+
+.related-products--edge-arrows .slider-button--prev {
+  left: var(--rp-arrow-offset, -1rem);
+}
+
+.related-products--edge-arrows .slider-button--next {
+  right: var(--rp-arrow-offset, -1rem);
+}
+
+.related-products--edge-arrows .slider-counter {
+  display: none;
+}
+
+@media screen and (max-width: 749px) {
+  .related-products--edge-arrows .slider-button {
+    width: calc(var(--rp-arrow-size, 4.8rem) * 0.8);
+    height: calc(var(--rp-arrow-size, 4.8rem) * 0.8);
+  }
+}

@@ -1,0 +1,82 @@
+{% comment %}
+  Overlay collection card: title and button sit on top of the image.
+
+  Accepts:
+  - block: {Object} collection-list block (required)
+  - section: {Object} collection-list section, for its settings (required)
+  - placeholder_image: {String} Placeholder svg name (optional)
+{% endcomment %}
+
+{%- liquid
+  assign s = section.settings
+  assign card_collection = block.settings.collection
+
+  assign card_title = block.settings.title_override
+  if card_title == blank
+    assign card_title = card_collection.title
+  endif
+
+  comment
+    A per-block image overrides the collection's own featured image, so a tile
+    can use a lifestyle shot rather than whatever the collection carries.
+  endcomment
+  assign card_image = block.settings.image
+  if card_image == blank
+    assign card_image = card_collection.featured_image
+  endif
+
+  assign card_url = card_collection.url
+  assign has_button = false
+  if s.button_label != blank
+    assign has_button = true
+  endif
+-%}
+
+<div class="collection-overlay">
+  <div class="collection-overlay__media media">
+    {%- if card_image != blank -%}
+      {{
+        card_image
+        | image_url: width: 1200
+        | image_tag:
+          loading: 'lazy',
+          widths: '200, 300, 400, 600, 800, 1000, 1200',
+          sizes: '(min-width: 750px) 33vw, 90vw',
+          alt: card_image.alt | default: card_title | escape
+      }}
+    {%- else -%}
+      {{ placeholder_image | default: 'collection-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+    {%- endif -%}
+  </div>
+
+  {%- comment -%}
+    Without a button the whole card is the link. With one, only the button is —
+    nesting a link inside a link is invalid HTML.
+  {%- endcomment -%}
+  {%- if card_url != blank and has_button == false -%}
+    <a href="{{ card_url }}" class="collection-overlay__link" aria-label="{{ card_title | escape }}"></a>
+  {%- endif -%}
+
+  <div class="collection-overlay__content collection-overlay__content--{{ s.content_position }} collection-overlay__content--align-{{ s.content_alignment }}">
+    {%- if card_title != blank -%}
+      <p class="collection-overlay__title">{{ card_title | escape }}</p>
+    {%- endif -%}
+
+    {%- if has_button -%}
+      {%- capture btn_style -%}
+        {%- render 'button-custom-style', settings: s, prefix: 'btn_' -%}
+      {%- endcapture -%}
+      <a
+        {% if card_url == blank %}
+          role="link" aria-disabled="true"
+        {% else %}
+          href="{{ card_url }}"
+        {% endif %}
+        class="button collection-overlay__button{% if s.btn_custom %} button--custom{% endif %}"
+        {%- if btn_style != blank %} style="{{ btn_style | strip_newlines | strip }}"{% endif %}
+      >
+        {{- s.button_label | escape -}}
+      </a>
+    {%- endif -%}
+  </div>
+</div>

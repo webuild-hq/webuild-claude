@@ -1,0 +1,119 @@
+{% comment %}
+  "Explore other products" rows under the cart items.
+
+  Products already in the cart are skipped, so the block never suggests
+  something the customer just added. Each row posts to /cart/add through Dawn's
+  own product-form element, which gives the same optimistic UI, error handling
+  and cart refresh as any other add — and lets the flight animation fire.
+
+  Accepts:
+  - section: {Object} the cart items section, for its settings (required)
+{% endcomment %}
+
+{%- liquid
+  comment
+    Sourced from a merchant-chosen collection rather than Shopify's
+    recommendations object: that object is only populated by the
+    /recommendations/products endpoint against a product, so on the cart page
+    it is always empty.
+  endcomment
+  assign s = section.settings
+  assign candidates = s.upsell_collection.products
+-%}
+
+{%- if s.show_upsell and candidates.size > 0 and cart != empty -%}
+  {%- liquid
+    comment
+      Ids already in the cart, joined into a lookup string. Rebuilding it per
+      candidate would be O(n*m) over two loops for no benefit.
+    endcomment
+    assign cart_ids = ''
+    for line in cart.items
+      assign cart_ids = cart_ids | append: ',' | append: line.product_id | append: ','
+    endfor
+
+    assign shown = 0
+  -%}
+
+  <div class="cart-upsell">
+    {%- if s.upsell_heading != blank -%}
+      <h2 class="cart-upsell__heading">{{ s.upsell_heading | escape }}</h2>
+    {%- endif -%}
+
+    <ul class="cart-upsell__list" role="list">
+      {%- for candidate in candidates -%}
+        {%- liquid
+          assign needle = ',' | append: candidate.id | append: ','
+          assign in_cart = false
+          if cart_ids contains needle
+            assign in_cart = true
+          endif
+        -%}
+        {%- if in_cart == false and candidate.available and shown < s.upsell_limit -%}
+          {%- assign shown = shown | plus: 1 -%}
+          <li class="cart-upsell__item">
+            <div class="cart-upsell__media">
+              {%- if candidate.featured_image != blank -%}
+                {{
+                  candidate.featured_image
+                  | image_url: width: 200
+                  | image_tag: loading: 'lazy', widths: '100, 150, 200', alt: candidate.featured_image.alt | escape
+                }}
+              {%- endif -%}
+            </div>
+
+            <div class="cart-upsell__info">
+              <a href="{{ candidate.url }}" class="cart-upsell__title">{{ candidate.title | escape }}</a>
+              <p class="cart-upsell__price">
+                {%- if candidate.price_varies -%}
+                  {{ 'products.product.price.from_price_html' | t: price: candidate.price_min | money_with_currency }}
+                {%- else -%}
+                  {{ candidate.price | money_with_currency }}
+                {%- endif -%}
+              </p>
+            </div>
+
+            {%- comment -%}
+              Variants with options need a choice made on the product page, so
+              those rows link out instead of adding blind.
+            {%- endcomment -%}
+            {%- if candidate.variants.size > 1 -%}
+              <a href="{{ candidate.url }}" class="cart-upsell__button button">
+                {{- s.upsell_choose_label | default: 'Choose' | escape -}}
+              </a>
+            {%- else -%}
+              {%- comment -%}
+                The <span> and the loading spinner are not decoration:
+                product-form.js reads submitButton.querySelector('span') in its
+                constructor and calls .loading__spinner on submit, so omitting
+                either one throws and the add silently fails.
+              {%- endcomment -%}
+              <product-form class="cart-upsell__form" data-hide-errors="true">
+                {%- form 'product',
+                  candidate,
+                  id: 'CartUpsell-' | append: candidate.id,
+                  class: 'form',
+                  novalidate: 'novalidate'
+                -%}
+                  <input
+                    type="hidden"
+                    name="id"
+                    value="{{ candidate.selected_or_first_available_variant.id }}"
+                  >
+                  <button
+                    type="submit"
+                    name="add"
+                    class="cart-upsell__button button"
+                  >
+                    <span>{{ s.upsell_button_label | default: 'Add to bag' | escape }}</span>
+                    {%- render 'loading-spinner' -%}
+                  </button>
+                {%- endform -%}
+              </product-form>
+            {%- endif -%}
+          </li>
+        {%- endif -%}
+      {%- endfor -%}
+    </ul>
+  </div>
+{%- endif -%}

@@ -4,8 +4,10 @@
 // Usage : node scripts/build-theme-guides.mjs
 import { readdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join, basename } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const THEMES_DIR = new URL("../themes/", import.meta.url).pathname;
+// fileURLToPath et non .pathname : un chemin avec des espaces serait encodé ("%20") et introuvable.
+const THEMES_DIR = fileURLToPath(new URL("../themes/", import.meta.url));
 
 // Réglages purement visuels de l'éditeur, inutiles pour remplir une section.
 const SKIPPED_TYPES = new Set(["header", "paragraph"]);

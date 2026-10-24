@@ -1,0 +1,124 @@
+{% comment %}
+  Availability block: label, coloured stock status and an optional level bar.
+
+  Replaces Dawn's inventory paragraph, whose status colours were written as
+  inline styles and so could never be themed. Here the active state resolves to
+  a single --pi-status-color / --pi-bar-color pair, which keeps the CSS free of
+  per-state rules and lets a merchant recolour every state.
+
+  Accepts:
+  - block: {Object} the inventory block, for its settings (required)
+  - product: {Object} Product (required)
+{% endcomment %}
+
+{%- liquid
+  assign s = block.settings
+  assign variant = product.selected_or_first_available_variant
+  assign qty = variant.inventory_quantity
+
+  assign tracked = false
+  if variant.inventory_management == 'shopify'
+    assign tracked = true
+  endif
+
+  comment
+    The bar is a share of the block's own "full stock" figure, not of total
+    inventory — merchants rarely want to reveal real stock levels, and a full
+    bar at 200 units would be meaningless anyway.
+  endcomment
+  assign bar_pct = 0
+  if tracked and qty > 0
+    assign bar_pct = qty | times: 100 | divided_by: s.inventory_full
+    if bar_pct > 100
+      assign bar_pct = 100
+    endif
+  endif
+
+  assign state = 'in_stock'
+  if tracked and qty <= 0
+    assign state = 'out'
+  elsif tracked and qty <= s.inventory_threshold
+    assign state = 'low'
+  endif
+
+  case state
+    when 'low'
+      assign state_color = s.low_color
+    when 'out'
+      assign state_color = s.out_color
+    else
+      assign state_color = s.in_stock_color
+  endcase
+
+  assign show_bar = false
+  if s.show_bar and tracked and qty > 0
+    assign show_bar = true
+  endif
+-%}
+
+{%- capture inventory_vars -%}
+  --pi-label-size: {{ s.label_size }}px;
+  --pi-label-gap: {{ s.label_gap }}px;
+  --pi-status-gap: {{ s.status_gap }}px;
+  --pi-bar-height: {{ s.bar_height }}px;
+  --pi-bar-radius: {{ s.bar_radius }}px;
+  --pi-bar-speed: {{ s.bar_speed }}ms;
+  {%- if s.label_weight != 'inherit' %} --pi-label-weight: {{ s.label_weight }};{% endif -%}
+  {%- if s.label_color != blank %} --pi-label-color: {{ s.label_color }};{% endif -%}
+  {%- if s.track_color != blank %} --pi-track-color: {{ s.track_color }};{% endif -%}
+{%- endcapture -%}
+
+<div class="product-inventory" style="{{ inventory_vars | strip_newlines }}" {{ block.shopify_attributes }}>
+  {%- if s.heading != blank -%}
+    <p class="product-inventory__label">{{ s.heading | escape }}</p>
+  {%- endif -%}
+
+  <p
+    class="product-inventory__status"
+    role="status"
+    {% if state_color != blank or s.font_size > 0 %}
+      style="
+        {%- if state_color != blank %} --pi-status-color: {{ state_color }};{% endif -%}
+        {%- if s.font_size > 0 %} font-size: {{ s.font_size }}px;{% endif -%}
+      "
+    {% endif %}
+  >
+    {%- if tracked == false -%}
+      {{- 'products.product.inventory_in_stock' | t -}}
+    {%- elsif qty > 0 -%}
+      {%- if state == 'low' -%}
+        {%- if s.show_inventory_quantity -%}
+          {{- 'products.product.inventory_low_stock_show_count' | t: quantity: qty -}}
+        {%- else -%}
+          {{- 'products.product.inventory_low_stock' | t -}}
+        {%- endif -%}
+      {%- else -%}
+        {%- if s.show_inventory_quantity -%}
+          {{- 'products.product.inventory_in_stock_show_count' | t: quantity: qty -}}
+        {%- else -%}
+          {{- 'products.product.inventory_in_stock' | t -}}
+        {%- endif -%}
+      {%- endif -%}
+    {%- elsif variant.inventory_policy == 'continue' -%}
+      {{- 'products.product.inventory_out_of_stock_continue_selling' | t -}}
+    {%- else -%}
+      {{- 'products.product.inventory_out_of_stock' | t -}}
+    {%- endif -%}
+  </p>
+
+  {%- if show_bar -%}
+    <div
+      class="product-inventory__bar{% if s.bar_animate %} product-inventory__bar--animate{% endif %}"
+      role="img"
+      aria-label="{{ 'products.product.inventory_in_stock' | t }}"
+    >
+      <span
+        class="product-inventory__bar-fill"
+        style="
+          width: {{ bar_pct }}%;
+          {%- if state_color != blank %} --pi-bar-color: {{ state_color }};{% endif -%}
+        "
+      ></span>
+    </div>
+  {%- endif -%}
+</div>

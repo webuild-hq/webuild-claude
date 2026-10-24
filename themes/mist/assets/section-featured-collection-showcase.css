@@ -1,0 +1,348 @@
+/* Showcase product cards for featured-collection. The hover border is on the
+   card itself, so it wraps the image, quick view, title, price and pills. The
+   transparent border and constant padding are always present, so nothing shifts
+   when the border becomes visible. */
+.showcase-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 1rem;
+  border: 0.1rem solid transparent;
+  border-radius: var(--sc-radius, 1.6rem);
+  transition: border-color var(--duration-short) ease;
+}
+
+@media (hover: hover) {
+  .showcase-card:hover,
+  .showcase-card:focus-within {
+    border-color: rgba(var(--color-foreground), 0.6);
+  }
+}
+
+/* The image box holds the quick view button; the hover border lives on the
+   card, not here, so there is only ever one outline. */
+.showcase-card__media {
+  position: relative;
+  aspect-ratio: var(--sc-ratio, 1 / 1);
+  border-radius: calc(var(--sc-radius, 1.6rem) - 0.4rem);
+  overflow: hidden;
+  background: rgba(var(--color-foreground), 0.04);
+}
+
+.showcase-card__media-link {
+  display: block;
+  position: absolute;
+  inset: 0;
+}
+
+.showcase-card__media img,
+.showcase-card__media .placeholder-svg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Second image on hover, reusing Dawn's own crossfade mechanism (see
+   base.css .media--hover-effect): both images are stacked with absolute
+   positioning only when a second one exists, so a single image is unaffected. */
+.showcase-card__media-alt {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
+@media screen and (min-width: 990px) {
+  /* :has() gates every variant on an alt image actually existing — without it,
+     a card with only one image would fade/zoom/slide it to nothing on hover. */
+
+  /* Fade (default): plain opacity crossfade. */
+  .showcase-card__media--anim-fade:has(.showcase-card__media-alt) img {
+    transition: opacity var(--hover-img-speed, 500ms) ease;
+  }
+
+  .showcase-card:hover .showcase-card__media--anim-fade:has(.showcase-card__media-alt) img:not(.showcase-card__media-alt),
+  .showcase-card:focus-within .showcase-card__media--anim-fade:has(.showcase-card__media-alt) img:not(.showcase-card__media-alt) {
+    opacity: 0;
+  }
+
+  .showcase-card:hover .showcase-card__media--anim-fade .showcase-card__media-alt,
+  .showcase-card:focus-within .showcase-card__media--anim-fade .showcase-card__media-alt {
+    opacity: 1;
+  }
+
+  /* Zoom in: crossfade plus both images scale up slightly. */
+  .showcase-card__media--anim-zoom:has(.showcase-card__media-alt) img {
+    transition: opacity var(--hover-img-speed, 500ms) ease, transform var(--hover-img-speed, 500ms) ease;
+  }
+
+  .showcase-card:hover .showcase-card__media--anim-zoom:has(.showcase-card__media-alt) img:not(.showcase-card__media-alt),
+  .showcase-card:focus-within .showcase-card__media--anim-zoom:has(.showcase-card__media-alt) img:not(.showcase-card__media-alt) {
+    opacity: 0;
+    transform: scale(1.06);
+  }
+
+  .showcase-card:hover .showcase-card__media--anim-zoom .showcase-card__media-alt,
+  .showcase-card:focus-within .showcase-card__media--anim-zoom .showcase-card__media-alt {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+
+  /* Zoom out: the second image reveals while shrinking from an enlarged size
+     down to normal — the reverse motion of Zoom in. Only the alt image is
+     scaled, so the default (non-hovered) look is unaffected. */
+  .showcase-card__media--anim-zoom-out:has(.showcase-card__media-alt) img:not(.showcase-card__media-alt) {
+    transition: opacity var(--hover-img-speed, 500ms) ease;
+  }
+
+  .showcase-card__media--anim-zoom-out .showcase-card__media-alt {
+    transform: scale(1.15);
+    transition: opacity var(--hover-img-speed, 500ms) ease, transform var(--hover-img-speed, 500ms) ease;
+  }
+
+  .showcase-card:hover .showcase-card__media--anim-zoom-out:has(.showcase-card__media-alt) img:not(.showcase-card__media-alt),
+  .showcase-card:focus-within .showcase-card__media--anim-zoom-out:has(.showcase-card__media-alt) img:not(.showcase-card__media-alt) {
+    opacity: 0;
+  }
+
+  .showcase-card:hover .showcase-card__media--anim-zoom-out .showcase-card__media-alt,
+  .showcase-card:focus-within .showcase-card__media--anim-zoom-out .showcase-card__media-alt {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* Slide: the second image slides in from the right instead of fading. */
+  .showcase-card__media--anim-slide .showcase-card__media-alt {
+    opacity: 1;
+    transform: translateX(100%);
+    transition: transform var(--hover-img-speed, 500ms) ease;
+  }
+
+  .showcase-card:hover .showcase-card__media--anim-slide .showcase-card__media-alt,
+  .showcase-card:focus-within .showcase-card__media--anim-slide .showcase-card__media-alt {
+    transform: translateX(0);
+  }
+
+  /* None: instant swap, no transition at all. */
+  .showcase-card__media--anim-none:has(.showcase-card__media-alt) img {
+    transition: none;
+  }
+
+  .showcase-card:hover .showcase-card__media--anim-none:has(.showcase-card__media-alt) img:not(.showcase-card__media-alt),
+  .showcase-card:focus-within .showcase-card__media--anim-none:has(.showcase-card__media-alt) img:not(.showcase-card__media-alt) {
+    opacity: 0;
+  }
+
+  .showcase-card:hover .showcase-card__media--anim-none .showcase-card__media-alt,
+  .showcase-card:focus-within .showcase-card__media--anim-none .showcase-card__media-alt {
+    opacity: 1;
+  }
+}
+
+.showcase-card__badge {
+  position: absolute;
+  top: 1.2rem;
+  left: 1.2rem;
+  z-index: 2;
+  padding: 0.5rem 1.4rem;
+  border-radius: var(--sc-badge-radius, 999rem);
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.08rem;
+  text-transform: uppercase;
+  background: rgb(var(--color-button));
+  color: rgb(var(--color-button-text));
+}
+
+/* Reveal panel below the image, inside the frame. Collapsed with an animatable
+   grid row until the card is hovered, so it does not overlap the image. */
+.showcase-card__reveal {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows var(--duration-short) ease, opacity var(--duration-short) ease;
+}
+
+.showcase-card__reveal-inner {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.showcase-card:hover .showcase-card__reveal,
+.showcase-card:focus-within .showcase-card__reveal {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+/* Small top gap only once the panel is open. */
+.showcase-card:hover .showcase-card__reveal-inner,
+.showcase-card:focus-within .showcase-card__reveal-inner {
+  padding-top: 1rem;
+}
+
+.showcase-card__pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  justify-content: center;
+}
+
+.showcase-card__pill {
+  padding: var(--cp-padding-y, 0.5rem) var(--cp-padding-x, 1.2rem);
+  border-radius: var(--cp-radius, 0.8rem);
+  background: var(--cp-bg, rgba(var(--color-foreground), 0.05));
+  color: var(--cp-text, rgb(var(--color-foreground)));
+  font-size: var(--cp-font-size, 1.2rem);
+  text-decoration: none;
+  border-width: var(--cp-border-width, 0.1rem);
+  border-style: solid;
+  border-color: var(--cp-border-color, rgba(var(--color-foreground), 0.15));
+  transition: border-color var(--duration-short) ease;
+}
+
+.showcase-card__pill:hover {
+  border-color: var(--cp-border-color-hover, rgb(var(--color-foreground)));
+}
+
+/* Quick view overlays the bottom of the image, revealed on hover. Insets keep
+   it clear of the rounded image corners and inside the frame border. */
+.showcase-card__quickview.button {
+  position: absolute;
+  left: var(--qv-inset-x, 1.2rem);
+  right: var(--qv-inset-x, 1.2rem);
+  bottom: 1.2rem;
+  z-index: 2;
+  /* Flex centring: Dawn's .button is inline-flex, which without these would
+     leave the label off-centre once the element is absolutely positioned. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: var(--qv-height, 0);
+  min-width: 0;
+  padding: 1.2rem var(--qv-padding-x, 2rem);
+  font-size: var(--qv-font-size, 1.3rem);
+  font-weight: var(--qv-weight, inherit);
+  letter-spacing: 0.05rem;
+  text-transform: var(--qv-text-transform, uppercase);
+  /* Solid pill, readable over any image. Dawn draws its button border/shadow
+     with pseudo-elements, dropped here for a clean flat pill. */
+  border-width: var(--qv-border-width, 0);
+  border-style: solid;
+  border-color: var(--qv-border-color, transparent);
+  border-radius: var(--qv-radius, 0.8rem);
+  background: var(--qv-bg, rgb(var(--color-background)));
+  color: var(--qv-text, rgb(var(--color-foreground)));
+  opacity: 0;
+  transform: translateY(0.6rem);
+  transition: opacity var(--duration-short) ease, transform var(--duration-short) ease;
+  pointer-events: none;
+}
+
+.showcase-card__quickview.button::before,
+.showcase-card__quickview.button::after {
+  content: none;
+}
+
+.showcase-card:hover .showcase-card__quickview,
+.showcase-card:focus-within .showcase-card__quickview {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+.showcase-card__info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 1.6rem 0.5rem 0;
+  text-align: center;
+}
+
+.showcase-card__title {
+  margin: 0;
+  font-size: 1.7rem;
+  font-weight: 500;
+}
+
+.showcase-card__title a {
+  color: rgb(var(--color-foreground));
+  text-decoration: none;
+}
+
+.showcase-card__title a:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.3rem;
+}
+
+.showcase-card__rating {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.showcase-card__rating-text {
+  color: rgba(var(--color-foreground), 0.7);
+}
+
+.showcase-card__price {
+  font-size: 1.6rem;
+  margin: 0;
+}
+
+.showcase-card__variant-count {
+  margin: 0;
+  color: rgba(var(--color-foreground), 0.6);
+}
+
+/* Edge arrows: circular outline buttons at the far left/right, centered on the
+   card row rather than sitting in a control bar below. Anchored on
+   slider-component, which wraps only the card row (the heading is separate). */
+.featured-collection--edge-arrows slider-component {
+  position: relative;
+  display: block;
+}
+
+.featured-collection--edge-arrows .slider-buttons {
+  position: static;
+}
+
+.featured-collection--edge-arrows .slider-button {
+  position: absolute;
+  /* Biased above the row's centre so the arrows sit over the image, not the
+     title/price beneath it. */
+  top: 40%;
+  transform: translateY(-50%);
+  z-index: 3;
+  width: 4.8rem;
+  height: 4.8rem;
+  border-radius: 999rem;
+  border: 0.1rem solid rgba(var(--color-foreground), 0.4);
+  background: rgb(var(--color-background));
+}
+
+.featured-collection--edge-arrows .slider-button:hover:not([disabled]) {
+  border-color: rgb(var(--color-foreground));
+}
+
+.featured-collection--edge-arrows .slider-button--prev {
+  left: -1rem;
+}
+
+.featured-collection--edge-arrows .slider-button--next {
+  right: -1rem;
+}
+
+.featured-collection--edge-arrows .slider-counter {
+  display: none;
+}
+
+@media screen and (max-width: 749px) {
+  .featured-collection--edge-arrows .slider-button {
+    width: 3.8rem;
+    height: 3.8rem;
+  }
+}

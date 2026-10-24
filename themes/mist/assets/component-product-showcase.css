@@ -1,0 +1,244 @@
+/* ---------- Availability with stock bar ---------- */
+.product-inventory__label {
+  margin: 0 0 var(--pi-label-gap, 0.4rem);
+  font-size: var(--pi-label-size, 1.6rem);
+  font-weight: var(--pi-label-weight, 500);
+  color: var(--pi-label-color, rgb(var(--color-foreground)));
+}
+
+.product-inventory__status {
+  margin: 0 0 var(--pi-status-gap, 0.8rem);
+  color: var(--pi-status-color, rgb(var(--color-foreground)));
+}
+
+.product-inventory__bar {
+  position: relative;
+  height: var(--pi-bar-height, 0.4rem);
+  border-radius: var(--pi-bar-radius, 999rem);
+  background: var(--pi-track-color, rgba(var(--color-foreground), 0.12));
+  overflow: hidden;
+}
+
+.product-inventory__bar-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: var(--pi-bar-radius, 999rem);
+  background: var(--pi-bar-color, rgb(var(--color-foreground)));
+  transition: width var(--duration-default) ease;
+}
+
+/* Grows from empty on first paint so the level registers as a measurement
+   rather than a static rule. Suppressed under reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  .product-inventory__bar--animate .product-inventory__bar-fill {
+    animation: productInventoryFill var(--pi-bar-speed, 900ms) cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* No !important here: keyframe declarations carrying it are ignored per
+     spec, and animations already outrank the inline width the block writes. */
+  @keyframes productInventoryFill {
+    from {
+      width: 0;
+    }
+  }
+}
+
+/* ---------- Spec rows ----------
+   The container's side padding is what insets the row rules, so the dividers
+   stop short of the border instead of cutting the box in half. */
+.product-specs {
+  box-sizing: border-box;
+  max-width: var(--ps-max-width, none);
+  border: var(--ps-border-width, 0.1rem) solid var(--ps-border-color, rgba(var(--color-foreground), 0.25));
+  border-radius: var(--ps-radius, 1rem);
+  padding: 0 var(--ps-padding-x, 1.6rem);
+  background: var(--ps-bg, transparent);
+}
+
+.product-specs__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  padding: var(--ps-row-padding-y, 1.4rem) 0;
+  border-bottom: var(--ps-divider-width, 0.1rem) solid
+    var(--ps-divider-color, rgba(var(--color-foreground), 0.15));
+}
+
+/* No rule under the last row — the container border closes the box. */
+.product-specs__row:last-child {
+  border-bottom: 0;
+}
+
+.product-specs__label {
+  font-size: var(--ps-label-size, inherit);
+  font-weight: var(--ps-label-weight, 600);
+  color: var(--ps-label-color, inherit);
+}
+
+.product-specs__value {
+  font-weight: var(--ps-value-weight, inherit);
+  color: var(--ps-value-color, rgba(var(--color-foreground), 0.85));
+}
+
+/* ---------- Rounded showcase styling ----------
+   Dawn's media boxes read --media-radius (overridden per section in the
+   Liquid). global-media-settings forces `overflow: visible` so the shadow can
+   escape, which means that radius never clips the image — so it is applied to
+   the image itself as well. */
+.product--showcase .product-media-container img,
+.product--showcase .product-media-container .placeholder-svg,
+.product--showcase .product-media-container video,
+.product--showcase .product-media-container iframe {
+  border-radius: var(--pv-media-radius, 1.6rem);
+}
+
+.product--showcase .thumbnail,
+.product--showcase .thumbnail img {
+  border-radius: var(--pv-thumb-radius, 0.8rem);
+}
+
+/* Dawn's own border lives on .thumbnail (a real border, not global-media-settings'
+   box-shadow trick here), so it is overridden directly. The aria-current ring
+   is replaced with a border-color + width change, kept in sync with it. */
+.product--showcase .thumbnail {
+  border-width: var(--pv-thumb-border-width, 0.1rem);
+  border-color: var(--pv-thumb-border-color, transparent);
+}
+
+.product--showcase .thumbnail[aria-current] {
+  box-shadow: none;
+  border-width: var(--pv-thumb-border-active-width, 0.2rem);
+  border-color: var(--pv-thumb-border-active-color, rgb(var(--color-foreground)));
+}
+
+/* Variant options as bordered boxes rather than plain pills. */
+.product--showcase variant-radios fieldset.product-form__input,
+.product--showcase variant-selects fieldset.product-form__input {
+  gap: 1rem;
+}
+
+/* The resting fill is a tint of the scheme's own foreground rather than a fixed
+   grey, so the unselected/selected contrast survives a dark colour scheme
+   instead of inverting into an invisible pale-on-pale pill. */
+.product--showcase .product-form__input input[type='radio'] + label {
+  min-width: var(--pv-option-min-width, 9rem);
+  padding: var(--pv-option-padding-y, 1.3rem) var(--pv-option-padding-x, 2rem);
+  border: var(--pv-option-border-width, 0.1rem) solid
+    var(--pv-option-border-color, rgba(var(--color-foreground), 0.2));
+  border-radius: var(--pv-option-radius, 0.8rem);
+  background: var(--pv-option-bg, rgba(var(--color-foreground), 0.04));
+  color: var(--pv-option-text, rgb(var(--color-foreground)));
+  transition: border-color var(--duration-short) ease, background-color var(--duration-short) ease,
+    color var(--duration-short) ease;
+}
+
+.product--showcase .product-form__input input[type='radio'] + label:hover {
+  border-color: var(--pv-option-border-hover, var(--pv-option-border-active, rgb(var(--color-foreground))));
+  background: var(--pv-option-bg-hover, var(--pv-option-bg, rgba(var(--color-foreground), 0.04)));
+  color: var(--pv-option-text-hover, var(--pv-option-text, rgb(var(--color-foreground))));
+}
+
+.product--showcase .product-form__input input[type='radio']:checked + label {
+  border-color: var(--pv-option-border-active, rgb(var(--color-foreground)));
+  border-width: var(--pv-option-border-active-width, 0.2rem);
+  background: var(--pv-option-bg-active, rgb(var(--color-background)));
+  color: var(--pv-option-text-active, rgb(var(--color-foreground)));
+}
+
+/* Sold-out options: Dawn marks the input, not the label, so the state has to
+   be read from the input and drawn on its sibling. */
+.product--showcase .product-form__input input[type='radio'].disabled + label {
+  opacity: var(--pv-option-disabled-opacity, 0.4);
+  text-decoration: var(--pv-option-disabled-line, line-through);
+}
+
+/* Option label: "Size:" in full contrast, the chosen value stepped back, which
+   is what separates the two halves at a glance. */
+.product--showcase .product-form__input > .form__label {
+  margin-bottom: var(--pv-label-gap, 1rem);
+  font-size: var(--pv-label-size, 1.5rem);
+  font-weight: var(--pv-label-weight, 500);
+  color: var(--pv-label-color, rgb(var(--color-foreground)));
+}
+
+.product--showcase .product-form__input > .form__label [data-selected-value] {
+  font-weight: var(--pv-value-weight, 400);
+  color: var(--pv-value-color, rgba(var(--color-foreground), 0.6));
+}
+
+/* Dawn's quantity box doesn't paint its own border/background: .quantity is
+   just a clipping frame, while :before (background) and :after (border, via
+   box-shadow) are separate pseudo-elements that read the global
+   --inputs-radius / --inputs-radius-outset variables — not .quantity's own
+   border-radius. Overriding only the container's radius left the pseudo-
+   elements rounded to Dawn's global Inputs setting (often 0), so the visible
+   border stayed square no matter what --pv-option-radius was set to. Scoping
+   the same variables the pseudo-elements read is what makes them match. */
+.product--showcase .quantity {
+  --inputs-radius: var(--pv-option-radius, 0.8rem);
+  --inputs-radius-outset: calc(var(--pv-option-radius, 0.8rem) + var(--inputs-border-width));
+  border-radius: var(--pv-option-radius, 0.8rem);
+  overflow: hidden;
+}
+
+.product--showcase .product-form__submit {
+  border-radius: var(--pv-button-radius, 0.8rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* ---------- Thumbnails in a side column ----------
+   Dawn's "thumbnail" layout puts them under the main image. This turns the
+   gallery into a row and stacks the thumbnails beside it. Desktop only —
+   a narrow side column is unusable on a phone. */
+@media screen and (min-width: 750px) {
+  .product--thumbs-side media-gallery {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--pv-thumb-gap, 1.2rem);
+  }
+
+  .product--thumbs-side media-gallery > slider-component:first-of-type {
+    order: 2;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .product--thumbs-side .thumbnail-slider {
+    order: 1;
+    flex: 0 0 var(--pv-thumb-width, 9rem);
+    display: block;
+  }
+
+  .product--thumbs-side.product--thumbs-right media-gallery > slider-component:first-of-type {
+    order: 1;
+  }
+
+  .product--thumbs-side.product--thumbs-right .thumbnail-slider {
+    order: 2;
+  }
+
+  /* Vertical stack instead of Dawn's horizontal strip. */
+  .product--thumbs-side .thumbnail-list,
+  .product--thumbs-side .thumbnail-list.slider,
+  .product--thumbs-side .thumbnail-list.slider--tablet-up {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: var(--pv-thumb-gap, 1.2rem);
+    padding: 0;
+    margin: 0;
+  }
+
+  .product--thumbs-side .thumbnail-list__item,
+  .product--thumbs-side .thumbnail-list__item.slider__slide {
+    width: 100%;
+    max-width: none;
+  }
+
+  /* Dawn's arrows belong to a horizontal strip; they make no sense stacked. */
+  .product--thumbs-side .thumbnail-slider > .slider-button {
+    display: none;
+  }
+}

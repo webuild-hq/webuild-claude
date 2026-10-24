@@ -1,0 +1,714 @@
+{{ 'component-slider.css' | asset_url | stylesheet_tag }}
+{{ 'section-content-carousel.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign s = section.settings
+
+  case s.image_ratio
+    when 'portrait'
+      assign cc_ratio = '3 / 4'
+    when 'landscape'
+      assign cc_ratio = '4 / 3'
+    else
+      assign cc_ratio = '1 / 1'
+  endcase
+
+  comment
+    A fractional slide count is what produces the peek: 3 columns with a 30%
+    peek means 3.3 slides fit the viewport, leaving a third of a card showing.
+  endcomment
+  assign peek = s.peek_amount | divided_by: 100.0
+  assign visible_desktop = s.columns_desktop | plus: peek
+  assign visible_mobile = s.columns_mobile | plus: peek
+-%}
+
+{%- style -%}
+  #ContentCarousel-{{ section.id }} {
+    --cc-visible: {{ visible_mobile }};
+    --cc-gap: {{ s.gap | times: 0.6 | round: 0 }}px;
+    --cc-edge: {{ s.edge_padding | times: 0.6 | round: 0 }}px;
+    --cc-ratio: {{ cc_ratio }};
+    --cc-media-radius: {{ s.media_radius }}px;
+    --cc-media-gap: {{ s.media_gap }}px;
+    --cc-text-align: {{ s.text_align }};
+
+    --cc-title-size: {{ s.title_size }}px;
+    --cc-title-line-height: {{ s.title_line_height | divided_by: 100.0 }};
+    --cc-title-spacing: {{ s.title_spacing | divided_by: 100.0 }}em;
+    --cc-title-gap: {{ s.title_gap }}px;
+    {%- if s.title_weight != 'inherit' %} --cc-title-weight: {{ s.title_weight }};{% endif %}
+    {%- if s.title_transform != 'inherit' %} --cc-title-transform: {{ s.title_transform }};{% endif %}
+    {%- if s.title_color != blank %} --cc-title-color: {{ s.title_color }};{% endif %}
+
+    --cc-text-size: {{ s.text_size }}px;
+    --cc-text-line-height: {{ s.text_line_height | divided_by: 100.0 }};
+    {%- if s.text_color != blank %} --cc-text-color: {{ s.text_color }};{% endif %}
+
+    --cc-link-size: {{ s.link_size }}px;
+    --cc-link-gap: {{ s.link_gap }}px;
+    {%- if s.link_color != blank %} --cc-link-color: {{ s.link_color }};{% endif %}
+
+    --cc-heading-size: {{ s.heading_size | times: 0.75 | round: 0 }}px;
+    --cc-heading-gap: {{ s.heading_gap }}px;
+    --cc-heading-align: {{ s.heading_align }};
+    {%- if s.heading_weight != 'inherit' %} --cc-heading-weight: {{ s.heading_weight }};{% endif %}
+    {%- if s.heading_color != blank %} --cc-heading-color: {{ s.heading_color }};{% endif %}
+
+    --cc-arrow-size: {{ s.arrow_size }}px;
+    --cc-arrow-icon-size: {{ s.arrow_icon_size }}px;
+    --cc-arrow-top: {{ s.arrow_top }}%;
+    --cc-arrow-offset: {{ s.arrow_offset }}px;
+    --cc-arrow-border-width: {{ s.arrow_border_width }}px;
+    {%- if s.arrow_border_color != blank %} --cc-arrow-border-color: {{ s.arrow_border_color }};{% endif %}
+    {%- if s.arrow_border_color_hover != blank %} --cc-arrow-border-color-hover: {{ s.arrow_border_color_hover }};{% endif %}
+    {%- if s.arrow_bg != blank %} --cc-arrow-bg: {{ s.arrow_bg }};{% endif %}
+    {%- if s.arrow_bg_hover != blank %} --cc-arrow-bg-hover: {{ s.arrow_bg_hover }};{% endif %}
+    {%- if s.arrow_color != blank %} --cc-arrow-color: {{ s.arrow_color }};{% endif %}
+  }
+
+  #ContentCarousel-{{ section.id }} .content-carousel__inner {
+    padding-top: {{ s.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ s.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    #ContentCarousel-{{ section.id }} {
+      --cc-visible: {{ visible_desktop }};
+      --cc-gap: {{ s.gap }}px;
+      --cc-edge: {{ s.edge_padding }}px;
+      --cc-heading-size: {{ s.heading_size }}px;
+    }
+
+    #ContentCarousel-{{ section.id }} .content-carousel__inner {
+      padding-top: {{ s.padding_top }}px;
+      padding-bottom: {{ s.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+<div
+  id="ContentCarousel-{{ section.id }}"
+  class="content-carousel color-{{ s.color_scheme }} gradient{% if s.hide_arrows_mobile %} content-carousel--hide-arrows-mobile{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+>
+  <div class="content-carousel__inner{% unless s.full_width %} page-width{% endunless %}">
+    {%- if s.heading != blank -%}
+      <h2 class="content-carousel__heading inline-richtext">{{ s.heading }}</h2>
+    {%- endif -%}
+
+    {%- if section.blocks.size > 0 -%}
+      <slider-component class="content-carousel__slider">
+        <ul
+          id="Slider-{{ section.id }}"
+          class="content-carousel__track slider slider--everywhere"
+          role="list"
+        >
+          {%- for block in section.blocks -%}
+            {%- liquid
+              assign media_style = ''
+              if s.image_ratio == 'adapt' and block.settings.image != blank
+                assign media_style = 'aspect-ratio: ' | append: block.settings.image.aspect_ratio | append: ';'
+              endif
+            -%}
+            <li
+              id="Slide-{{ section.id }}-{{ forloop.index }}"
+              class="content-carousel__slide slider__slide"
+              {{ block.shopify_attributes }}
+            >
+              <div
+                class="content-carousel__media"
+                {% if media_style != blank or block.settings.image != blank %}
+                  style="{{ media_style }}{% if block.settings.image != blank %} --cc-focal: {{ block.settings.image.presentation.focal_point }};{% endif %}"
+                {% endif %}
+              >
+                {%- if block.settings.image != blank -%}
+                  {{
+                    block.settings.image
+                    | image_url: width: 1200
+                    | image_tag:
+                      loading: 'lazy',
+                      widths: '300, 400, 600, 800, 1000, 1200',
+                      sizes: '(min-width: 750px) 33vw, 90vw',
+                      alt: block.settings.image.alt | escape
+                  }}
+                {%- else -%}
+                  {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+                {%- endif -%}
+              </div>
+
+              <div class="content-carousel__content">
+                {%- if block.settings.title != blank -%}
+                  <h3 class="content-carousel__title inline-richtext">
+                    {%- if block.settings.link != blank -%}
+                      <a href="{{ block.settings.link }}" class="content-carousel__card-link">
+                        <span class="visually-hidden">{{ block.settings.title | strip_html | escape }}</span>
+                      </a>
+                    {%- endif -%}
+                    {{ block.settings.title }}
+                  </h3>
+                {%- endif -%}
+
+                {%- if block.settings.text != blank -%}
+                  <div class="content-carousel__text rte">{{ block.settings.text }}</div>
+                {%- endif -%}
+
+                {%- if block.settings.link != blank and block.settings.link_label != blank -%}
+                  <span class="content-carousel__link link">{{ block.settings.link_label | escape }}</span>
+                {%- endif -%}
+              </div>
+            </li>
+          {%- endfor -%}
+        </ul>
+
+        {%- if s.show_arrows -%}
+          <button
+            type="button"
+            class="content-carousel__button content-carousel__button--prev"
+            name="previous"
+            aria-label="{{ 'general.slider.previous_slide' | t }}"
+            aria-controls="Slider-{{ section.id }}"
+          >
+            <span class="svg-wrapper">
+              {{- 'icon-arrow.svg' | inline_asset_content -}}
+            </span>
+          </button>
+          <button
+            type="button"
+            class="content-carousel__button content-carousel__button--next"
+            name="next"
+            aria-label="{{ 'general.slider.next_slide' | t }}"
+            aria-controls="Slider-{{ section.id }}"
+          >
+            <span class="svg-wrapper">
+              {{- 'icon-arrow.svg' | inline_asset_content -}}
+            </span>
+          </button>
+        {%- endif -%}
+      </slider-component>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.content-carousel.name",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "t:sections.content-carousel.settings.heading.label"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "min": 16,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "default": 32,
+      "label": "t:sections.content-carousel.settings.heading_size.label",
+      "info": "t:sections.content-carousel.settings.heading_size.info"
+    },
+    {
+      "type": "select",
+      "id": "heading_weight",
+      "options": [
+        {
+          "value": "inherit",
+          "label": "t:sections.image-banner.settings_shared.button_weight.options__default.label"
+        },
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" },
+        { "value": "700", "label": "700" },
+        { "value": "800", "label": "800" }
+      ],
+      "default": "inherit",
+      "label": "t:sections.content-carousel.settings.heading_weight.label"
+    },
+    {
+      "type": "select",
+      "id": "heading_align",
+      "options": [
+        {
+          "value": "left",
+          "label": "t:sections.content-carousel.settings.alignment.options__left.label"
+        },
+        {
+          "value": "center",
+          "label": "t:sections.content-carousel.settings.alignment.options__center.label"
+        }
+      ],
+      "default": "left",
+      "label": "t:sections.content-carousel.settings.heading_align.label"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "t:sections.content-carousel.settings.heading_color.label"
+    },
+    {
+      "type": "range",
+      "id": "heading_gap",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 32,
+      "label": "t:sections.content-carousel.settings.heading_gap.label"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme-1",
+      "label": "t:sections.all.colors.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.content-carousel.settings.header__layout.content"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "default": true,
+      "label": "t:sections.content-carousel.settings.full_width.label",
+      "info": "t:sections.content-carousel.settings.full_width.info"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "default": 3,
+      "label": "t:sections.content-carousel.settings.columns_desktop.label"
+    },
+    {
+      "type": "range",
+      "id": "columns_mobile",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "default": 1,
+      "label": "t:sections.content-carousel.settings.columns_mobile.label"
+    },
+    {
+      "type": "range",
+      "id": "peek_amount",
+      "min": 0,
+      "max": 60,
+      "step": 5,
+      "unit": "%",
+      "default": 30,
+      "label": "t:sections.content-carousel.settings.peek_amount.label",
+      "info": "t:sections.content-carousel.settings.peek_amount.info"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 24,
+      "label": "t:sections.content-carousel.settings.gap.label"
+    },
+    {
+      "type": "range",
+      "id": "edge_padding",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 20,
+      "label": "t:sections.content-carousel.settings.edge_padding.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.content-carousel.settings.header__card.content"
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "options": [
+        {
+          "value": "adapt",
+          "label": "t:sections.content-carousel.settings.image_ratio.options__adapt.label"
+        },
+        {
+          "value": "square",
+          "label": "t:sections.content-carousel.settings.image_ratio.options__square.label"
+        },
+        {
+          "value": "portrait",
+          "label": "t:sections.content-carousel.settings.image_ratio.options__portrait.label"
+        },
+        {
+          "value": "landscape",
+          "label": "t:sections.content-carousel.settings.image_ratio.options__landscape.label"
+        }
+      ],
+      "default": "square",
+      "label": "t:sections.content-carousel.settings.image_ratio.label"
+    },
+    {
+      "type": "range",
+      "id": "media_radius",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 16,
+      "label": "t:sections.content-carousel.settings.media_radius.label"
+    },
+    {
+      "type": "range",
+      "id": "media_gap",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 16,
+      "label": "t:sections.content-carousel.settings.media_gap.label"
+    },
+    {
+      "type": "select",
+      "id": "text_align",
+      "options": [
+        {
+          "value": "left",
+          "label": "t:sections.content-carousel.settings.alignment.options__left.label"
+        },
+        {
+          "value": "center",
+          "label": "t:sections.content-carousel.settings.alignment.options__center.label"
+        }
+      ],
+      "default": "left",
+      "label": "t:sections.content-carousel.settings.text_align.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.content-carousel.settings.header__title.content"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 12,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 22,
+      "label": "t:sections.content-carousel.settings.title_size.label"
+    },
+    {
+      "type": "select",
+      "id": "title_weight",
+      "options": [
+        {
+          "value": "inherit",
+          "label": "t:sections.image-banner.settings_shared.button_weight.options__default.label"
+        },
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" },
+        { "value": "700", "label": "700" }
+      ],
+      "default": "inherit",
+      "label": "t:sections.content-carousel.settings.title_weight.label"
+    },
+    {
+      "type": "select",
+      "id": "title_transform",
+      "options": [
+        {
+          "value": "inherit",
+          "label": "t:sections.image-banner.settings_shared.button_weight.options__default.label"
+        },
+        {
+          "value": "none",
+          "label": "t:sections.content-carousel.settings.title_transform.options__none.label"
+        },
+        {
+          "value": "uppercase",
+          "label": "t:sections.content-carousel.settings.title_transform.options__uppercase.label"
+        }
+      ],
+      "default": "inherit",
+      "label": "t:sections.content-carousel.settings.title_transform.label"
+    },
+    {
+      "type": "range",
+      "id": "title_line_height",
+      "min": 90,
+      "max": 200,
+      "step": 5,
+      "unit": "%",
+      "default": 130,
+      "label": "t:sections.content-carousel.settings.title_line_height.label"
+    },
+    {
+      "type": "range",
+      "id": "title_spacing",
+      "min": -5,
+      "max": 20,
+      "step": 1,
+      "default": 0,
+      "label": "t:sections.content-carousel.settings.title_spacing.label"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "t:sections.content-carousel.settings.title_color.label"
+    },
+    {
+      "type": "range",
+      "id": "title_gap",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 8,
+      "label": "t:sections.content-carousel.settings.title_gap.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.content-carousel.settings.header__text.content"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 12,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 16,
+      "label": "t:sections.content-carousel.settings.text_size.label"
+    },
+    {
+      "type": "range",
+      "id": "text_line_height",
+      "min": 100,
+      "max": 220,
+      "step": 5,
+      "unit": "%",
+      "default": 160,
+      "label": "t:sections.content-carousel.settings.text_line_height.label"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "t:sections.content-carousel.settings.text_color.label"
+    },
+    {
+      "type": "range",
+      "id": "link_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 15,
+      "label": "t:sections.content-carousel.settings.link_size.label"
+    },
+    {
+      "type": "range",
+      "id": "link_gap",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 12,
+      "label": "t:sections.content-carousel.settings.link_gap.label"
+    },
+    {
+      "type": "color",
+      "id": "link_color",
+      "label": "t:sections.content-carousel.settings.link_color.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.content-carousel.settings.header__arrows.content"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "default": true,
+      "label": "t:sections.content-carousel.settings.show_arrows.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_arrows_mobile",
+      "default": true,
+      "label": "t:sections.content-carousel.settings.hide_arrows_mobile.label"
+    },
+    {
+      "type": "range",
+      "id": "arrow_size",
+      "min": 24,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 48,
+      "label": "t:sections.content-carousel.settings.arrow_size.label"
+    },
+    {
+      "type": "range",
+      "id": "arrow_icon_size",
+      "min": 8,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 18,
+      "label": "t:sections.content-carousel.settings.arrow_icon_size.label"
+    },
+    {
+      "type": "range",
+      "id": "arrow_top",
+      "min": 5,
+      "max": 95,
+      "step": 1,
+      "unit": "%",
+      "default": 32,
+      "label": "t:sections.content-carousel.settings.arrow_top.label",
+      "info": "t:sections.content-carousel.settings.arrow_top.info"
+    },
+    {
+      "type": "range",
+      "id": "arrow_offset",
+      "min": -40,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 10,
+      "label": "t:sections.content-carousel.settings.arrow_offset.label"
+    },
+    {
+      "type": "range",
+      "id": "arrow_border_width",
+      "min": 0,
+      "max": 6,
+      "step": 1,
+      "unit": "px",
+      "default": 1,
+      "label": "t:sections.content-carousel.settings.arrow_border_width.label"
+    },
+    {
+      "type": "color",
+      "id": "arrow_border_color",
+      "label": "t:sections.content-carousel.settings.arrow_border_color.label"
+    },
+    {
+      "type": "color",
+      "id": "arrow_border_color_hover",
+      "label": "t:sections.content-carousel.settings.arrow_border_color_hover.label"
+    },
+    {
+      "type": "color",
+      "id": "arrow_bg",
+      "label": "t:sections.content-carousel.settings.arrow_bg.label"
+    },
+    {
+      "type": "color",
+      "id": "arrow_bg_hover",
+      "label": "t:sections.content-carousel.settings.arrow_bg_hover.label"
+    },
+    {
+      "type": "color",
+      "id": "arrow_color",
+      "label": "t:sections.content-carousel.settings.arrow_color.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.padding.section_padding_heading"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 36,
+      "label": "t:sections.all.padding.padding_top"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 36,
+      "label": "t:sections.all.padding.padding_bottom"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "t:sections.content-carousel.blocks.slide.name",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:sections.content-carousel.blocks.slide.settings.image.label"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "title",
+          "default": "Vegan Leather",
+          "label": "t:sections.content-carousel.blocks.slide.settings.title.label"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "default": "<p>Describe the material, process or value you want customers to understand.</p>",
+          "label": "t:sections.content-carousel.blocks.slide.settings.text.label"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "t:sections.content-carousel.blocks.slide.settings.link.label"
+        },
+        {
+          "type": "text",
+          "id": "link_label",
+          "label": "t:sections.content-carousel.blocks.slide.settings.link_label.label",
+          "info": "t:sections.content-carousel.blocks.slide.settings.link_label.info"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 16,
+  "presets": [
+    {
+      "name": "t:sections.content-carousel.presets.name",
+      "blocks": [
+        {
+          "type": "slide",
+          "settings": {
+            "title": "Vegan Leather",
+            "text": "<p>Our luxurious PU leather is 100% vegan and stays soft over time. All our fabrications are kind to our furry friends.</p>"
+          }
+        },
+        {
+          "type": "slide",
+          "settings": {
+            "title": "Recycled Polyester",
+            "text": "<p>Made from recycled plastic bottles, diverting plastic from landfill while using far fewer resources than new fibres.</p>"
+          }
+        },
+        {
+          "type": "slide",
+          "settings": {
+            "title": "Textile Printing",
+            "text": "<p>All prints are created in house: no minimum order quantities, flexibility with colour and no setup costs.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
