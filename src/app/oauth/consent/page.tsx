@@ -13,7 +13,7 @@ export const metadata = { title: "Autoriser l'accès | Webuild" };
 export default function ConsentPage({ searchParams }: PageProps<"/oauth/consent">) {
   return (
     <main className="flex flex-1 flex-col items-center justify-center px-4 py-16">
-      <Suspense fallback={<p className="opacity-60">Chargement...</p>}>
+      <Suspense fallback={<p className="text-muted">Chargement...</p>}>
         <Consent searchParams={searchParams} />
       </Suspense>
     </main>
@@ -66,12 +66,12 @@ async function Consent({
     connection?.default_organization_id ?? preferences?.last_organization_id ?? organizations[0]?.id;
 
   return (
-    <div className="flex w-full max-w-md flex-col gap-6 rounded-2xl border border-black/10 p-8 dark:border-white/15">
+    <div className="flex w-full max-w-md flex-col gap-6 rounded-2xl border border-border bg-surface p-8">
       <div className="flex flex-col gap-2">
         <h1 className="text-xl font-semibold">
           {details.client.name || "Une application"} souhaite accéder à ton compte Webuild
         </h1>
-        <p className="text-sm opacity-70">Connecté en tant que {details.user.email}</p>
+        <p className="text-sm text-muted">Connecté en tant que {details.user.email}</p>
       </div>
 
       <p className="text-sm">
@@ -82,7 +82,7 @@ async function Consent({
       {scopes.length > 0 && (
         <div className="text-sm">
           <p className="font-medium">Permissions demandées :</p>
-          <ul className="mt-1 list-disc pl-5 opacity-80">
+          <ul className="mt-1 list-disc pl-5 text-muted">
             {scopes.map((scope) => (
               <li key={scope}>{scope}</li>
             ))}
@@ -90,10 +90,10 @@ async function Consent({
         </div>
       )}
 
-      <p className="text-xs opacity-60">Redirection après autorisation : {details.redirect_uri}</p>
+      <p className="text-xs text-muted">Redirection après autorisation : {details.redirect_uri}</p>
 
       {params.error && (
-        <p className="text-sm text-red-600">La décision n&apos;a pas pu être enregistrée. Réessaie.</p>
+        <p className="text-sm text-error">La décision n&apos;a pas pu être enregistrée. Réessaie.</p>
       )}
 
       <form action={decide} className="flex flex-col gap-5">
@@ -114,7 +114,7 @@ async function Consent({
                 {org.name}
               </label>
             ))}
-            <p className="text-xs opacity-60">
+            <p className="text-xs text-muted">
               Tu pourras préciser une autre agence à Claude dans une conversation.
             </p>
           </fieldset>
@@ -122,7 +122,7 @@ async function Consent({
           organizations[0] && (
             <>
               <input type="hidden" name="organization_id" value={organizations[0].id} />
-              <p className="text-sm opacity-80">
+              <p className="text-sm text-muted">
                 Agence : <strong>{organizations[0].name}</strong>
               </p>
             </>
@@ -135,7 +135,7 @@ async function Consent({
             name="decision"
             value="deny"
             formNoValidate
-            className="flex-1 rounded-lg border border-black/15 px-4 py-2.5 font-medium dark:border-white/20"
+            className="flex-1 rounded-lg border border-border bg-surface px-4 py-2.5 font-medium"
           >
             Refuser
           </button>
@@ -143,7 +143,7 @@ async function Consent({
             type="submit"
             name="decision"
             value="approve"
-            className="flex-1 rounded-lg bg-foreground px-4 py-2.5 font-medium text-background"
+            className="flex-1 rounded-lg bg-accent px-4 py-2.5 font-medium text-accent-foreground"
           >
             Autoriser
           </button>
@@ -154,5 +154,5 @@ async function Consent({
 }
 
 function ErrorMessage({ children }: { children: React.ReactNode }) {
-  return <p className="max-w-md text-center text-red-600">{children}</p>;
+  return <p className="max-w-md text-center text-error">{children}</p>;
 }

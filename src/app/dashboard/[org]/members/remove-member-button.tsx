@@ -29,8 +29,8 @@ export function RemoveMemberButton({
       <input type="hidden" name="organization_id" value={organizationId} />
       <input type="hidden" name="slug" value={slug} />
       <input type="hidden" name="user_id" value={userId} />
-      {state.error && <span className="text-sm text-red-600">{state.error}</span>}
-      <button type="submit" disabled={pending} className="text-sm text-red-600 hover:underline">
+      {state.error && <span className="text-sm text-error">{state.error}</span>}
+      <button type="submit" disabled={pending} className="text-sm text-error hover:underline">
         {label}
       </button>
     </form>

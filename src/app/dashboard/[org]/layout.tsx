@@ -1,52 +1,52 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { requireUser } from "@/lib/auth";
 import { listMyOrganizations } from "@/modules/organizations/queries";
 import { signOut } from "@/app/(auth)/logout/actions";
+import { Loading } from "@/components/ui";
+import { loadOrganization } from "./context";
+import { NavLinks } from "./nav-links";
 import { OrganizationSwitcher } from "./organization-switcher";
 
 export default function OrganizationLayout({ children, params }: LayoutProps<"/dashboard/[org]">) {
   return (
-    <div className="flex flex-1 flex-col">
-      <header className="border-b border-black/10 dark:border-white/15">
-        <div className="mx-auto flex w-full max-w-4xl flex-wrap items-center gap-x-6 gap-y-3 px-4 py-3">
-          <Link href="/" className="font-semibold">
-            Webuild
-          </Link>
-          <Suspense fallback={<span className="text-sm opacity-60">Chargement...</span>}>
-            <Navigation params={params} />
-          </Suspense>
-          <form action={signOut} className="ml-auto">
-            <button type="submit" className="text-sm opacity-70 hover:opacity-100">
-              Se déconnecter
-            </button>
-          </form>
-        </div>
-      </header>
-      <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-8 px-4 py-8">{children}</main>
+    <div className="flex flex-1 flex-col md:flex-row">
+      <aside className="flex flex-col gap-4 border-b border-border bg-surface px-4 py-4 md:sticky md:top-0 md:h-screen md:w-64 md:shrink-0 md:border-b-0 md:border-r md:py-6">
+        <Link href="/" className="px-3 text-lg font-semibold tracking-tight">
+          Webuild
+        </Link>
+        <Suspense fallback={<div className="px-3"><Loading /></div>}>
+          <Sidebar params={params} />
+        </Suspense>
+      </aside>
+      <main className="flex w-full max-w-5xl flex-1 flex-col gap-8 px-4 py-8 md:px-10">
+        <Suspense fallback={<Loading />}>{children}</Suspense>
+      </main>
     </div>
   );
 }
 
-async function Navigation({ params }: { params: LayoutProps<"/dashboard/[org]">["params"] }) {
+async function Sidebar({ params }: { params: LayoutProps<"/dashboard/[org]">["params"] }) {
   const { org: slug } = await params;
-  const { supabase, user } = await requireUser(`/dashboard/${slug}`);
+  const { supabase, user } = await loadOrganization(slug);
   const organizations = await listMyOrganizations(supabase, user.id);
-  const current = organizations.find((org) => org.slug === slug);
-  if (!current) notFound();
 
   return (
-    <>
+    <div className="flex flex-1 flex-col gap-4">
       <OrganizationSwitcher organizations={organizations} currentSlug={slug} />
-      <nav className="flex gap-4 text-sm">
-        <Link href={`/dashboard/${slug}`} className="opacity-80 hover:opacity-100">
-          Vue d&apos;ensemble
+      <NavLinks slug={slug} />
+      <div className="mt-auto flex flex-wrap gap-x-4 gap-y-1 border-t border-border px-3 pt-4 text-sm md:flex-col">
+        <span className="truncate text-muted" title={user.email ?? ""}>
+          {user.email}
+        </span>
+        <Link href="/reset-password" className="text-muted hover:text-foreground">
+          Changer mon mot de passe
         </Link>
-        <Link href={`/dashboard/${slug}/members`} className="opacity-80 hover:opacity-100">
-          Membres
-        </Link>
-      </nav>
-    </>
+        <form action={signOut}>
+          <button type="submit" className="text-muted hover:text-foreground">
+            Se déconnecter
+          </button>
+        </form>
+      </div>
+    </div>
   );
 }

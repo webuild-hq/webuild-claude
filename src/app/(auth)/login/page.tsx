@@ -1,17 +1,18 @@
 import { Suspense } from "react";
 import { safeNextPath } from "@/lib/safe-redirect";
+import { Loading } from "@/components/ui";
 import { LoginForm } from "./login-form";
 
 export const metadata = { title: "Connexion | Webuild" };
 
 export default function LoginPage({ searchParams }: PageProps<"/login">) {
   return (
-    <main className="flex flex-1 flex-col items-center justify-center gap-8 px-4 py-16">
-      <h1 className="text-2xl font-semibold">Connexion à Webuild</h1>
-      <Suspense>
+    <>
+      <h1 className="text-2xl font-semibold tracking-tight">Connexion</h1>
+      <Suspense fallback={<Loading />}>
         <LoginFormWithParams searchParams={searchParams} />
       </Suspense>
-    </main>
+    </>
   );
 }
 

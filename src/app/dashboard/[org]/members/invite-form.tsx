@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { inviteMember, type ActionState } from "@/modules/organizations/actions";
+import { Button, Input, Notice, Select } from "@/components/ui";
 
 export function InviteForm({ organizationId, slug }: { organizationId: string; slug: string }) {
   const [state, formAction, pending] = useActionState<ActionState, FormData>(inviteMember, {});
@@ -11,31 +12,17 @@ export function InviteForm({ organizationId, slug }: { organizationId: string; s
       <input type="hidden" name="organization_id" value={organizationId} />
       <input type="hidden" name="slug" value={slug} />
       <div className="flex flex-wrap gap-2">
-        <input
-          name="email"
-          type="email"
-          required
-          placeholder="Email"
-          className="min-w-56 flex-1 rounded-lg border border-black/15 bg-transparent px-3 py-2 dark:border-white/20"
-        />
-        <select
-          name="role"
-          defaultValue="member"
-          className="rounded-lg border border-black/15 bg-transparent px-3 py-2 dark:border-white/20"
-        >
+        <Input name="email" type="email" required placeholder="Email" className="min-w-56 flex-1" />
+        <Select name="role" defaultValue="member" className="w-auto">
           <option value="member">Membre</option>
           <option value="admin">Admin</option>
-        </select>
-        <button
-          type="submit"
-          disabled={pending}
-          className="rounded-lg bg-foreground px-4 py-2 font-medium text-background disabled:opacity-60"
-        >
+        </Select>
+        <Button type="submit" disabled={pending}>
           Inviter
-        </button>
+        </Button>
       </div>
-      {state.error && <p className="text-sm text-red-600">{state.error}</p>}
-      {state.ok && <p className="text-sm text-green-700">{state.ok}</p>}
+      {state.error && <Notice tone="error">{state.error}</Notice>}
+      {state.ok && <Notice tone="success">{state.ok}</Notice>}
     </form>
   );
 }

@@ -1,60 +1,50 @@
-import { Suspense } from "react";
-import { notFound } from "next/navigation";
-import { requireUser } from "@/lib/auth";
 import { publicOrigin } from "@/lib/origin";
-import {
-  getMyOrganization,
-  listMembers,
-  listPendingInvitations,
-} from "@/modules/organizations/queries";
+import { listMembers, listPendingInvitations } from "@/modules/organizations/queries";
 import { canManageMembers, ROLE_LABELS } from "@/modules/organizations/types";
 import { revokeInvitation } from "@/modules/organizations/actions";
+import { getOrganizationPlan } from "@/modules/billing/queries";
+import { CopyButton } from "@/components/copy-button";
+import { Badge, Card, PageHeader } from "@/components/ui";
+import { loadOrganization } from "../context";
 import { InviteForm } from "./invite-form";
 import { RemoveMemberButton } from "./remove-member-button";
-import { CopyButton } from "./copy-button";
 
 export const metadata = { title: "Membres | Webuild" };
 
-export default function MembersPage({ params }: PageProps<"/dashboard/[org]/members">) {
-  return (
-    <Suspense fallback={<p className="opacity-60">Chargement...</p>}>
-      <Members params={params} />
-    </Suspense>
-  );
-}
-
-async function Members({ params }: { params: PageProps<"/dashboard/[org]/members">["params"] }) {
+export default async function MembersPage({ params }: PageProps<"/dashboard/[org]/members">) {
   const { org: slug } = await params;
-  const { supabase, user } = await requireUser(`/dashboard/${slug}/members`);
-  const organization = await getMyOrganization(supabase, user.id, slug);
-  if (!organization) notFound();
+  const { supabase, user, organization } = await loadOrganization(slug, "/members");
 
   const manager = canManageMembers(organization.role);
-  const [members, invitations, origin] = await Promise.all([
+  const [members, invitations, plan, origin] = await Promise.all([
     listMembers(supabase, organization.id),
     manager ? listPendingInvitations(supabase, organization.id) : Promise.resolve([]),
+    getOrganizationPlan(supabase, organization.id),
     publicOrigin(),
   ]);
+  const seatsUsed = members.length + invitations.length;
 
   return (
     <>
-      <h1 className="text-2xl font-semibold">Membres</h1>
+      <PageHeader
+        title="Membres"
+        description={`${seatsUsed} / ${plan.maxMembers} places utilisées (plan ${plan.name}, invitations en attente comprises).`}
+      />
 
-      <section className="flex flex-col divide-y divide-black/10 rounded-2xl border border-black/10 dark:divide-white/15 dark:border-white/15">
+      <Card className="divide-y divide-border">
         {members.map((member) => {
           const isMe = member.userId === user.id;
-          const canRemove =
-            isMe || (manager && (member.role !== "owner" || organization.role === "owner"));
+          const canRemove = isMe || (manager && (member.role !== "owner" || organization.role === "owner"));
           return (
             <div key={member.userId} className="flex flex-wrap items-center gap-3 px-5 py-3">
               <div className="flex min-w-0 flex-1 flex-col">
                 <span className="truncate font-medium">
                   {member.fullName ?? member.email}
-                  {isMe && <span className="opacity-60"> (toi)</span>}
+                  {isMe && <span className="text-muted"> (toi)</span>}
                 </span>
-                <span className="truncate text-sm opacity-60">{member.email}</span>
+                <span className="truncate text-sm text-muted">{member.email}</span>
               </div>
-              <span className="text-sm opacity-80">{ROLE_LABELS[member.role]}</span>
+              <Badge>{ROLE_LABELS[member.role]}</Badge>
               {canRemove && (
                 <RemoveMemberButton
                   organizationId={organization.id}
@@ -66,37 +56,34 @@ async function Members({ params }: { params: PageProps<"/dashboard/[org]/members
             </div>
           );
         })}
-      </section>
+      </Card>
 
       {manager && (
         <section className="flex flex-col gap-4">
-          <h2 className="font-medium">Inviter un membre</h2>
+          <h2 className="font-semibold">Inviter un membre</h2>
           <InviteForm organizationId={organization.id} slug={slug} />
 
           {invitations.length > 0 && (
             <div className="flex flex-col gap-2">
-              <h3 className="text-sm font-medium opacity-80">Invitations en attente</h3>
-              {invitations.map((invitation) => {
-                const link = `${origin}/invitations/${invitation.token}`;
-                return (
-                  <div
-                    key={invitation.id}
-                    className="flex flex-wrap items-center gap-3 rounded-xl border border-black/10 px-4 py-3 text-sm dark:border-white/15"
-                  >
-                    <span className="flex-1 truncate">
-                      {invitation.email} · {ROLE_LABELS[invitation.role]}
-                    </span>
-                    <CopyButton value={link} />
-                    <form action={revokeInvitation}>
-                      <input type="hidden" name="invitation_id" value={invitation.id} />
-                      <input type="hidden" name="slug" value={slug} />
-                      <button type="submit" className="text-red-600 hover:underline">
-                        Annuler
-                      </button>
-                    </form>
-                  </div>
-                );
-              })}
+              <h3 className="text-sm font-medium text-muted">Invitations en attente</h3>
+              <p className="text-xs text-muted">
+                Copie le lien et envoie-le à la personne invitée. Elle devra se connecter avec cette adresse email.
+              </p>
+              {invitations.map((invitation) => (
+                <Card key={invitation.id} className="flex flex-wrap items-center gap-3 px-4 py-3 text-sm">
+                  <span className="flex-1 truncate">
+                    {invitation.email} · {ROLE_LABELS[invitation.role]}
+                  </span>
+                  <CopyButton value={`${origin}/invitations/${invitation.token}`} />
+                  <form action={revokeInvitation}>
+                    <input type="hidden" name="invitation_id" value={invitation.id} />
+                    <input type="hidden" name="slug" value={slug} />
+                    <button type="submit" className="text-sm text-error hover:underline">
+                      Annuler
+                    </button>
+                  </form>
+                </Card>
+              ))}
             </div>
           )}
         </section>

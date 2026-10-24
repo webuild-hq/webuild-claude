@@ -11,7 +11,7 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 export default function InvitationPage({ params }: PageProps<"/invitations/[token]">) {
   return (
     <main className="flex flex-1 flex-col items-center justify-center px-4 py-16">
-      <Suspense fallback={<p className="opacity-60">Chargement...</p>}>
+      <Suspense fallback={<p className="text-muted">Chargement...</p>}>
         <Invitation params={params} />
       </Suspense>
     </main>
@@ -36,15 +36,15 @@ async function Invitation({ params }: { params: PageProps<"/invitations/[token]"
   const emailMatches = user.email?.toLowerCase() === invitation.email;
 
   return (
-    <div className="flex w-full max-w-md flex-col gap-5 rounded-2xl border border-black/10 p-8 dark:border-white/15">
+    <div className="flex w-full max-w-md flex-col gap-5 rounded-2xl border border-border bg-surface p-8">
       <h1 className="text-xl font-semibold">Rejoindre {invitation.organizationName}</h1>
-      <p className="text-sm opacity-80">
+      <p className="text-sm text-muted">
         Tu es invité en tant que <strong>{ROLE_LABELS[invitation.role]}</strong>.
       </p>
       {emailMatches ? (
         <AcceptInvitationForm token={token} />
       ) : (
-        <p className="text-sm text-red-600">
+        <p className="text-sm text-error">
           Cette invitation a été envoyée à {invitation.email}, mais tu es connecté avec {user.email}.
           Connecte-toi avec la bonne adresse pour l&apos;accepter.
         </p>
@@ -54,5 +54,5 @@ async function Invitation({ params }: { params: PageProps<"/invitations/[token]"
 }
 
 function Message({ children }: { children: React.ReactNode }) {
-  return <p className="max-w-md text-center opacity-80">{children}</p>;
+  return <p className="max-w-md text-center text-muted">{children}</p>;
 }
