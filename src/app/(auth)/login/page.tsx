@@ -21,7 +21,7 @@ async function LoginFormWithParams({
   searchParams: PageProps<"/login">["searchParams"];
 }) {
   const params = await searchParams;
-  const next = safeNextPath(typeof params.next === "string" ? params.next : null);
+  const next = safeNextPath(typeof params.next === "string" ? params.next : null, "/dashboard");
   const error = typeof params.error === "string" ? params.error : undefined;
   return <LoginForm next={next} error={error} />;
 }

@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { listMyOrganizations } from "@/modules/organizations/queries";
 import { decide } from "./actions";
 
 export const metadata = { title: "Autoriser l'accès | Webuild" };
@@ -50,6 +51,19 @@ async function Consent({
   }
 
   const scopes = details.scope?.trim() ? details.scope.trim().split(/\s+/) : [];
+  const userId = claims.claims.sub;
+  const [organizations, { data: connection }, { data: preferences }] = await Promise.all([
+    listMyOrganizations(supabase, userId),
+    supabase
+      .from("mcp_connections")
+      .select("default_organization_id")
+      .eq("user_id", userId)
+      .eq("oauth_client_id", details.client.id)
+      .maybeSingle(),
+    supabase.from("user_preferences").select("last_organization_id").eq("user_id", userId).maybeSingle(),
+  ]);
+  const preselected =
+    connection?.default_organization_id ?? preferences?.last_organization_id ?? organizations[0]?.id;
 
   return (
     <div className="flex w-full max-w-md flex-col gap-6 rounded-2xl border border-black/10 p-8 dark:border-white/15">
@@ -82,24 +96,58 @@ async function Consent({
         <p className="text-sm text-red-600">La décision n&apos;a pas pu être enregistrée. Réessaie.</p>
       )}
 
-      <form action={decide} className="flex gap-3">
+      <form action={decide} className="flex flex-col gap-5">
         <input type="hidden" name="authorization_id" value={authorizationId} />
-        <button
-          type="submit"
-          name="decision"
-          value="deny"
-          className="flex-1 rounded-lg border border-black/15 px-4 py-2.5 font-medium dark:border-white/20"
-        >
-          Refuser
-        </button>
-        <button
-          type="submit"
-          name="decision"
-          value="approve"
-          className="flex-1 rounded-lg bg-foreground px-4 py-2.5 font-medium text-background"
-        >
-          Autoriser
-        </button>
+
+        {organizations.length > 1 ? (
+          <fieldset className="flex flex-col gap-2 text-sm">
+            <legend className="mb-1 font-medium">Agence utilisée par défaut</legend>
+            {organizations.map((org) => (
+              <label key={org.id} className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="organization_id"
+                  value={org.id}
+                  defaultChecked={org.id === preselected}
+                  required
+                />
+                {org.name}
+              </label>
+            ))}
+            <p className="text-xs opacity-60">
+              Tu pourras préciser une autre agence à Claude dans une conversation.
+            </p>
+          </fieldset>
+        ) : (
+          organizations[0] && (
+            <>
+              <input type="hidden" name="organization_id" value={organizations[0].id} />
+              <p className="text-sm opacity-80">
+                Agence : <strong>{organizations[0].name}</strong>
+              </p>
+            </>
+          )
+        )}
+
+        <div className="flex gap-3">
+          <button
+            type="submit"
+            name="decision"
+            value="deny"
+            formNoValidate
+            className="flex-1 rounded-lg border border-black/15 px-4 py-2.5 font-medium dark:border-white/20"
+          >
+            Refuser
+          </button>
+          <button
+            type="submit"
+            name="decision"
+            value="approve"
+            className="flex-1 rounded-lg bg-foreground px-4 py-2.5 font-medium text-background"
+          >
+            Autoriser
+          </button>
+        </div>
       </form>
     </div>
   );

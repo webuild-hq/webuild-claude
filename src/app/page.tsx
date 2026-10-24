@@ -39,9 +39,17 @@ async function Account() {
 
   return (
     <div className="flex flex-col gap-4 rounded-2xl border border-black/10 p-6 dark:border-white/15">
-      <p>
-        Connecté en tant que <strong>{String(data.claims.email ?? data.claims.sub)}</strong>
-      </p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p>
+          Connecté en tant que <strong>{String(data.claims.email ?? data.claims.sub)}</strong>
+        </p>
+        <Link
+          href="/dashboard"
+          className="rounded-lg bg-foreground px-4 py-2 text-sm font-medium text-background"
+        >
+          Ouvrir le dashboard
+        </Link>
+      </div>
       <div className="flex flex-col gap-2 text-sm">
         <p className="font-medium">Connecter Webuild à Claude</p>
         <p className="opacity-70">

@@ -4,18 +4,38 @@ Catalogue de thèmes Shopify premium, pilotable par Claude via un serveur MCP. V
 
 Projet Next.js 16 (App Router), Supabase (Postgres, Auth, Storage).
 
-## État actuel : validation OAuth
-
-Cette première version sert à valider que Claude peut se connecter au MCP Webuild via le serveur OAuth 2.1 de Supabase Auth :
+## Fonctionnalités
 
 | Route | Rôle |
 |---|---|
 | `/login` | Connexion et inscription (email + mot de passe, Google) |
 | `/auth/callback` | Retour de Google et des liens de confirmation email |
-| `/oauth/consent` | Écran de consentement OAuth (Supabase y redirige avec un `authorization_id`) |
+| `/dashboard` | Ouvre la dernière agence utilisée |
+| `/dashboard/new` | Création d'une agence |
+| `/dashboard/[agence]` | Vue d'ensemble de l'agence et connexion à Claude |
+| `/dashboard/[agence]/members` | Membres, invitations, retrait d'un membre |
+| `/invitations/[token]` | Acceptation d'une invitation |
+| `/oauth/consent` | Écran de consentement OAuth, avec choix de l'agence par défaut |
 | `/.well-known/oauth-protected-resource/api/mcp` | Métadonnées RFC 9728 : Supabase Auth est le serveur d'autorisation |
 | `/.well-known/oauth-authorization-server` | Copie des métadonnées Supabase pour les anciens clients MCP |
-| `/api/mcp` | Serveur MCP (Streamable HTTP), protégé par jeton Bearer. Un seul outil : `whoami` |
+| `/api/mcp` | Serveur MCP (Streamable HTTP), protégé par jeton Bearer |
+
+Outils MCP : `list_my_agencies` (agences de l'utilisateur, rôle, agence par défaut).
+
+À l'inscription, chaque utilisateur reçoit automatiquement un profil et une première agence dont il est propriétaire.
+
+## Base de données
+
+Les migrations sont dans `supabase/migrations/`, à exécuter dans l'ordre dans le **SQL Editor** de Supabase.
+
+Les tests de sécurité (RLS et fonctions) tournent sur un Postgres local jetable qui imite Supabase :
+
+```bash
+scripts/test-db.sh                           # avec un superutilisateur Postgres local
+PSQL="sudo -u postgres psql" scripts/test-db.sh
+```
+
+Chaque ligne `===` du résultat annonce ce qui est attendu (un refus attendu apparaît comme `ERROR`).
 
 ## Développement local
 
@@ -46,4 +66,4 @@ Le MCP doit être joignable en HTTPS (Claude ne peut pas se connecter à `localh
 1. Déployer le projet (par exemple sur Vercel) avec les variables de `.env.example`.
 2. Dans Claude : Paramètres > Connecteurs > Ajouter un connecteur personnalisé, avec l'URL `https://<domaine>/api/mcp`.
 3. Se connecter à Webuild et autoriser l'accès sur l'écran de consentement.
-4. Demander à Claude d'appeler l'outil `whoami` : il doit renvoyer l'email du compte connecté.
+4. Demander à Claude d'appeler l'outil `list_my_agencies` : il doit renvoyer les agences du compte connecté.
