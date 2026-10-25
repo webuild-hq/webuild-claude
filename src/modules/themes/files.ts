@@ -69,7 +69,10 @@ export async function readThemeLicense(slug: string): Promise<string | null> {
 
 export type ThemeGuide = {
   theme: string;
-  templates: Record<string, { file?: string; kind?: string; sections?: { id: string; type?: string }[] }>;
+  templates: Record<
+    string,
+    { file?: string; kind?: string; sections?: { id: string; type?: string; imageSlots?: string[] }[] }
+  >;
   sections: Record<
     string,
     {

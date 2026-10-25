@@ -47,7 +47,10 @@
       "sections": [
         {
           "id": "promo_bar_VF8EaV",
-          "type": "promo-bar"
+          "type": "promo-bar",
+          "imageSlots": [
+            "image"
+          ]
         },
         {
           "id": "banner",
@@ -70,51 +73,103 @@
       "sections": [
         {
           "id": "promo_bar_KM74Lm",
-          "type": "promo-bar"
+          "type": "promo-bar",
+          "imageSlots": [
+            "image"
+          ]
         },
         {
           "id": "image_banner",
-          "type": "image-banner"
+          "type": "image-banner",
+          "imageSlots": [
+            "image",
+            "image_2"
+          ]
         },
         {
           "id": "featured_cards_RPi68y",
-          "type": "featured-cards"
+          "type": "featured-cards",
+          "imageSlots": [
+            "card_KnF47P.image",
+            "card_F8GCLm.image",
+            "card_73fxHp.image"
+          ]
         },
         {
           "id": "marquee_wgBVrj",
-          "type": "marquee"
+          "type": "marquee",
+          "imageSlots": [
+            "image_6CMk6L.image",
+            "image_p94KCA.image"
+          ]
         },
         {
           "id": "image_with_products_myf6Rf",
-          "type": "image-with-products"
+          "type": "image-with-products",
+          "imageSlots": [
+            "image"
+          ]
         },
         {
           "id": "currently_obsessed_AxJgyn",
-          "type": "currently-obsessed"
+          "type": "currently-obsessed",
+          "imageSlots": [
+            "edit_6FG7Cz.image",
+            "edit_xTKcet.image",
+            "edit_eJTj8b.image",
+            "edit_8xCCJ7.image"
+          ]
         },
         {
           "id": "image_with_text_XMGkiy",
-          "type": "image-with-text"
+          "type": "image-with-text",
+          "imageSlots": [
+            "image"
+          ]
         },
         {
           "id": "multicolumn_r8DhQ6",
-          "type": "multicolumn"
+          "type": "multicolumn",
+          "imageSlots": [
+            "column_AaKHtb.image",
+            "column_gpcbtA.image",
+            "column_6exGhJ.image"
+          ]
         },
         {
           "id": "image_with_text_RqTQLY",
-          "type": "image-with-text"
+          "type": "image-with-text",
+          "imageSlots": [
+            "image"
+          ]
         },
         {
           "id": "video_marquee_phcQnH",
-          "type": "video-marquee"
+          "type": "video-marquee",
+          "imageSlots": [
+            "cover_image",
+            "mobile_image",
+            "image_L4MiBk.image",
+            "image_aYwnqG.image"
+          ]
         },
         {
           "id": "press_quotes_CL3Gy4",
-          "type": "press-quotes"
+          "type": "press-quotes",
+          "imageSlots": [
+            "quote_WbfBFY.logo",
+            "quote_pmn7if.logo",
+            "quote_A6eJjg.logo",
+            "quote_zpNTyD.logo"
+          ]
         },
         {
           "id": "testimonials_RGecFL",
-          "type": "testimonials"
+          "type": "testimonials",
+          "imageSlots": [
+            "testimonial_j4Xa8N.image",
+            "testimonial_MbyAkK.image"
+          ]
         },
         {
           "id": "editorial_statement_JH4aLG",
@@ -158,7 +213,10 @@
       "sections": [
         {
           "id": "main",
-          "type": "email-signup-banner"
+          "type": "email-signup-banner",
+          "imageSlots": [
+            "image"
+          ]
         }
       ]
     },
@@ -167,7 +225,10 @@
       "sections": [
         {
           "id": "promo_bar_a63kri",
-          "type": "promo-bar"
+          "type": "promo-bar",
+          "imageSlots": [
+            "image"
+          ]
         },
         {
           "id": "main",
@@ -175,11 +236,18 @@
         },
         {
           "id": "marquee_NcTjHT",
-          "type": "marquee"
+          "type": "marquee",
+          "imageSlots": [
+            "image_3d6GeY.image",
+            "image_9dniGL.image"
+          ]
         },
         {
           "id": "image_with_text_GtaKV4",
-          "type": "image-with-text"
+          "type": "image-with-text",
+          "imageSlots": [
+            "image"
+          ]
         },
         {
           "id": "disclosures",
@@ -187,7 +255,13 @@
         },
         {
           "id": "content_carousel_mnU6qt",
-          "type": "content-carousel"
+          "type": "content-carousel",
+          "imageSlots": [
+            "slide_jADjUt.image",
+            "slide_UcKLM4.image",
+            "slide_WDz3m4.image",
+            "slide_6ByzX3.image"
+          ]
         },
         {
           "id": "editorial_statement_p79t4r",
@@ -195,7 +269,10 @@
         },
         {
           "id": "promise_BGGjag",
-          "type": "promise"
+          "type": "promise",
+          "imageSlots": [
+            "image"
+          ]
         },
         {
           "id": "feature_accordion_q6eLUD",
@@ -207,7 +284,14 @@
         },
         {
           "id": "instagram_feed_Ykxhbd",
-          "type": "instagram-feed"
+          "type": "instagram-feed",
+          "imageSlots": [
+            "image_FWY7xP.image",
+            "image_awUnKe.image",
+            "image_4V7dRJ.image",
+            "image_xMgHNL.image",
+            "image_CpxkaU.image"
+          ]
         }
       ]
     },

@@ -1,6 +1,7 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { slugify } from "@/lib/slugify";
 import {
   type AspectRatio,
   buildImagePrompt,
@@ -10,16 +11,6 @@ import {
 } from "./generate";
 
 export const IMAGES_BUCKET = "generated-images";
-
-function slugify(value: string) {
-  return value
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 40);
-}
 
 export type SectionImageRequest = {
   organizationId: string;

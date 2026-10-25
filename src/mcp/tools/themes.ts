@@ -10,9 +10,11 @@ const INSTALL_STEPS = (themeName: string, url: string) => [
   `1. Avec le connecteur Shopify, appelle la mutation themeCreate(source: "${url}", name: "${themeName} (Webuild)", role: UNPUBLISHED). ` +
     "Ne publie jamais directement : le thème reste en brouillon tant que l'utilisateur n'a pas validé.",
   "2. Shopify importe le zip en arrière-plan : interroge theme(id) { processing processingFailed } jusqu'à processing = false.",
-  "3. Personnalise le thème avec themeFilesUpsert : templates/*.json (sections, réglages, blocs) et config/settings_data.json. " +
-    "Utilise get_theme_guide pour connaître les sections et réglages disponibles.",
-  "4. Pour chaque image : generate_section_image, puis fileCreate(files: { originalSource: <url>, filename: <filename>, contentType: IMAGE }) " +
+  "3. Personnalise le thème avec themeFilesUpsert : templates/*.json et config/settings_data.json. Pars des fichiers livrés et garde " +
+    "leur disposition (mêmes sections, même ordre, mêmes blocs) : remplis-les sans les recomposer, sauf demande de l'utilisateur. " +
+    "Utilise get_theme_guide pour connaître les réglages.",
+  "4. Remplis tous les emplacements d'image (imageSlots dans get_theme_guide). Génère un petit jeu d'images avec generate_section_image " +
+    "et réutilise chacune à plusieurs endroits. Pour chaque image : fileCreate(files: { originalSource: <url>, filename: <filename>, contentType: IMAGE }) " +
     "et attends fileStatus = READY. Dans le template, la valeur du réglage image est \"shopify://shop_images/<filename>\".",
   "5. Donne à l'utilisateur le lien d'aperçu https://<domaine>/?preview_theme_id=<id du thème> et attends sa validation.",
   "6. Après validation explicite seulement : themePublish(id).",
@@ -82,7 +84,8 @@ export function registerThemeTools(server: McpServer) {
     {
       title: "Guide d'un thème",
       description:
-        "Structure d'un thème : templates (sections par page), sections disponibles et emplacements d'image. " +
+        "Structure d'un thème : templates (sections par page, dans l'ordre, avec leurs emplacements d'image imageSlots), " +
+        "sections disponibles et emplacements d'image. " +
         "Sans `section`, renvoie la vue d'ensemble ; avec `section`, renvoie tous les réglages et blocs de cette section " +
         "(identifiants, types, valeurs par défaut, options). À utiliser avant de modifier les templates avec themeFilesUpsert.",
       inputSchema: z.object({
@@ -119,7 +122,9 @@ export function registerThemeTools(server: McpServer) {
           ]),
         ),
         imageSettings: guide.imageSettings,
-        note: "Appelle get_theme_guide avec `section` pour obtenir le détail des réglages d'une section.",
+        note:
+          "Garde la disposition des templates (sections, ordre, blocs) à la création. Remplis chaque imageSlots, en " +
+          "réutilisant les mêmes images si besoin. Appelle get_theme_guide avec `section` pour le détail des réglages.",
       });
     },
   );

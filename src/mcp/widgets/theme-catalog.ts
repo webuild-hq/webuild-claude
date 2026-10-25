@@ -152,6 +152,9 @@ export const THEME_CATALOG_HTML = /* html */ `<!doctype html>
       request("ui/message", {
         role: "user",
         content: [{ type: "text", text: "Je choisis le thème " + theme.name + " (" + theme.slug + ")." }],
+      }).then(function () {
+        // Claude ne l'envoie pas seul : il le place dans la zone de message, à valider par l'utilisateur.
+        choose.textContent = "Valide le message dans Claude";
       }).catch(function () { choose.disabled = false; });
     };
     actions.appendChild(demo);

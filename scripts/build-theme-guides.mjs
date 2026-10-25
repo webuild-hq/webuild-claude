@@ -75,7 +75,23 @@ function compactBlocks(blocks = [], t) {
   });
 }
 
-function readTemplates(themeDir) {
+// Emplacements d'image d'une section telle qu'elle est posée dans le template : "image" pour un réglage de la
+// section, "<id du bloc>.image" pour un réglage de bloc. C'est la liste que Claude doit remplir.
+function imageSlots(section, imageSettings) {
+  const slots = [];
+  for (const image of imageSettings.filter((i) => i.section === section?.type)) {
+    if (!image.block) {
+      slots.push(image.setting);
+      continue;
+    }
+    for (const [blockId, block] of Object.entries(section.blocks ?? {})) {
+      if (block.type === image.block) slots.push(`${blockId}.${image.setting}`);
+    }
+  }
+  return slots;
+}
+
+function readTemplates(themeDir, imageSettings) {
   const dir = join(themeDir, "templates");
   const templates = {};
   for (const file of readdirSync(dir).sort()) {
@@ -86,10 +102,10 @@ function readTemplates(themeDir) {
     const json = parseLenientJson(readFileSync(join(dir, file), "utf8"));
     templates[file.replace(/\.json$/, "")] = {
       file: `templates/${file}`,
-      sections: (json.order ?? Object.keys(json.sections ?? {})).map((id) => ({
-        id,
-        type: json.sections?.[id]?.type,
-      })),
+      sections: (json.order ?? Object.keys(json.sections ?? {})).map((id) => {
+        const slots = imageSlots(json.sections?.[id], imageSettings);
+        return { id, type: json.sections?.[id]?.type, ...(slots.length ? { imageSlots: slots } : {}) };
+      }),
     };
   }
   return templates;
@@ -135,7 +151,7 @@ function buildGuide(slug) {
   return {
     theme: slug,
     generatedFrom: "Schémas {% schema %} des sections et templates JSON du thème",
-    templates: readTemplates(themeDir),
+    templates: readTemplates(themeDir, imageSettings),
     sections,
     imageSettings,
   };

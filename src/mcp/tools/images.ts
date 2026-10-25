@@ -18,6 +18,12 @@ function defaultAspectRatio(section: string, setting = "", label = ""): AspectRa
   return "4:5";
 }
 
+// Sans génération possible, Claude remplit quand même le thème : une section vide casse son rendu.
+const FILL_WITH_EXISTING_IMAGES =
+  "Préviens l'utilisateur, puis remplis quand même tous les emplacements d'image avec les images déjà disponibles " +
+  "(photos produits, fichiers de la boutique, images des produits importés), en réutilisant la même image si besoin : " +
+  "aucune section ne doit rester vide.";
+
 export function registerImageTools(server: McpServer) {
   server.registerTool(
     "generate_section_image",
@@ -27,7 +33,9 @@ export function registerImageTools(server: McpServer) {
         "Génère une image premium adaptée à une section d'un thème Webuild (hero, bannière, éditorial, lifestyle) " +
         "et renvoie une URL publique temporaire. Importe-la ensuite dans la boutique avec fileCreate du connecteur " +
         "Shopify, puis référence-la dans le template avec \"shopify://shop_images/<filename>\". " +
-        "Débite des crédits (remboursés si la génération échoue). Ne remplace pas les vraies photos de produits.",
+        "Débite des crédits (remboursés si la génération échoue). Une image peut remplir plusieurs emplacements : " +
+          "génère un petit jeu d'images et réutilise-les plutôt qu'une image par emplacement. " +
+          "Ne remplace pas les vraies photos de produits.",
       inputSchema: z.object({
         theme: z.string().describe("Slug du thème."),
         section: z.string().describe("Type de section, par exemple hero-banner."),
@@ -46,7 +54,7 @@ export function registerImageTools(server: McpServer) {
       const context = mcpContext(ctx);
       if (!context) return NOT_AUTHENTICATED;
       if (!isImageGenerationConfigured()) {
-        return errorResult("La génération d'images n'est pas encore activée sur ce serveur Webuild.");
+        return errorResult(`La génération d'images n'est pas encore activée sur ce serveur Webuild. ${FILL_WITH_EXISTING_IMAGES}`);
       }
 
       const theme = getTheme(slug);
@@ -93,6 +101,10 @@ export function registerImageTools(server: McpServer) {
           return errorResult(
             "La génération de l'image a échoué (crédits remboursés). Reformule la description ou réessaie.",
           );
+        }
+        if (result.error?.message === "insufficient_credits") {
+          const message = dbErrorResult(result.error).content[0].text;
+          return errorResult(`${message} ${FILL_WITH_EXISTING_IMAGES}`);
         }
         return dbErrorResult(result.error);
       }

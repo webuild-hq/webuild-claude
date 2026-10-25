@@ -149,6 +149,8 @@ Le jeton prouve l'identité de l'utilisateur. L'appartenance à l'agence est **r
 | `get_theme_guide` | Sections, schémas des réglages, presets, formats d'image attendus, règles de composition | Non |
 | `prepare_theme_install` | Construit le zip verrouillé sur un domaine `myshopify.com`, enregistre la livraison, renvoie un lien signé | Oui |
 | `generate_section_image` | Génère une image adaptée à une section (ratio, style du thème), renvoie une URL publique, un nom de fichier et un texte alternatif | Oui |
+| `upload_client_images` | Affiche la zone de dépôt (MCP Apps) où l'utilisateur dépose ses propres images ; il renvoie leurs URL publiques à Claude | Non |
+| `list_client_images` | Images déjà déposées par l'agence, avec leur URL publique | Non |
 
 Le serveur MCP envoie aussi des **instructions** à Claude à la connexion (rappel du déroulé et des règles importantes).
 
@@ -203,6 +205,7 @@ Fournie directement par le connecteur, sans rien à installer : les instructions
 - Débit avant la génération, **remboursement automatique** en cas d'échec. Le remboursement est fait par le serveur (clé secrète) : un membre ne peut pas rembourser un débit lui-même.
 - Stockage dans le bucket public `generated-images`, dossier = identifiant de l'agence, écrit avec le jeton de l'utilisateur (politique RLS de Storage). Les images servent de relais : Claude les importe dans la boutique avec `fileCreate`. Elles pourront être purgées après un délai.
 - Recommandation dans la méthode : images d'ambiance (hero, bannières, lifestyle). Ne pas remplacer les vraies photos de produits.
+- **Images de l'utilisateur** : une image jointe à la conversation n'est pas transmissible à Shopify (Claude la voit mais n'a pas le fichier ; seule l'exécution de code avec un accès réseau autorisé par l'utilisateur le permettrait). Claude affiche donc la zone de dépôt (`upload_client_images`, interface MCP Apps). Le navigateur envoie chaque fichier directement dans le bucket public `client-images` (dossier = agence, 20 Mo, formats image) avec un lien d'envoi signé créé par l'outil `create_image_upload`, réservé à l'interface. Si l'hôte bloque cette connexion, l'image est compressée et passe par l'outil `upload_client_image` (corps limité à 4,5 Mo sur Vercel). "Utiliser ces images" envoie les URL publiques à Claude, qui les importe avec `fileCreate`. Seul le serveur écrit et liste ce bucket (clé secrète, migration `0005`).
 
 ## 13. Modèle de données
 
@@ -275,6 +278,8 @@ Plus tard, Claude pourra aussi utiliser des outils CRM (créer un client, ajoute
 - Calibrage des prix en crédits, à partir des coûts réels mesurés.
 - Choix de l'hébergeur (durée maximale des fonctions pour la génération d'images, Redis managé ou non).
 - Contenu exact des plans (crédits, places, prix).
+
+- **Sections que Claude peut utiliser** : aujourd'hui, rien n'empêche Claude de créer un fichier `sections/*.liquid`, de modifier le Liquid, le CSS ou le JS d'un thème, d'injecter du code via `custom-liquid` ou d'écrire dans un template un type de section absent du thème. Choix retenu : pas de règle provisoire. Webuild aura une **bibliothèque de sections libres**, et Claude ne sera autorisé à utiliser que les sections de cette bibliothèque (règle à ajouter alors dans la méthode et les instructions du MCP, éventuellement avec un outil qui vérifie un template avant écriture).
 
 ## 17. Étapes
 
